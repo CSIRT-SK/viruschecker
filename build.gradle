@@ -1,4 +1,4 @@
-group 'sk.csirt'
+group 'sk.csirt.viruschecker'
 version '1.0'
 
 apply plugin: "idea"

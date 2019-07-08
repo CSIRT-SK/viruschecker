@@ -7,7 +7,7 @@ It contains several standalone modules:
 
 - **driver**: This program provides REST API to communicate with some antivirus software installed 
 on the same machine.  
-- **gateway**: This program provides a unified REST API for all deployed driver instances. Its  
+- **sk.csirt.gateway**: This program provides a unified REST API for all deployed driver instances. Its  
 purpose is to simplify the implementation of clients (e.g. *client-web*) so they do not need to 
 handle multiple *driver*s themselves. 
 - **client-cli**: (TODO) This is a simple console REST client. The client part serves to upload 
@@ -20,7 +20,7 @@ The architecture of this solution can be visualized as follows
 ```dtd
                              :---> driver (e.g. Avast)
 client-cli ---:              :---> driver (e.g. Eset)
-              :--> gateway --:      ...
+              :--> sk.csirt.gateway --:      ...
 client-web ---:              :      ...
                              :---> driver (e.g. Kaspersky)
 ```
@@ -42,7 +42,7 @@ These steps describe how to build and deploy this program from scratch and they 
    - Create container/virtual machine for each different antivirus.
    - Install and configure each antivirus
    - Deploy and configure driver program for each antivirus.
-3. Deploy gateway application.
+3. Deploy sk.csirt.gateway application.
 4. Deploy web client application.
 5. (Optional) Deploy console client application.
 
@@ -69,15 +69,16 @@ Open terminal in this directory and
 
 The driver provides a unified REST API to simplify communication with supported antivirus solutions.
 As of this moment the supported antivirus software includes
-- Kaspersky Free
+- Avast
+- Kaspersky
+- Eset
 
 Support for following AVs is under active development
-- Avast
+
 - Avira
 - Bitdefender
-- Eset
 - Norton
-- Windefender
+- Windows defender
 
 The location of the compiled JRE executable is `driver/build/libs/driver-[VERSION]-all.jar`.
 
@@ -221,7 +222,7 @@ updates.
 The following sub-subsections comprise the recommended steps to install and configure each of the
  supported antivirus solutions. 
 
-#### 2.2.1 Avast
+#### 2.2.1 Avast (paid)
 
 You need the *Avast Pro Antivirus* or *Avast Interner Security*.
 
@@ -275,15 +276,64 @@ In my case the path is `C:\Program Files\AVAST Software\Avast`.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.2 Avira
+#### 2.2.2 Avira (free)
 
-(TODO)
+Download and install the Avira Free Antivirus.
+
+##### Configuration
+
+Open the Avira window and navigate to *Antivirus* item. Click on the `v` symbol at right to the 
+*Quick Scan* button and in the popped up menu select *Disable Real-Time Protection* options.
+
+
+In the *Settings* window disable the following features:
+
+* In the *Protection* tab permanently disable the *Core shields*, *Ransomware Shield*, 
+*Firewall* and *Real site* features. 
+
+* In the *Privacy* tab, disable the *Sensitive Data Shield*.
+
+* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
+
+* In the *Licensing* window click on the green symbol `x` located to the right of 
+*License key* label.
+
+* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
+
+* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
+
+##### Command line utility
+
+Avast provides the command line utility called *ashCmd.exe* that may be used to scan the 
+selected file for malware and to store human readable reports to specified file.
+
+By default, our driver application assumes that the *ashCmd.exe* program is available in the *Path* 
+system variable. To do this, follow these steps:
+
+* Press *Start*, search "Computer", right click on the found program with the same name and select 
+*Properties* 
+
+* On the left-hand side open the *Advanced system settings*.
+
+* Press the *Environment Variables* button.
+
+* Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
+the *Edit...* button below.
+
+* Add the installation path of the Eset to the beginning of *Variable value* text. 
+In my case the path is `C:\Program Files (x86)\Avira\Antivirus`.
+  
+    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
+    
+    ```C:\Program Files (x86)\Avira\Antivirus;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    
+* A reboot of the virtual machine is now recommended. 
 
 #### 2.2.3 Bitdefender
 
 (TODO)
 
-#### 2.2.4 Eset
+#### 2.2.4 Eset (paid)
 
 Install any of the Eset antivirus software, i.e. *Eset Nod32*, *Eset Internet Security*, ... .
 This guide assumes the installation of Eset Internet Security, however, in the case of other Eset
@@ -339,7 +389,7 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.5 Kaspersky
+#### 2.2.5 Kaspersky (free)
 
 Install the Kaspersky Free Antivirus. 
 If you have the paid version, you can use it as well, but for our purposes the free version is 
@@ -394,11 +444,72 @@ the *Edit...* button below.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.6 Norton
+#### 2.2.6 Norton (paid)
 
-(TODO)
+/** WIP
 
-#### 2.2.7 Windows defender
+Install any of the Norton paid antivirus offer.
+This guide assumes the installation of Norton Internet Security, however, another 
+Norton products should be basically the same.
+
+Mention should be made that Norton requires updated Windows, otherwise the installation wizard 
+refuses to start.
+In my case three iterations of Windows 7 updates were sufficient to successfully install the 
+antivirus.
+
+##### Configuration
+
+Open the Eset window and click on the setup icon at the left side of the window. 
+Disable all features in the *Computer protection*, *Internet protection*, *Network protection* 
+and *Security protection* options.
+
+Click on the *Advanced setup* icon at the bottom side of the window, or just press *F5* key.
+
+* In the *Detection engine* -> *Real-time file system protection* tab, uncheck the *Enable 
+Real-time file system protection*. 
+
+* In the *Detection engine* -> *Cloud-based protection* tab, uncheck the *Enable ESET 
+LiveGrid@ reputation system* and *Enable ESET LiveGrid@ feedback system* options.
+
+* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
+
+* In the *Licensing* window click on the green symbol `x` located to the right of 
+*License key* label.
+
+* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
+
+* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
+
+##### Command line utility
+
+Eset provides the command line utility called *ecls.exe* that may be used to scan the 
+selected file for malware and to store human readable reports to specified file.
+
+By default, our driver application assumes that the *ecls.exe* program is available in the *Path* 
+system variable. To do this, follow these steps:
+
+* Press *Start*, search "Computer", right click on the found program with the same name and select 
+*Properties* 
+
+* On the left-hand side open the *Advanced system settings*.
+
+* Press the *Environment Variables* button.
+
+* Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
+the *Edit...* button below.
+
+* Add the installation path of the Eset to the beginning of *Variable value* text. 
+In my case the path is `C:\Program Files\ESET\ESET Security`.
+  
+    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
+    
+    ```C:\Program Files\ESET\ESET Security;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    
+* A reboot of the virtual machine is now recommended. 
+
+**/
+
+#### 2.2.7 Windows defender (free)
 
 (TODO)
 
@@ -422,8 +533,10 @@ To test the successful launch of the driver program open the web browser and go 
 `http://127.0.0.1:8080/`.
 If the "HELLO WORLD" is displayed, the application should be working correctly. 
 
-3 Deploy gateway web application
+3 Deploy sk.csirt.gateway web application
 --------------------------------
+
+
 
 4 Deploy client web application
 -------------------------------

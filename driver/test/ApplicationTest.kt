@@ -1,6 +1,6 @@
 //package sk.csirt.viruschecker
 //
-//import driver.module
+//import sk.csirt.viruschecker.driver.module
 //import io.ktor.http.*
 //import kotlin.test.*
 //import io.ktor.server.testing.*
