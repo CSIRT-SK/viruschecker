@@ -48,9 +48,12 @@ dependencies {
     compile "io.ktor:ktor-client-gson:$ktor_version"
     compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
 
-    compile "io.github.microutils:kotlin-logging:1.6.24"
-    compile "com.xenomachina:kotlin-argparser:2.0.7"
-    
+    compile "io.github.microutils:kotlin-logging:$koltin_logger_version"
+    compile "com.xenomachina:kotlin-argparser:$argparser_version"
+    compile "commons-io:commons-io:$apache_commons_io_version"
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
+
+
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }
 

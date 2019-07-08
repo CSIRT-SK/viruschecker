@@ -19,7 +19,8 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import org.slf4j.event.Level
 import sk.csirt.viruschecker.gateway.config.CommandLineArguments
-import sk.csirt.viruschecker.gateway.service.ScannerService
+import sk.csirt.viruschecker.gateway.routing.scanFile
+import sk.csirt.viruschecker.gateway.service.ScanService
 
 private val logger = KotlinLogging.logger { }
 
@@ -70,7 +71,7 @@ fun Application.module() {
     }
 
     val driverUrls = parsedArgs.driverUrls
-    val scannerService = ScannerService(driverUrls, client)
+    val scannerService = ScanService(driverUrls, client)
 
     routing {
         get("/") {
@@ -81,6 +82,7 @@ fun Application.module() {
             call.respond(mapOf("hello" to "world"))
         }
 
+        scanFile(scannerService)
     }
 
 }

@@ -20,7 +20,7 @@ import sk.csirt.viruschecker.driver.config.PropertiesFactory
 import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
 import sk.csirt.viruschecker.driver.routing.scanFile
 
-val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger {  }
 
 lateinit var parsedArgs: CommandLineArguments
 

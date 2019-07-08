@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.gateway.payload
+package sk.csirt.viruschecker.gateway.routing.payload
 
 import java.time.Instant
 
@@ -11,7 +11,8 @@ data class FileScanResponse(
 
 data class AntivirusResponse(
     val antivirus: String,
-    val status: ScannedFileStatus
+    val status: ScannedFileStatus,
+    val malwareDescription: String
 )
 
 /**

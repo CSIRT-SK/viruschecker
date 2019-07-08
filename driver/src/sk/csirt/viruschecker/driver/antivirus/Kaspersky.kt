@@ -33,7 +33,7 @@ class Kaspersky(
                             it[0].trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                         ),
                         status = ReportEntry.Status.fromCommonName(it[2].trim()),
-                        description = if (it.size > 3) it[3].trim() else ""
+                        description = if (it.size > 3) it[3].trim() else "OK"
                     )
                 }
             }

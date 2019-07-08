@@ -2,15 +2,15 @@ package sk.csirt.viruschecker.driver.routing
 
 import sk.csirt.viruschecker.driver.config.Constants
 import io.ktor.application.call
+import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
-import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.driver.antivirus.FileScanParameters
-import sk.csirt.viruschecker.driver.payload.FileScanResponse
-import sk.csirt.viruschecker.driver.payload.toCheckResponse
+import sk.csirt.viruschecker.driver.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.driver.routing.payload.toCheckResponse
 import sk.csirt.viruschecker.driver.antivirus.FileScanReport
 import io.ktor.util.asStream
 import kotlinx.io.core.Input
@@ -23,8 +23,7 @@ import java.util.*
 private val logger = KotlinLogging.logger { }
 
 fun Route.scanFile(virusChecker: Antivirus) {
-    post("/scanFile") {
-        val multipart = call.receiveMultipart()
+    post<MultiPartData>("/scanFile") { multipart ->
         logger.info("Receiving file")
         val responses = mutableListOf<FileScanResponse>()
 

@@ -1,10 +1,7 @@
 package sk.csirt.viruschecker.driver.utils
 
-import java.lang.Exception
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 fun Iterable<String>.cleanCommentsAndEmptyLines() =
     asSequence()
@@ -15,17 +12,6 @@ fun Iterable<String>.cleanCommentsAndEmptyLines() =
                 .takeIf { it > 0 }
                 ?.let { line.substring(0, it) } ?: line
         }.toList()
-
-
-fun ZonedDateTime_tryParse(text: String, vararg formatters: DateTimeFormatter): ZonedDateTime? {
-    formatters.forEach { formatter ->
-        try {
-            return ZonedDateTime.parse(text, formatter)
-        } catch (e: Exception) {
-        }
-    }
-    return null
-}
 
 fun parseParameter(
     commandList: MutableList<String>,
