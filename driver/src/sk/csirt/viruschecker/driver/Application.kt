@@ -11,13 +11,15 @@ import io.ktor.gson.*
 import org.koin.ktor.ext.Koin
 import org.slf4j.event.Level
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
-import sk.csirt.viruschecker.driver.config.*
 import io.ktor.http.ContentType
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 import sk.csirt.viruschecker.driver.config.CommandLineArguments
 import sk.csirt.viruschecker.driver.config.PropertiesFactory
 import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
+import sk.csirt.viruschecker.driver.routing.info
 import sk.csirt.viruschecker.driver.routing.scanFile
 
 private val logger = KotlinLogging.logger {  }
@@ -29,6 +31,7 @@ fun main(args: Array<String>) = mainBody {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module() {
@@ -54,6 +57,8 @@ fun Application.module() {
         }
     }
 
+    install(Locations)
+
     install(Koin) {
         modules(driverDependencyInjectionModule)
         properties(PropertiesFactory.loadOrCreateDefault())
@@ -76,6 +81,7 @@ fun Application.module() {
             call.respond(mapOf("hello" to "world"))
         }
 
+        info(virusChecker)
         scanFile(virusChecker)
 
     }

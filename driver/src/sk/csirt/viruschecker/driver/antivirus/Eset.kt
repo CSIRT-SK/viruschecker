@@ -26,15 +26,15 @@ class Eset(
             .also { logger.debug("Lines ${it.toList()}") }
         return linesWithScannedFile
             .map { line ->
-                line.split(", ")[1].let {
+                line.split(", ")[1].let { status ->
                     ReportEntry(
                         datetime = LocalDateTime.now(),
                         status = when {
-                            "result=\"\"" == it -> ReportEntry.Status.NOT_AVAILABLE
-                            "OK" in it -> ReportEntry.Status.OK
+                            "result=\"\"" == status -> ReportEntry.Status.NOT_AVAILABLE
+                            "OK" in status -> ReportEntry.Status.OK
                             else -> ReportEntry.Status.INFECTED
                         },
-                        description = it.split("=")[1].let {
+                        description = status.split("=")[1].let {
                             it.substring(1, it.length - 1)
                         }
                     )

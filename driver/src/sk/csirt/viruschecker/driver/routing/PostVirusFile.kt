@@ -2,28 +2,31 @@ package sk.csirt.viruschecker.driver.routing
 
 import sk.csirt.viruschecker.driver.config.Constants
 import io.ktor.application.call
-import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.post
+import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import io.ktor.routing.post
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.driver.antivirus.FileScanParameters
-import sk.csirt.viruschecker.driver.routing.payload.FileScanResponse
-import sk.csirt.viruschecker.driver.routing.payload.toCheckResponse
 import sk.csirt.viruschecker.driver.antivirus.FileScanReport
 import io.ktor.util.asStream
 import kotlinx.io.core.Input
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
+import sk.csirt.viruschecker.routing.ApiRoutes
+import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+@KtorExperimentalLocationsAPI
 fun Route.scanFile(virusChecker: Antivirus) {
-    post<MultiPartData>("/scanFile") { multipart ->
+    post<ApiRoutes.ScanFile> {
+        val multipart = call.receiveMultipart()
         logger.info("Receiving file")
         val responses = mutableListOf<FileScanResponse>()
 
@@ -47,7 +50,7 @@ private fun processFile(fileItem: PartData.FileItem, virusChecker: Antivirus): F
     val report: FileScanReport = virusChecker.scanFile(
         fileItem.provider().toCheckParameters(filename, Paths.get(Constants.scanDir))
     )
-    return report.toCheckResponse()
+    return report.toFileScanResponse()
 }
 
 private fun Input.toCheckParameters(filename: String, path: Path): FileScanParameters {
@@ -58,4 +61,10 @@ private fun Input.toCheckParameters(filename: String, path: Path): FileScanParam
     return FileScanParameters(savedFile, filename)
 }
 
+fun FileScanReport.toFileScanResponse() = FileScanResponse(
+    filename = filename,
+    antivirus = antivirus.commonName,
+    status = FileScanResponse.Status.valueOf(status.name),
+    malwareDescription = malwareDescription
+)
 

@@ -1,22 +1,27 @@
-
 apply plugin: 'application'
 
-// mainClassName = "io.ktor.server.jetty.EngineMain"
-mainClassName = "sk.csirt.viruschecker.driver.ApplicationKt"
+// mainClassName = "io.ktor.server.netty.EngineMain"
+mainClassName = "sk.csirt.viruschecker.client.web.ApplicationKt"
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile project(':common')
+    compile project(':client-common')
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-metrics:$ktor_version"
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-websockets:$ktor_version"
     compile "io.ktor:ktor-gson:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
     
-    
+    compile "io.ktor:ktor-client-core:$ktor_version"
+    compile "io.ktor:ktor-client-core-jvm:$ktor_version"
+    compile "io.ktor:ktor-client-apache:$ktor_version"
+    compile "io.ktor:ktor-client-json-jvm:$ktor_version"
+    compile "io.ktor:ktor-client-gson:$ktor_version"
+    compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
+
     compile "org.koin:koin-ktor:$koin_version"
-//    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
     
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }
@@ -27,12 +32,4 @@ shadowJar {
         attributes 'Main-Class': mainClassName,
                 'Implementation-Version': app_version
     }
-    // This is needed for jetty for proper functioning outside od IDE
-//    transform(ServiceFileTransformer) {
-//        path = 'META-INF/services'
-//        include 'org.eclipse.jetty.http.HttpFieldPreEncoder'
-//    }
 }
-
-
-

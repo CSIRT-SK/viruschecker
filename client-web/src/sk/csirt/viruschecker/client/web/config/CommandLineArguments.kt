@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.client.cli.config
+package sk.csirt.viruschecker.client.web.config
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
@@ -11,19 +11,10 @@ class CommandLineArguments(parser: ArgParser) {
         help = "List of urls containing virus checker drivers."
     ) { FileUtils.readLines(File(this), Charset.defaultCharset()) }
 
-    val fileToScan by parser.positional(
-        help = "File to scan. Does not support directories (only archived)."
-    ) { File(this) }
-
     private val defaultTimeut = 50000
     val timeout by parser.storing(
         "-t", "--timeout",
         help = "Optional: Sets socket timeout in milliseconds. Default is $defaultTimeut."
     ) { this.toInt() }.default(defaultTimeut)
 
-    val outputFile by parser.storing(
-        "-o", "--out",
-        help = "Specify file to store report. Supports also csv and Markdown if the filename ends" +
-                " with appropriate postfix."
-    ) { File(this) }.default<File?>(null)
 }

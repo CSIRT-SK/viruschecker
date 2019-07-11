@@ -1,11 +1,48 @@
-group 'sk.csirt.viruschecker'
-version '1.0'
+buildscript {
+    repositories {
+        jcenter()
+    }
 
-apply plugin: "idea"
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:$shadow_version"
+    }
+}
 
-idea {
-  module {
-    downloadSources = true
-    downloadJavadoc = true
-  }
+allprojects {
+    group 'sk.csirt.viruschecker'
+    version app_version
+    apply plugin: 'idea'
+    
+    idea {
+        module {
+            downloadSources = true
+            downloadJavadoc = true
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'kotlin'
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url 'https://kotlin.bintray.com/ktor' }
+        maven { url 'https://kotlin.bintray.com/kotlinx' }
+    }
+
+    sourceSets {
+        main.kotlin.srcDirs = main.java.srcDirs = ['src']
+        test.kotlin.srcDirs = test.java.srcDirs = ['test']
+        main.resources.srcDirs = ['resources']
+        test.resources.srcDirs = ['testresources']
+    }
+
+    dependencies {
+        compile "ch.qos.logback:logback-classic:$logback_version"
+        compile "com.xenomachina:kotlin-argparser:$argparser_version"
+        compile "io.github.microutils:kotlin-logging:$koltin_logger_version"
+        compile "commons-io:commons-io:$apache_commons_io_version"
+    }
 }

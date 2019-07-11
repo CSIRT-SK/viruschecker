@@ -3,26 +3,27 @@ Virus Checker
 
 This is a repository for an offline based virus checker application stack, similar to VirusTotal.
 
-It contains several standalone modules:
+It contains several executable modules:
 
 - **driver**: This program provides REST API to communicate with some antivirus software installed 
 on the same machine.  
-- **sk.csirt.gateway**: This program provides a unified REST API for all deployed driver instances. Its  
-purpose is to simplify the implementation of clients (e.g. *client-web*) so they do not need to 
-handle multiple *driver*s themselves. 
-- **client-cli**: (TODO) This is a simple console REST client. The client part serves to upload 
-files to
- several *driver*s at once and to read/export scan reports.  
-- **client-web**: (TODO) This is a simple web frontend for **client-cli**.
+- **client-cli**:  This is a simple console REST client. The client part serves to upload 
+files toseveral *driver*s at once and to read/export scan reports.  
+- **client-web**: This is a simple graphical web frontend with the same purpose as **client-cli**.
 
-The architecture of this solution can be visualized as follows
+There are also some helper modules that contains shared dependencies or classes.
+
+- **common**
+- **cli-common**
+
+The architecture of this software solution is visualized below.
 
 ```dtd
-                             :---> driver (e.g. Avast)
-client-cli ---:              :---> driver (e.g. Eset)
-              :--> sk.csirt.gateway --:      ...
-client-web ---:              :      ...
-                             :---> driver (e.g. Kaspersky)
+                           :---> driver (e.g. Avast)
+client-cli ---:            :---> driver (e.g. Eset)
+              :------------:
+client-web ---:            :      ...
+                           :---> driver (e.g. Kaspersky)
 ```
 
 Before diving further we denote the following terms:
@@ -200,7 +201,7 @@ This will create a backup of the virtual machine in the exactly same state as it
 After the snapshot is complete, you may shut down the virtual machine classically using 
 *Start*->*Shut down*.
 
-### 2.2 Install and configure antivirus
+### 2.3 Install and configure antivirus
 
 Driver program supports the aforementioned antivirus solutions.
 If you have performed the steps in the previous section, then it is highly recommended to clone the 
@@ -222,7 +223,7 @@ updates.
 The following sub-subsections comprise the recommended steps to install and configure each of the
  supported antivirus solutions. 
 
-#### 2.2.1 Avast (paid)
+#### 2.3.1 Avast (paid)
 
 You need the *Avast Pro Antivirus* or *Avast Interner Security*.
 
@@ -276,7 +277,7 @@ In my case the path is `C:\Program Files\AVAST Software\Avast`.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.2 Avira (free)
+#### 2.3.2 Avira (free)
 
 Download and install the Avira Free Antivirus.
 
@@ -329,11 +330,11 @@ In my case the path is `C:\Program Files (x86)\Avira\Antivirus`.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.3 Bitdefender
+#### 2.3.3 Bitdefender
 
 (TODO)
 
-#### 2.2.4 Eset (paid)
+#### 2.3.4 Eset (paid)
 
 Install any of the Eset antivirus software, i.e. *Eset Nod32*, *Eset Internet Security*, ... .
 This guide assumes the installation of Eset Internet Security, however, in the case of other Eset
@@ -389,7 +390,7 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.5 Kaspersky (free)
+#### 2.3.5 Kaspersky (free)
 
 Install the Kaspersky Free Antivirus. 
 If you have the paid version, you can use it as well, but for our purposes the free version is 
@@ -444,7 +445,7 @@ the *Edit...* button below.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.2.6 Norton (paid)
+#### 2.3.6 Norton (paid)
 
 /** WIP
 
@@ -509,11 +510,11 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
 
 **/
 
-#### 2.2.7 Windows defender (free)
+#### 2.3.7 Windows defender (free)
 
 (TODO)
 
-### 2.3 Run the driver program.
+### 2.4 Run the driver program.
 
 We will assume that the driver program was placed at `C:\virus-checker` folder.
  
@@ -531,10 +532,24 @@ We will assume that the driver program was placed at `C:\virus-checker` folder.
 
 To test the successful launch of the driver program open the web browser and go to 
 `http://127.0.0.1:8080/`.
-If the "HELLO WORLD" is displayed, the application should be working correctly. 
+If the "HELLO WORLD" is displayed, the application should be working correctly.
 
-3 Deploy sk.csirt.gateway web application
---------------------------------
+### 2.5 Driver REST API
+
+Driver provides REST web API.
+You can use it directly or with the provided client applications.
+
+This subsection describes the API endpoints along with the corresponding requests and responses.
+
+
+
+
+
+
+3 Deploy client applications
+----------------------------
+
+If at least one driver application is successfully deployed you can its API to query   
 
 
 
