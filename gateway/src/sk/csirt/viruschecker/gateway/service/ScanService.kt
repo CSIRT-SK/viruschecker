@@ -1,6 +1,6 @@
-package sk.csirt.viruschecker.client.service
+package sk.csirt.viruschecker.gateway.service
 
-import sk.csirt.viruschecker.client.payload.FileMultiScanResponse
+import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
 import java.io.File
 
 interface ScanService {

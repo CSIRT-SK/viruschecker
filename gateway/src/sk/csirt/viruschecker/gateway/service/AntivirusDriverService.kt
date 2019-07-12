@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.client.service
+package sk.csirt.viruschecker.gateway.service
 
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.async

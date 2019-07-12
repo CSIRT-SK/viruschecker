@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.client.service
+package sk.csirt.viruschecker.gateway.service
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -11,35 +11,34 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
-import sk.csirt.viruschecker.client.payload.AntivirusScanResponse
-import sk.csirt.viruschecker.client.payload.FileMultiScanResponse
-import sk.csirt.viruschecker.client.payload.ScannedFileStatus
-import sk.csirt.viruschecker.hash.Md5
-import sk.csirt.viruschecker.hash.Sha256
-import sk.csirt.viruschecker.routing.ApiRoutes
+import sk.csirt.viruschecker.hash.*
+import sk.csirt.viruschecker.routing.payload.AntivirusScanResponse
+import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
+import sk.csirt.viruschecker.routing.payload.ScannedFileStatus
+import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import sk.csirt.viruschecker.utils.await
 import java.io.File
 import java.io.FileInputStream
 import java.time.Instant
 
-class DefaultScanService(
+class DefaultDriverScanService(
     driverUrls: List<String>,
     client: HttpClient
 ) : AntivirusDriverService(driverUrls, client), ScanService {
     private val logger = KotlinLogging.logger { }
 
     override suspend fun scanFile(fileToScan: File): FileMultiScanResponse = coroutineScope {
-        val deferredHashes = let {
+        val sha256Deferred = async { fileToScan.sha256() }
+        val otherHashesDeferred = let {
             logger.info { "Computing MD5 and SHA-256 for $fileToScan" }
             listOf(
-                async { Md5().hash(fileToScan)},
-                async { Sha256().hash(fileToScan)}
+                async { fileToScan.md5() }
             )
         }
 
         val driverResponses = multiDriverRequest { driverUrl, client ->
-            client.post<FileScanResponse>("$driverUrl${ApiRoutes.scanFile}") {
+            client.post<FileScanResponse>("$driverUrl${DriverRoutes.scanFile}") {
                 this.body = MultiPartFormDataContent(listOf(
                     PartData.FileItem(
                         partHeaders = Headers.build {
@@ -69,7 +68,8 @@ class DefaultScanService(
                 status = it.maxBy { it.status }?.status
                     ?: ScannedFileStatus.NOT_AVAILABLE,
                 reports = it,
-                fileHashes = deferredHashes.await()
+                sha256 = sha256Deferred.await().value,
+                otherHashes = otherHashesDeferred.await()
             )
         }
     }

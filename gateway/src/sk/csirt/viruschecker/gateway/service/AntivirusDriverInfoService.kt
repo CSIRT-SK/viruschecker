@@ -1,13 +1,13 @@
-package sk.csirt.viruschecker.client.service
+package sk.csirt.viruschecker.gateway.service
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import mu.KotlinLogging
-import sk.csirt.viruschecker.client.payload.UrlAntivirusDriverInfoResponse
-import sk.csirt.viruschecker.routing.ApiRoutes
+import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
+import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
 
-class AntivirusDriverInfoService(
+class DriverInfoService(
     driverUrls: List<String>,
     client: HttpClient
 ) : AntivirusDriverService(driverUrls, client) {
@@ -15,7 +15,7 @@ class AntivirusDriverInfoService(
     suspend fun info(): List<UrlAntivirusDriverInfoResponse> =
         multiDriverRequest { driverUrl, client ->
             try {
-                val info = client.get<AntivirusDriverInfoResponse>("$driverUrl${ApiRoutes.info}")
+                val info = client.get<AntivirusDriverInfoResponse>("$driverUrl${DriverRoutes.index}")
                 UrlAntivirusDriverInfoResponse(
                     url = driverUrl,
                     success = true,

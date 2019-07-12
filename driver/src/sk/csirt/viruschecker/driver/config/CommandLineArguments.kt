@@ -2,6 +2,7 @@ package sk.csirt.viruschecker.driver.config
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
+import sk.csirt.viruschecker.config.defaultTimeout
 
 class CommandLineArguments(parser: ArgParser) {
 
@@ -22,4 +23,8 @@ class CommandLineArguments(parser: ArgParser) {
                 "with `.csv`."
     ).default("report.csv")
 
+    val socketTimeout by parser.storing(
+        "-t", "--timeout",
+        help = "Optional: Set socket in milliseconds. Default is $defaultTimeout."
+    ) { this.toLong() }.default(defaultTimeout)
 }

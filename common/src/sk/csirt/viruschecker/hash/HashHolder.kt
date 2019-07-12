@@ -1,16 +1,17 @@
 package sk.csirt.viruschecker.hash
 
 import java.io.File
+import java.io.InputStream
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.io.InputStream
 
-data class Hash(val value: String, val algorithm: HashAlgorithm)
-
-sealed class HashAlgorithm(private val algorithm: String) {
+sealed class HashAlgorithm(
+    private val algorithm: String
+) {
     private val digest: MessageDigest = MessageDigest.getInstance(algorithm)
 
-    fun hash(inputStream: InputStream): Hash {
+    open fun hash(inputStream: InputStream): HashHolder {
+
         inputStream.use {
             val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
             var sizeRead = inputStream.read(buffer)
@@ -27,14 +28,18 @@ sealed class HashAlgorithm(private val algorithm: String) {
             "0".repeat(32 - hashText.length) + hashText
         else
             hashText
-        return Hash(hashTextPadded, this)
+       return HashHolder(hashTextPadded, algorithm)
     }
 
-    fun hash(file: File) = hash(file.inputStream().buffered())
+    class Sha256 : HashAlgorithm("SHA-256")
 
-    override fun toString(): String = algorithm
+    class Md5: HashAlgorithm("MD5")
 }
 
-class Md5 : HashAlgorithm("Md5")
+data class HashHolder(val value: String, val algorithm: String)
 
-class Sha256 : HashAlgorithm("SHA-256")
+fun InputStream.sha256(): HashHolder = HashAlgorithm.Sha256().hash(this)
+fun InputStream.md5(): HashHolder = HashAlgorithm.Md5().hash(this)
+
+fun File.sha256(): HashHolder = this.inputStream().buffered().sha256()
+fun File.md5(): HashHolder = this.inputStream().buffered().md5()

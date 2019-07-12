@@ -14,8 +14,7 @@ import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.service.DefaultScanService
-import sk.csirt.viruschecker.client.web.service.ScanReportService
+import sk.csirt.viruschecker.client.service.MultiScanService
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
 import sk.csirt.viruschecker.utils.copyToSuspend
 import sk.csirt.viruschecker.utils.tempDirectory
@@ -23,7 +22,7 @@ import java.io.File
 import java.util.*
 
 @KtorExperimentalLocationsAPI
-fun Route.scanFile(scanReportService: ScanReportService, scanService: DefaultScanService) {
+fun Route.scanFile(scanService: MultiScanService) {
     get<WebRoutes.ScanFile> {
         call.respondDefaultHtml {
             h2 { +"Scan file" }
@@ -75,11 +74,9 @@ fun Route.scanFile(scanReportService: ScanReportService, scanService: DefaultSca
                     call.respond(HttpStatusCode.InternalServerError, "File was not uploaded")
                 }
             } else {
-
-                val report = scanService.scanFile(fileToScan)
-                scanReportService.save(report, fileId);
+                val report = scanService.scanFile(fileToScan);
                 { call ->
-                    call.respondRedirect(call.url(WebRoutes.ScanReport(fileId)), false)
+                    call.respondRedirect(call.url(WebRoutes.ScanReport(report.sha256)), false)
                 }
             }
         responseLambda(call)

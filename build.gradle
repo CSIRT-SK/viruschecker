@@ -45,4 +45,10 @@ subprojects {
         compile "io.github.microutils:kotlin-logging:$koltin_logger_version"
         compile "commons-io:commons-io:$apache_commons_io_version"
     }
+
+    compileKotlin {
+        kotlinOptions {
+            freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
+        }
+    }
 }

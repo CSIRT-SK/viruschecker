@@ -6,7 +6,7 @@ import sk.csirt.viruschecker.driver.antivirus.*
 object Properties {
 
     val keepReportsDays = "keep.reports.days"
-    val scanTimeout = "scan.timeout.millis"
+    val scanTimeout = "scan.socketTimeout.millis"
 
     val avast = "avast"
     val eset = "eset"

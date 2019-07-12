@@ -1,13 +1,13 @@
-package sk.csirt.viruschecker.client.web.repository.entity
+package sk.csirt.viruschecker.gateway.cache.entity
 
-import sk.csirt.viruschecker.hash.Hash
+import sk.csirt.viruschecker.hash.HashHolder
 import java.time.Instant
 
 data class ScanReportEntity(
-    val id: String,
+    val sha256: String,
     val filename: String,
     val date: Instant,
-    val fileHashes: List<Hash>,
+    val otherHashes: List<HashHolder>,
     val reports: List<AntivirusReportEntity>
 )
 

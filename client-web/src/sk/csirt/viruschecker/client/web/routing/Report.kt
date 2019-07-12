@@ -1,27 +1,22 @@
 package sk.csirt.viruschecker.client.web.routing
 
 import io.ktor.application.call
-import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
-import io.ktor.routing.Route
 import io.ktor.locations.get
-import io.ktor.response.respond
+import io.ktor.routing.Route
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.payload.ScannedFileStatus
-import sk.csirt.viruschecker.client.web.service.ScanReportService
+import sk.csirt.viruschecker.client.service.ReportByHashService
 import sk.csirt.viruschecker.client.web.template.pAlert
 import sk.csirt.viruschecker.client.web.template.pOk
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
+import sk.csirt.viruschecker.routing.payload.ScannedFileStatus
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @KtorExperimentalLocationsAPI
-fun Route.showReport(reportService: ScanReportService) {
+fun Route.showReport(reportService: ReportByHashService) {
     get<WebRoutes.ScanReport> { params ->
-        val scanReport = reportService.findById(params.id) ?: run {
-            call.respond(HttpStatusCode.BadRequest, "Id is incorrect.")
-            return@get
-        }
+        val scanReport = reportService.findReportBySha256(params.hash)
         call.respondDefaultHtml {
             h2 { +"Scan report for ${scanReport.filename}" }
 
@@ -33,9 +28,14 @@ fun Route.showReport(reportService: ScanReportService) {
                 pStatus(scanReport.status)
             }
 
-            scanReport.fileHashes.forEach {
-                p{
-                    +it.algorithm.toString()
+            p {
+                +"SHA-256"
+                br()
+                +scanReport.sha256
+            }
+            scanReport.otherHashes.forEach {
+                p {
+                    +it.algorithm
                     br()
                     +it.value
                 }
@@ -53,7 +53,6 @@ fun Route.showReport(reportService: ScanReportService) {
                 }
                 hr(classes = "lhr")
             }
-
         }
     }
 

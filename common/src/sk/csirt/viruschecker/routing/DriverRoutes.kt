@@ -3,11 +3,11 @@ package sk.csirt.viruschecker.routing
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
-object ApiRoutes{
-    const val info = "/info"
+object DriverRoutes{
+    const val index = "/"
     @KtorExperimentalLocationsAPI
-    @Location(info)
-    class Info
+    @Location(index)
+    class Index
 
     const val scanFile = "/scanFile"
     @KtorExperimentalLocationsAPI

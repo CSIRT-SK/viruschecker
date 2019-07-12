@@ -1,13 +1,14 @@
-package sk.csirt.viruschecker.client.payload
+package sk.csirt.viruschecker.routing.payload
 
-import sk.csirt.viruschecker.hash.Hash
+import sk.csirt.viruschecker.hash.HashHolder
 import java.time.Instant
 
 data class FileMultiScanResponse(
     val date: Instant,
+    val sha256: String,
     val filename: String,
     val status: ScannedFileStatus,
-    val fileHashes: List<Hash>,
+    val otherHashes: List<HashHolder>,
     val reports: List<AntivirusScanResponse>
 )
 

@@ -1,26 +1,35 @@
-package sk.csirt.viruschecker.driver
+package sk.csirt.viruschecker.gateway
+
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.ktor.application.Application
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
+import io.ktor.http.ContentType
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.request.path
+import io.ktor.response.respondText
+import io.ktor.routing.get
 import io.ktor.routing.routing
+import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
-import sk.csirt.viruschecker.driver.antivirus.Antivirus
-import sk.csirt.viruschecker.driver.config.CommandLineArguments
-import sk.csirt.viruschecker.driver.config.PropertiesFactory
-import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
-import sk.csirt.viruschecker.driver.routing.index
-import sk.csirt.viruschecker.driver.routing.scanFile
+import sk.csirt.viruschecker.gateway.cache.service.ScanReportService
+import sk.csirt.viruschecker.gateway.config.CommandLineArguments
+import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
+import sk.csirt.viruschecker.gateway.routing.driversInfo
+import sk.csirt.viruschecker.gateway.routing.findByHash
+import sk.csirt.viruschecker.gateway.routing.multiScanFile
+import sk.csirt.viruschecker.gateway.service.CachedScanService
+import sk.csirt.viruschecker.gateway.service.DriverInfoService
+import sk.csirt.viruschecker.gateway.service.ScanService
 
 private val logger = KotlinLogging.logger {  }
 
@@ -31,6 +40,7 @@ fun main(args: Array<String>) = mainBody {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {
@@ -58,16 +68,22 @@ fun Application.module() {
 
     install(Locations)
 
-       install(Koin) {
-        modules(driverDependencyInjectionModule)
-        properties(PropertiesFactory.loadOrCreateDefault())
+    install(Koin) {
+        modules(gatewayDependencyInjectionModule)
     }
 
-    val virusChecker by inject<Antivirus>(parsedArgs.antivirus)
+    val scanService by inject<CachedScanService>()
+    val scanReportService by inject<ScanReportService>()
+    val antivirusDriverInfoService by inject<DriverInfoService>()
 
     routing {
-        index(virusChecker)
-        scanFile(virusChecker)
+        get("/") {
+            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+        }
+
+        driversInfo(antivirusDriverInfoService)
+        multiScanFile(scanService)
+        findByHash(scanReportService)
 
     }
 

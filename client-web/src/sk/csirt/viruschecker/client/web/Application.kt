@@ -3,7 +3,6 @@ package sk.csirt.viruschecker.client.web
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.ktor.application.*
-import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.features.*
 import io.ktor.routing.*
@@ -14,14 +13,14 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
-import sk.csirt.viruschecker.client.service.AntivirusDriverInfoService
-import sk.csirt.viruschecker.client.service.DefaultScanService
+import sk.csirt.viruschecker.client.service.DriverInfoGatewayService
+import sk.csirt.viruschecker.client.service.MultiScanService
+import sk.csirt.viruschecker.client.service.ReportByHashService
 import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
 import sk.csirt.viruschecker.client.web.routing.index
 import sk.csirt.viruschecker.client.web.routing.showReport
 import sk.csirt.viruschecker.client.web.routing.scanFile
-import sk.csirt.viruschecker.client.web.service.ScanReportService
 import sk.csirt.viruschecker.client.web.template.styles
 
 private val logger = KotlinLogging.logger { }
@@ -73,27 +72,15 @@ fun Application.module() {
     }
 
 
-    val scanService by inject<DefaultScanService>()
-    val scanReportService by inject<ScanReportService>()
-    val antivirusDriverInfoService by inject<AntivirusDriverInfoService>()
+    val scanService by inject<MultiScanService>()
+    val scanReportService by inject<ReportByHashService>()
+    val antivirusDriverInfoService by inject<DriverInfoGatewayService>()
 
     routing {
-//        get("/") {
-//            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-//            call.respondRedirect(call.url(WebRoutes.scanFile), permanent = false)
-//        }
-
-        get("/json/gson") {
-            call.respond(mapOf("hello" to "world"))
-        }
-
         index(antivirusDriverInfoService)
         styles()
-        scanFile(scanService = scanService, scanReportService = scanReportService)
+        scanFile(scanService = scanService)
         showReport(scanReportService)
-
     }
-
-
 }
 

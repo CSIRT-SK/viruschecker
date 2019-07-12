@@ -1,6 +1,4 @@
-package sk.csirt.viruschecker.client.payload
-
-import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
+package sk.csirt.viruschecker.routing.payload
 
 data class UrlAntivirusDriverInfoResponse(
     val url: String,

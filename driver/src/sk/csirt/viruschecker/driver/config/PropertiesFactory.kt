@@ -35,7 +35,7 @@ object PropertiesFactory {
         val content = """
 # Keep records for specified start
 $keepReportsDays=30
-# Scan timeout
+# Scan socketTimeout
 $scanTimeout=15000
 
 # =============================================================================

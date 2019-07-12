@@ -269,7 +269,7 @@ system variable. To do this, follow these steps:
 * Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
 the *Edit...* button below.
 
-* Add the installation path of the Eset to the beginning of *Variable value* text. 
+* Add the installation path of the Avast to the beginning of *Variable value* text. 
 In my case the path is `C:\Program Files\AVAST Software\Avast`.
   
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
@@ -500,20 +500,80 @@ system variable. To do this, follow these steps:
 * Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
 the *Edit...* button below.
 
-* Add the installation path of the Eset to the beginning of *Variable value* text. 
-In my case the path is `C:\Program Files\ESET\ESET Security`.
+* Add the installation path of the Avast to the beginning of *Variable value* text. 
+In our case the path is `C:\Program Files\Microsoft Security Client`, since we assume Windows 7 
+is installed. 
+In newer version of Windows the path should be `C:\Program Files\Windows Defender`.
   
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
     
-    ```C:\Program Files\ESET\ESET Security;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    ```C:\Program Files\Microsoft Security Client;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
 * A reboot of the virtual machine is now recommended. 
 
-**/
+#### 2.3.7 Windows Defender/Microsoft Security Essentials (free)
 
-#### 2.3.7 Windows defender (free)
+If you have a Windows 7 VM then you need to install Microsoft Security Essentials as Windows 
+Defender on this system is unusable for our purposes.
+ 
+##### Configuration
 
-(TODO)
+##### A) Microsoft Security Essentials (Windows 7)
+
+Open the antivirus window and click on the *Settings* tab at the left side of the window.
+
+Disable the following features:
+
+* In the *Scheduled scan* tab, uncheck the *Run a scheduled scan on my PC*. 
+
+* In the *Real-time protection* tab, uncheck the *Turn on real-time protection*.
+
+* In the *MAPS* tab, make sure the *I don't want to join MAPS* option is selected. 
+
+##### B) Windows Defender (Windows 10)
+
+This paragraph is intended for Windows Defender in Windows 10.
+Windows 8 version of defender has different UI, however the idea is similar - to disable all 
+automatic protection features except virus database updates.
+  
+Run *Windows Security* app from start menu. 
+
+Disable the following features:
+
+* In the *Virus & threat protection* tab, turn off the *Tamper protection*. 
+
+* In the *App & browser control* tab, turn off the *Tamper protection*. 
+
+* In the *Real-time protection* tab, select *Off* option for each setting.
+
+(TODO) Disable telemetry
+
+##### Command line utility
+
+Microsoft provides the command line utility called *MpCmdRun.exe* that may be used to scan the 
+selected file for malware.
+
+By default, our driver application assumes that the *MpCmdRun.exe* program is available in the *Path* 
+system variable. To do this, follow these steps:
+
+* Press *Start*, search "Computer", right click on the found program with the same name and select 
+*Properties* 
+
+* On the left-hand side open the *Advanced system settings*.
+
+* Press the *Environment Variables* button.
+
+* Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
+the *Edit...* button below.
+
+* Add the installation path of the Eset to the beginning of *Variable value* text. 
+In my case the path is `C:\Program Files\AVAST Software\Avast`.
+  
+    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
+    
+    ```C:\Program Files\AVAST Software\Avast;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    
+* A reboot of the virtual machine is now recommended.
 
 ### 2.4 Run the driver program.
 

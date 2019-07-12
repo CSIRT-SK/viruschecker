@@ -8,20 +8,20 @@ import io.ktor.response.respond
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
-import sk.csirt.viruschecker.routing.ApiRoutes
+import sk.csirt.viruschecker.routing.DriverRoutes
 
 private val logger = KotlinLogging.logger { }
 
 
-private const val ideRunMessage = "Driver application is probably running in IDE."
+private const val ideRunMessage = "Version not available. Driver application is probably running from IDE."
 
 @KtorExperimentalLocationsAPI
-fun Route.info(virusChecker: Antivirus) {
-    get<ApiRoutes.Info> {
+fun Route.index(virusChecker: Antivirus) {
+    get<DriverRoutes.Index> {
         call.respond(AntivirusDriverInfoResponse(
             antivirus = virusChecker.type.commonName,
-            driverVersion = AntivirusDriverInfoResponse::class.java.`package`.implementationVersion
-                ?: "Version not available. $ideRunMessage"
+            driverVersion = Antivirus::class.java.`package`.implementationVersion
+                ?: ideRunMessage
         ))
     }
 }

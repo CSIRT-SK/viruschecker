@@ -2,7 +2,7 @@ package sk.csirt.viruschecker.client.reporting
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
-import sk.csirt.viruschecker.client.payload.FileMultiScanResponse
+import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
 import java.io.File
 import java.io.FileWriter
 import java.time.LocalDateTime
