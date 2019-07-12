@@ -11,8 +11,7 @@ import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.DefaultReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
-import sk.csirt.viruschecker.client.service.ScanService
-import sk.csirt.viruschecker.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.client.service.DefaultScanService
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
@@ -31,7 +30,7 @@ fun Application.module() {
     val urls = parsedArgs.driverUrls
     val fileToScan = parsedArgs.fileToScan
 
-    val scanService = ScanService(urls, client)
+    val scanService = DefaultScanService(urls, client)
     val scanReport = runBlocking { scanService.scanFile(fileToScan) }
 
     printReports(scanReport)

@@ -8,7 +8,7 @@ import java.nio.charset.Charset
 import java.time.LocalDateTime
 
 class Eset(
-    scanCommand: ExecutableCommand
+    scanCommand: ScanCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
@@ -20,6 +20,7 @@ class Eset(
         params: FileScanParameters
     ): Sequence<ReportEntry> {
         val linesWithScannedFile = FileUtils.readLines(reportFile, Charset.defaultCharset())
+            .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
             .asSequence()
             .filter { it.startsWith("name=") }
             .filter { params.fileToScan.name in it }

@@ -13,19 +13,17 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
-import kotlinx.coroutines.*
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.service.ScanService
+import sk.csirt.viruschecker.client.service.DefaultScanService
 import sk.csirt.viruschecker.client.web.service.ScanReportService
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
-import sk.csirt.viruschecker.hash.HashAlgorithm
 import sk.csirt.viruschecker.utils.copyToSuspend
 import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
 import java.util.*
 
 @KtorExperimentalLocationsAPI
-fun Route.scanFile(scanReportService: ScanReportService, scanService: ScanService) {
+fun Route.scanFile(scanReportService: ScanReportService, scanService: DefaultScanService) {
     get<WebRoutes.ScanFile> {
         call.respondDefaultHtml {
             h2 { +"Scan file" }

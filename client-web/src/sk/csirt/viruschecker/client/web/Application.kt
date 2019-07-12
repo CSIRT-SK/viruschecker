@@ -12,14 +12,12 @@ import org.koin.ktor.ext.Koin
 import org.slf4j.event.Level
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
-import io.ktor.locations.url
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 import sk.csirt.viruschecker.client.service.AntivirusDriverInfoService
-import sk.csirt.viruschecker.client.service.ScanService
+import sk.csirt.viruschecker.client.service.DefaultScanService
 import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
-import sk.csirt.viruschecker.client.web.routing.WebRoutes
 import sk.csirt.viruschecker.client.web.routing.index
 import sk.csirt.viruschecker.client.web.routing.showReport
 import sk.csirt.viruschecker.client.web.routing.scanFile
@@ -75,7 +73,7 @@ fun Application.module() {
     }
 
 
-    val scanService by inject<ScanService>()
+    val scanService by inject<DefaultScanService>()
     val scanReportService by inject<ScanReportService>()
     val antivirusDriverInfoService by inject<AntivirusDriverInfoService>()
 

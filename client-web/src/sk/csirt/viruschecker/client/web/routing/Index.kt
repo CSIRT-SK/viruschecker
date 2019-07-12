@@ -19,12 +19,14 @@ fun Routing.index(antivirusDriverInfoService: AntivirusDriverInfoService) {
             h2 { +"Welcome" }
             +"This is a web interface of the VirusChecker, version: $version."
 
-            h3 { +"These are currently deployed antivirus drivers." }
+            h3 { +"These are the currently deployed antivirus drivers." }
             info.forEach {
                 p{
-                    +"Antivirus: ${it.antivirus}"
+                    +"Antivirus: ${it.info.antivirus}"
                     br()
-                    +"Driver version: ${it.driverVersion}"
+                    +"Address: ${it.url}"
+                    br()
+                    +"Driver version: ${it.info.driverVersion}"
                 }
             }
         }

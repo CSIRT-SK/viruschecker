@@ -2,6 +2,15 @@ package sk.csirt.viruschecker.driver.config
 
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
+import sk.csirt.viruschecker.driver.antivirus.ScanCommand
+import sk.csirt.viruschecker.driver.antivirus.ScanCommand.Placeholder.REPORT_FILE
+import sk.csirt.viruschecker.driver.antivirus.ScanCommand.Placeholder.SCAN_FILE
+import sk.csirt.viruschecker.driver.config.Properties.avast
+import sk.csirt.viruschecker.driver.config.Properties.eset
+import sk.csirt.viruschecker.driver.config.Properties.kaspersky
+import sk.csirt.viruschecker.driver.config.Properties.keepReportsDays
+import sk.csirt.viruschecker.driver.config.Properties.microsoft
+import sk.csirt.viruschecker.driver.config.Properties.scanTimeout
 import sk.csirt.viruschecker.driver.utils.cleanCommentsAndEmptyLines
 import java.nio.charset.Charset
 import java.nio.file.Paths
@@ -9,6 +18,7 @@ import java.nio.file.Paths
 object PropertiesFactory {
 
     val propertiesName = "viruschecker-driver.properties"
+
     private val propertiesFile = Paths.get(propertiesName).toAbsolutePath().toFile()
 
     private val logger = KotlinLogging.logger { }
@@ -24,46 +34,30 @@ object PropertiesFactory {
     private fun createDefualtProperties() {
         val content = """
 # Keep records for specified start
-keep.reports.days=30
-# Update start (24h format)
-update.start=03:00
-# Update interval
-update.start.interval.days=1
+$keepReportsDays=30
 # Scan timeout
-scan.timeout.millis=15000
+$scanTimeout=15000
 
 # =============================================================================
 # Avast
 
-avast=ashCmd.exe
-avast.flag.report=/_>
-
-avast.scan.flag=
-## Additional flags separated by ', '
-avast.scan.flag.additional=
-
-# =============================================================================
-# Kaspersky
-
-kaspersky=avp.com
-kaspersky.flag.report=/RA:
-
-kaspersky.scan.flag=scan
-kaspersky.scan.flag.additional=/i0
-
-kaspersky.update.flag=update
-## Additional flags separated by ', '
-kaspersky.update.flag.additional=
+$avast=ashCmd.exe $SCAN_FILE /_> $REPORT_FILE
 
 # =============================================================================
 # Eset
 
-eset=ecls.exe
-eset.flag.report=/log-file=
+$eset=ecls.exe $SCAN_FILE /log-file=$REPORT_FILE /log-all
 
-eset.scan.flag=
-## Additional flags separated by ', '
-eset.scan.flag.additional=/log-all
+# =============================================================================
+# Kaspersky
+
+$kaspersky=avp.com scan $SCAN_FILE /RA:$REPORT_FILE /i0
+
+# =============================================================================
+# Microsoft
+
+$microsoft=MpCmdRun.exe -Scan -ScanType 3 -File $SCAN_FILE -DisableRemediation
+
 """
         FileUtils.write(propertiesFile, content, Charset.defaultCharset())
     }

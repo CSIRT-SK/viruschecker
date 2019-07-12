@@ -10,7 +10,7 @@ enum class AntivirusType(
     BITDEFENDER("Bitdefender"),
     ESET("Eset"),
     KASPERSKY("Kaspersky"),
-    MS_DEFENDER("Microsoft Defender"),
-    NORTON("Norton"),
+    MICROSOFT("Microsoft"),
+    SYMANTEC("Symantec"),
 }
 

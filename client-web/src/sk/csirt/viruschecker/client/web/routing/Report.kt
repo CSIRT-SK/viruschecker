@@ -49,7 +49,7 @@ fun Route.showReport(reportService: ScanReportService) {
                     +"Antivirus: ${it.antivirus}"
                     br()
                     +"Description: ${it.malwareDescription}"
-                    pStatus(scanReport.status)
+                    pStatus(it.status)
                 }
                 hr(classes = "lhr")
             }

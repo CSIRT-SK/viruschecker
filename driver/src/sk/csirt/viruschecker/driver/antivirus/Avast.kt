@@ -8,7 +8,7 @@ import java.nio.charset.Charset
 import java.time.LocalDateTime
 
 class Avast(
-    scanCommand: ExecutableCommand
+    scanCommand: ScanCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
@@ -24,6 +24,7 @@ class Avast(
 //        sleep(500)
         return sequenceOf(
             FileUtils.readLines(reportFile, Charset.defaultCharset())
+                .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
                 .takeIf { it.isNotEmpty() }
                 ?.first()
                 ?.let { line ->

@@ -9,9 +9,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class Kaspersky(
-        scanCommand: ExecutableCommand,
-        updateCommand: ExecutableCommand
-) : UpdatableCommandLineAntivirus(scanCommand, updateCommand) {
+        scanCommand: ScanCommand
+//        updateCommand: ScanCommand
+) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
 
@@ -22,6 +22,7 @@ class Kaspersky(
         params: FileScanParameters
     ): Sequence<ReportEntry> {
         val linesWithScannedFile = FileUtils.readLines(reportFile, Charset.defaultCharset())
+            .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
             .asSequence()
             .filterNot { it.startsWith(";") }
             .filter { params.fileToScan.name in it }

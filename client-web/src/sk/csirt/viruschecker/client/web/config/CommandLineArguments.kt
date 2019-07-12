@@ -9,7 +9,11 @@ import java.nio.charset.Charset
 class CommandLineArguments(parser: ArgParser) {
     val driverUrls by parser.positional(
         help = "List of urls containing virus checker drivers."
-    ) { FileUtils.readLines(File(this), Charset.defaultCharset()) }
+    ) {
+        FileUtils.readLines(File(this), Charset.defaultCharset())
+            .map { it.trim() }
+            .filterNot { it.startsWith("#") }
+    }
 
     private val defaultTimeut = 50000
     val timeout by parser.storing(

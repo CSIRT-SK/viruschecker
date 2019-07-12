@@ -3,7 +3,6 @@ package sk.csirt.viruschecker.driver.antivirus
 import sk.csirt.viruschecker.driver.config.Constants
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
-import sk.csirt.viruschecker.driver.utils.parseParameter
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -12,16 +11,27 @@ import java.time.LocalDateTime
 import java.util.*
 
 
-data class ExecutableCommand(
-    val executableName: String,
-    val flag: String,
-    val reportFlag: String,
-    val additionalOptions: String,
-    val timeout: Long
-)
+data class ScanCommand(
+    val command: String
+) {
+
+    fun parse(fileToScan: File, fileToReport: File) =
+        command.split(" ").map {
+            when {
+                SCAN_FILE in it -> it.replace(SCAN_FILE, fileToScan.canonicalPath)
+                REPORT_FILE in it -> it.replace(REPORT_FILE, fileToReport.canonicalPath)
+                else -> it
+            }
+        }
+
+    companion object Placeholder {
+        const val SCAN_FILE = "[SCAN-FILE]"
+        const val REPORT_FILE = "[REPORT-FILE]"
+    }
+}
 
 abstract class CommandLineAntivirus(
-    protected val scanCommand: ExecutableCommand
+    private val scanCommand: ScanCommand
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
@@ -31,8 +41,7 @@ abstract class CommandLineAntivirus(
             Constants.scanReportsDir,
             "report-${params.fileToScan.nameWithoutExtension}-${UUID.randomUUID()}.txt"
         ).toFile()
-        val output = runScanCommand(params, reportFile)
-//        reportFile.createNewFile()
+        val output = runAntivirus(params, reportFile)
         // Some antiviruses (Avast) cannot write reports properly when invoked from another process.
         // This will manually write their STDOUT to the file
         writeOutputToFileIfNotExists(reportFile, output)
@@ -51,33 +60,28 @@ abstract class CommandLineAntivirus(
         FileUtils.writeLines(reportFile, scanOutput)
     }
 
-    private fun runScanCommand(params: FileScanParameters, reportFile: File): List<String> {
-        val command = buildScanCommand(params, scanCommand, reportFile)
-        return runAntivirus(command)
-    }
-
-    protected fun runAntivirus(command: List<String>): List<String> {
+    private fun runAntivirus(params: FileScanParameters, reportFile: File): List<String> {
         val processBuilder = ProcessBuilder()
-        processBuilder.command(command)
+        processBuilder.command(scanCommand.parse(params.fileToScan, reportFile))
         val process = processBuilder.start()
-        logger.debug("Waiting for antivirus. Command to run: $command")
+        logger.debug("Waiting for antivirus. Command to run: $scanCommand")
         val processReader = BufferedReader(InputStreamReader(process.inputStream))
         val output = mutableListOf<String>()
         var line: String? = processReader.readLine()
         var i = 1
         while (line != null) {
             logger.debug("Output line [$i] from antivirus: $line")
-            output+= line
+            output += line
             line = processReader.readLine()
             i++
         }
-        logger.debug("Antivirus task completed. Command successfully executed: $command")
+        logger.debug("Antivirus task completed. Command successfully executed: $scanCommand")
         return output
     }
 
     private fun retrieveReport(
-            params: FileScanParameters,
-            reportFile: File
+        params: FileScanParameters,
+        reportFile: File
     ): FileScanReport {
         logger.debug("Retrieving report from $reportFile for file $params")
         val parsedEntries = parseReportFile(reportFile, params)
@@ -106,9 +110,9 @@ abstract class CommandLineAntivirus(
 
 
     protected class ReportEntry(
-            val datetime: LocalDateTime,
-            val status: Status,
-            val description: String
+        val datetime: LocalDateTime,
+        val status: Status,
+        val description: String
     ) {
         enum class Status {
             OK, INFECTED, NOT_AVAILABLE;
@@ -121,31 +125,5 @@ abstract class CommandLineAntivirus(
                 }
             }
         }
-    }
-
-    companion object {
-        fun buildScanCommand(
-                params: FileScanParameters,
-                command: ExecutableCommand,
-                reportFile: File
-        ): List<String> {
-            val commandList = mutableListOf(command.executableName)
-            parseParameter(
-                commandList,
-                command.flag,
-                params.fileToScan.canonicalPath
-            )
-            parseParameter(
-                commandList,
-                command.reportFlag,
-                reportFile.canonicalPath
-            )
-            command.additionalOptions.takeIf { it.isNotEmpty() }?.also {
-                commandList.addAll(it.split(", "))
-            }
-
-            return commandList
-        }
-
     }
 }

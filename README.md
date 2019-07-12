@@ -73,13 +73,14 @@ As of this moment the supported antivirus software includes
 - Avast
 - Kaspersky
 - Eset
+- Windows defender
 
 Support for following AVs is under active development
 
 - Avira
 - Bitdefender
-- Norton
-- Windows defender
+- Symantec
+
 
 The location of the compiled JRE executable is `driver/build/libs/driver-[VERSION]-all.jar`.
 
@@ -445,15 +446,15 @@ the *Edit...* button below.
     
 * A reboot of the virtual machine is now recommended. 
 
-#### 2.3.6 Norton (paid)
+#### 2.3.6 Symantec (paid)
 
 /** WIP
 
-Install any of the Norton paid antivirus offer.
-This guide assumes the installation of Norton Internet Security, however, another 
-Norton products should be basically the same.
+Install any of the Symantec paid antivirus offer.
+This guide assumes the installation of Symantec Internet Security, however, another 
+Symantec products should be basically the same.
 
-Mention should be made that Norton requires updated Windows, otherwise the installation wizard 
+Mention should be made that Symantec requires updated Windows, otherwise the installation wizard 
 refuses to start.
 In my case three iterations of Windows 7 updates were sufficient to successfully install the 
 antivirus.
@@ -526,7 +527,7 @@ We will assume that the driver program was placed at `C:\virus-checker` folder.
 * Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
     * `[NAME-OF-PROGRAM]` is the name of the driver program.
     * `[ANTIVIRUS]` must be one of the following: `--avast`,
-     `--avira`, `--bitdefender`, `--eset`, `--kaspersky`, `--norton`, `--windefender`. (TODO: 
+     `--avira`, `--bitdefender`, `--eset`, `--kaspersky`, `--symantec`, `--windefender`. (TODO: 
      auto-detection of the installed antivirus)
         * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --kaspersky`
 
