@@ -1,3 +1,5 @@
 package sk.csirt.viruschecker.config
 
-const val defaultTimeout = 50000L
+import java.time.Duration
+
+val defaultTimeout = Duration.ofMillis(50_000L)

@@ -8,7 +8,7 @@ import sk.csirt.viruschecker.client.service.ReportByHashService
 import sk.csirt.viruschecker.client.web.parsedArgs
 
 val webClientDependencyInjectionModule = module {
-    single { httpClient(parsedArgs.socketTimeout.toInt()) }
+    single { httpClient(parsedArgs.socketTimeout) }
     single { DriverInfoGatewayService(parsedArgs.gateway, get()) }
     single { ReportByHashService(parsedArgs.gateway, get()) }
     single { MultiScanService(parsedArgs.gateway, get()) }

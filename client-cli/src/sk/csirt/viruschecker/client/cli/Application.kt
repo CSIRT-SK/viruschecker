@@ -11,6 +11,7 @@ import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.DefaultReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
+import sk.csirt.viruschecker.client.service.MultiScanParameters
 import sk.csirt.viruschecker.client.service.MultiScanService
 import kotlin.system.exitProcess
 
@@ -25,13 +26,13 @@ fun main(args: Array<String>) {
 
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {
-    val client = httpClient(parsedArgs.socketTimeout.toInt())
+    val client = httpClient(parsedArgs.socketTimeout)
 
     val gatewayUrl = parsedArgs.gateway
     val fileToScan = parsedArgs.fileToScan
 
     val scanService = MultiScanService(gatewayUrl, client)
-    val scanReport = runBlocking { scanService.scanFile(fileToScan) }
+    val scanReport = runBlocking { scanService.scanFile(MultiScanParameters(fileToScan, fileToScan.name)) }
 
     printReports(scanReport)
 

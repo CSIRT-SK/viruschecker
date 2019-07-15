@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.gateway.service
+package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -18,17 +18,18 @@ import sk.csirt.viruschecker.routing.payload.ScannedFileStatus
 import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import sk.csirt.viruschecker.utils.await
-import java.io.File
 import java.io.FileInputStream
 import java.time.Instant
 
 class DefaultDriverScanService(
     driverUrls: List<String>,
     client: HttpClient
-) : AntivirusDriverService(driverUrls, client), ScanService {
+) : AntivirusDriverService(driverUrls, client),
+    DriverScanService {
     private val logger = KotlinLogging.logger { }
 
-    override suspend fun scanFile(fileToScan: File): FileMultiScanResponse = coroutineScope {
+    override suspend fun scanFile(scanParams: ScanParameters): FileMultiScanResponse = coroutineScope {
+        val (fileToScan, originalFileName) = scanParams
         val sha256Deferred = async { fileToScan.sha256() }
         val otherHashesDeferred = let {
             logger.info { "Computing MD5 and SHA-256 for $fileToScan" }
@@ -38,20 +39,30 @@ class DefaultDriverScanService(
         }
 
         val driverResponses = multiDriverRequest { driverUrl, client ->
-            client.post<FileScanResponse>("$driverUrl${DriverRoutes.scanFile}") {
-                this.body = MultiPartFormDataContent(listOf(
-                    PartData.FileItem(
-                        partHeaders = Headers.build {
-                            this[HttpHeaders.ContentDisposition] =
-                                ContentDisposition.File.withParameter(
-                                    "filename",
-                                    fileToScan.name
-                                ).toString()
-                        },
-                        dispose = { },
-                        provider = { FileInputStream(fileToScan).asInput() }
-                    )
-                ))
+            try{
+                client.post<FileScanResponse>("$driverUrl${DriverRoutes.scanFile}") {
+                    this.body = MultiPartFormDataContent(listOf(
+                        PartData.FileItem(
+                            partHeaders = Headers.build {
+                                this[HttpHeaders.ContentDisposition] =
+                                    ContentDisposition.File.withParameter(
+                                        "filename",
+                                        originalFileName
+                                    ).toString()
+                            },
+                            dispose = { },
+                            provider = { FileInputStream(fileToScan).asInput() }
+                        )
+                    ))
+                }
+            }catch (e: Throwable){
+                logger.error { "Failed http post to $driverUrl.\n${e.message}" }
+                FileScanResponse(
+                    filename = originalFileName,
+                    malwareDescription = "Connection to $driverUrl was unsuccessful.",
+                    status = FileScanResponse.Status.NOT_AVAILABLE,
+                    antivirus = "Unknown"
+                )
             }
         }
 
@@ -64,7 +75,7 @@ class DefaultDriverScanService(
         }.let {
             FileMultiScanResponse(
                 date = Instant.now(),
-                filename = driverResponses.firstOrNull()?.filename ?: "",
+                filename = originalFileName,
                 status = it.maxBy { it.status }?.status
                     ?: ScannedFileStatus.NOT_AVAILABLE,
                 reports = it,

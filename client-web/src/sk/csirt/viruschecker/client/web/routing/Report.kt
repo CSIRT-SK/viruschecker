@@ -3,6 +3,7 @@ package sk.csirt.viruschecker.client.web.routing
 import io.ktor.application.call
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
+import io.ktor.response.respond
 import io.ktor.routing.Route
 import kotlinx.html.*
 import sk.csirt.viruschecker.client.service.ReportByHashService
@@ -20,7 +21,9 @@ fun Route.showReport(reportService: ReportByHashService) {
         call.respondDefaultHtml {
             h2 { +"Scan report for ${scanReport.filename}" }
 
-            +"Date: ${scanReport.date.let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }}"
+            +scanReport.date
+                .let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }
+                .let { "Time: ${it.toLocalDate()}, ${it.toLocalTime()}" }
 //            br()
 //
             p {

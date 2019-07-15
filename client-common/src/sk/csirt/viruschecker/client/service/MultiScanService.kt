@@ -21,7 +21,7 @@ class MultiScanService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun scanFile(fileToScan: File): FileMultiScanResponse = coroutineScope {
+    suspend fun scanFile(params: MultiScanParameters): FileMultiScanResponse = coroutineScope {
         client.post<FileMultiScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
             this.body = MultiPartFormDataContent(listOf(
                 PartData.FileItem(
@@ -29,13 +29,18 @@ class MultiScanService(
                         this[HttpHeaders.ContentDisposition] =
                             ContentDisposition.File.withParameter(
                                 "filename",
-                                fileToScan.name
+                                params.originalFilename
                             ).toString()
                     },
                     dispose = { },
-                    provider = { FileInputStream(fileToScan).asInput() }
+                    provider = { FileInputStream(params.fileToScan).asInput() }
                 )
             ))
         }
     }
 }
+
+data class MultiScanParameters(
+    val fileToScan: File,
+    val originalFilename: String
+)

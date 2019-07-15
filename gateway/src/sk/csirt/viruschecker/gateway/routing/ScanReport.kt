@@ -7,7 +7,7 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import mu.KotlinLogging
-import sk.csirt.viruschecker.gateway.cache.service.ScanReportService
+import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
 import sk.csirt.viruschecker.routing.GatewayRoutes
 
 private val logger = KotlinLogging.logger { }

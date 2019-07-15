@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.gateway.service
+package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get

@@ -3,14 +3,20 @@ package sk.csirt.viruschecker.client.web
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.ktor.application.*
+import io.ktor.client.features.ClientRequestException
+import io.ktor.content.TextContent
 import io.ktor.request.*
 import io.ktor.features.*
 import io.ktor.routing.*
 import io.ktor.gson.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.withCharset
 import org.koin.ktor.ext.Koin
 import org.slf4j.event.Level
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
+import io.ktor.response.respond
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 import sk.csirt.viruschecker.client.service.DriverInfoGatewayService
@@ -45,6 +51,27 @@ fun Application.module() {
     }
     // Automatic '304 Not Modified' Responses
     install(ConditionalHeaders)
+
+    install(StatusPages) {
+        exception<Throwable> {
+            call.respond(HttpStatusCode.InternalServerError)
+            throw it
+        }
+        exception<ClientRequestException> {
+            call.respond(HttpStatusCode.NotFound, "Specified resource was not found")
+            throw it
+        }
+        status(HttpStatusCode.NotFound) {
+            call.respond(
+                TextContent(
+                    status = it,
+                    text = "${it.value} ${it.description}",
+                    contentType =  ContentType.Text.Plain.withCharset(Charsets.UTF_8)
+                )
+            )
+        }
+    }
+
 
 //    install(CORS) {
 //        method(HttpMethod.Options)

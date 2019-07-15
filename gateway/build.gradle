@@ -1,0 +1,45 @@
+
+apply plugin: 'application'
+
+// mainClassName = "io.ktor.server.jetty.EngineMain"
+mainClassName = "sk.csirt.viruschecker.gateway.ApplicationKt"
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile project(':common')
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-metrics:$ktor_version"
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-websockets:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-client-core:$ktor_version"
+    compile "io.ktor:ktor-client-core-jvm:$ktor_version"
+    compile "io.ktor:ktor-client-apache:$ktor_version"
+    compile "io.ktor:ktor-client-json-jvm:$ktor_version"
+    compile "io.ktor:ktor-client-gson:$ktor_version"
+    compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
+    compile "net.openhft:chronicle-map:$chronicle_map_version"
+
+    compile group: 'org.apache.commons', name: 'commons-csv', version: apache_commons_version
+    compile "org.koin:koin-ktor:$koin_version"
+
+    testCompile "io.ktor:ktor-server-tests:$ktor_version"
+}
+
+// This task will generate your fat JAR and put it in the ./build/libs/ directory
+shadowJar {
+    manifest {
+        attributes 'Main-Class': mainClassName,
+                'Implementation-Version': app_version
+    }
+    // This is needed for jetty for proper functioning outside od IDE
+//    transform(ServiceFileTransformer) {
+//        path = 'META-INF/services'
+//        include 'org.eclipse.jetty.http.HttpFieldPreEncoder'
+//    }
+}
+
+
+

@@ -6,8 +6,9 @@ import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logging
+import java.time.Duration
 
-fun httpClient(defaultSocketTimeout: Int) = HttpClient(Apache) {
+fun httpClient(defaultSocketTimeout: Duration) = HttpClient(Apache) {
     install(JsonFeature) {
         serializer = GsonSerializer()
     }
@@ -15,8 +16,8 @@ fun httpClient(defaultSocketTimeout: Int) = HttpClient(Apache) {
         level = LogLevel.HEADERS
     }
     engine {
-        socketTimeout = defaultSocketTimeout
-        connectTimeout = defaultSocketTimeout
-        connectionRequestTimeout = defaultSocketTimeout
+        socketTimeout = defaultSocketTimeout.toMillis().toInt()
+        connectTimeout = defaultSocketTimeout.toMillis().toInt()
+        connectionRequestTimeout = defaultSocketTimeout.toMillis().toInt()
     }
 }

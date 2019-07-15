@@ -1,12 +1,11 @@
-package sk.csirt.viruschecker.gateway.cache.service
+package sk.csirt.viruschecker.gateway.persistence.service
 
-import sk.csirt.viruschecker.gateway.cache.entity.AntivirusReportEntity
+import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.routing.payload.AntivirusScanResponse
 import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
 import sk.csirt.viruschecker.routing.payload.ScannedFileStatus
-import sk.csirt.viruschecker.gateway.cache.repository.ScanReportRepository
-import sk.csirt.viruschecker.gateway.cache.entity.ScanReportEntity
-import sk.csirt.viruschecker.hash.HashHolder
+import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
+import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 
 class ScanReportService(private val reportRepository: ScanReportRepository) {
     internal fun save(response: FileMultiScanResponse) {

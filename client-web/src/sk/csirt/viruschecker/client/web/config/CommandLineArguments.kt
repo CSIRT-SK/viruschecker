@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.config.defaultTimeout
 import java.io.File
 import java.nio.charset.Charset
+import java.time.Duration
 
 class CommandLineArguments(parser: ArgParser) {
     val gateway by parser.positional(
@@ -15,6 +16,6 @@ class CommandLineArguments(parser: ArgParser) {
     val socketTimeout by parser.storing(
         "-t", "--timeout",
         help = "Optional: Set socket timeout in milliseconds. Default is $defaultTimeout."
-    ) { this.toLong() }.default(defaultTimeout)
+    ) { Duration.ofMillis(this.toLong()) }.default(defaultTimeout)
 
 }

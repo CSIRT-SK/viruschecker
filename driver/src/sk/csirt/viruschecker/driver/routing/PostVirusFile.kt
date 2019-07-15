@@ -25,7 +25,7 @@ import java.util.*
 private val logger = KotlinLogging.logger { }
 
 @KtorExperimentalLocationsAPI
-fun Route.scanFile(virusChecker: Antivirus) {
+fun Route.scanFile(antivirus: Antivirus) {
     post<DriverRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
@@ -35,7 +35,7 @@ fun Route.scanFile(virusChecker: Antivirus) {
             val part = multipart.readPart() ?: break
             when (part) {
                 is PartData.FileItem -> {
-                    processFile(part, virusChecker).also { responses.add(it) }
+                    processFile(part, antivirus).also { responses.add(it) }
                 }
             }
             part.dispose()
@@ -45,6 +45,7 @@ fun Route.scanFile(virusChecker: Antivirus) {
     }
 }
 
+@KtorExperimentalAPI
 private fun processFile(fileItem: PartData.FileItem, virusChecker: Antivirus): FileScanResponse {
     val filename = fileItem.originalFileName ?: "file${UUID.randomUUID()}"
 

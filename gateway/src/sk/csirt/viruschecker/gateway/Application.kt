@@ -21,15 +21,14 @@ import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
-import sk.csirt.viruschecker.gateway.cache.service.ScanReportService
+import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
 import sk.csirt.viruschecker.gateway.config.CommandLineArguments
 import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
 import sk.csirt.viruschecker.gateway.routing.driversInfo
 import sk.csirt.viruschecker.gateway.routing.findByHash
 import sk.csirt.viruschecker.gateway.routing.multiScanFile
-import sk.csirt.viruschecker.gateway.service.CachedScanService
-import sk.csirt.viruschecker.gateway.service.DriverInfoService
-import sk.csirt.viruschecker.gateway.service.ScanService
+import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
 
 private val logger = KotlinLogging.logger {  }
 
@@ -70,9 +69,10 @@ fun Application.module() {
 
     install(Koin) {
         modules(gatewayDependencyInjectionModule)
+        fileProperties()
     }
 
-    val scanService by inject<CachedScanService>()
+    val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<ScanReportService>()
     val antivirusDriverInfoService by inject<DriverInfoService>()
 

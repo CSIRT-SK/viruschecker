@@ -14,11 +14,14 @@ import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import kotlinx.html.*
+import sk.csirt.viruschecker.client.service.MultiScanParameters
 import sk.csirt.viruschecker.client.service.MultiScanService
+import sk.csirt.viruschecker.client.web.parsedArgs
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
 import sk.csirt.viruschecker.utils.copyToSuspend
 import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
+import java.time.Duration
 import java.util.*
 
 @KtorExperimentalLocationsAPI
@@ -26,7 +29,8 @@ fun Route.scanFile(scanService: MultiScanService) {
     get<WebRoutes.ScanFile> {
         call.respondDefaultHtml {
             h2 { +"Scan file" }
-
+            +"Scan can take up to ${parsedArgs.socketTimeout.seconds} seconds."
+            br(); br()
             form(
                 call.url(WebRoutes.ScanFile()),
                 classes = "pure-form-stacked",
@@ -51,7 +55,7 @@ fun Route.scanFile(scanService: MultiScanService) {
     post<WebRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
 //        var title = ""
-        var fileToScan: File? = null
+        var multiScanParameters: MultiScanParameters? = null
         val fileId = UUID.randomUUID().toString()
 
         while (true) {
@@ -63,18 +67,21 @@ fun Route.scanFile(scanService: MultiScanService) {
                 )
 
                 part.streamProvider().use { its -> file.outputStream().buffered().use { its.copyToSuspend(it) } }
-                fileToScan = file
+                multiScanParameters = MultiScanParameters(
+                    fileToScan = file,
+                    originalFilename = part.originalFileName ?: file.name
+                )
             }
             part.dispose()
         }
 
         val responseLambda: suspend (ApplicationCall) -> Unit =
-            if (fileToScan == null) {
+            if (multiScanParameters == null) {
                 { call ->
                     call.respond(HttpStatusCode.InternalServerError, "File was not uploaded")
                 }
             } else {
-                val report = scanService.scanFile(fileToScan);
+                val report = scanService.scanFile(multiScanParameters);
                 { call ->
                     call.respondRedirect(call.url(WebRoutes.ScanReport(report.sha256)), false)
                 }

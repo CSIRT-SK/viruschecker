@@ -1,6 +1,6 @@
-package sk.csirt.viruschecker.gateway.cache.repository
+package sk.csirt.viruschecker.gateway.persistence.repository
 
-import sk.csirt.viruschecker.gateway.cache.entity.ScanReportEntity
+import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 
 interface ScanReportRepository {
     fun save(item: ScanReportEntity): ScanReportEntity

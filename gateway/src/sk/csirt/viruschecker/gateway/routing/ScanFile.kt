@@ -12,18 +12,20 @@ import io.ktor.util.KtorExperimentalAPI
 import io.ktor.util.asStream
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
-import sk.csirt.viruschecker.gateway.service.ScanService
+import sk.csirt.viruschecker.gateway.routing.service.DriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
 import java.io.File
 import java.nio.file.Paths
+import java.time.Instant
 import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
-fun Route.multiScanFile(scanService: ScanService) {
+fun Route.multiScanFile(scanService: DriverScanService) {
     post<GatewayRoutes.MultiScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
@@ -33,15 +35,20 @@ fun Route.multiScanFile(scanService: ScanService) {
             val part = multipart.readPart() ?: break
             when (part) {
                 is PartData.FileItem -> {
-                    response = scanService.scanFile(part.toTempFile())
+                    response = scanService.scanFile(
+                        ScanParameters(
+                            fileToScan = part.toTempFile(),
+                            originalFilename = part.originalFileName ?: "scan${Instant.now()}"
+                        )
+                    )
                 }
             }
             part.dispose()
         }
 
-        if(response == null){
+        if (response == null) {
             call.respond(HttpStatusCode.BadRequest, "File was not uploaded.")
-        }else{
+        } else {
             call.respond(response)
         }
     }
