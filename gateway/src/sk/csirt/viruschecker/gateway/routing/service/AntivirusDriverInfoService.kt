@@ -14,14 +14,14 @@ class DriverInfoService(
     private val logger = KotlinLogging.logger { }
     suspend fun info(): List<UrlAntivirusDriverInfoResponse> =
         multiDriverRequest { driverUrl, client ->
-            try {
-                val info = client.get<AntivirusDriverInfoResponse>("$driverUrl${DriverRoutes.index}")
-                UrlAntivirusDriverInfoResponse(
-                    url = driverUrl,
-                    success = true,
-                    info = info
-                )
-            } catch (e: Exception) {
+            val info = client.get<AntivirusDriverInfoResponse>("$driverUrl${DriverRoutes.index}")
+            UrlAntivirusDriverInfoResponse(
+                url = driverUrl,
+                success = true,
+                info = info
+            )
+        }.map { (driverUrl, result) ->
+            result.getOrDefault(
                 UrlAntivirusDriverInfoResponse(
                     url = driverUrl,
                     success = false,
@@ -30,7 +30,6 @@ class DriverInfoService(
                         antivirus = "NA"
                     )
                 )
-            }
+            )
         }
-
 }

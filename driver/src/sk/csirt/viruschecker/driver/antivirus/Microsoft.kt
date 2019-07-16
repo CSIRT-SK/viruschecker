@@ -1,5 +1,7 @@
 package sk.csirt.viruschecker.driver.antivirus
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
@@ -15,11 +17,11 @@ class Microsoft(
 
     override val type: AntivirusType = AntivirusType.MICROSOFT
 
-    override fun parseReportFile(
+    override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
     ): Sequence<ReportEntry> {
-        val lines = FileUtils.readLines(reportFile, Charset.defaultCharset())
+        val lines = withContext(Dispatchers.IO) { FileUtils.readLines(reportFile, Charset.defaultCharset()) }
             .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
         val infectedCountString = lines.firstOrNull {
             it.startsWith("Scanning ") &&

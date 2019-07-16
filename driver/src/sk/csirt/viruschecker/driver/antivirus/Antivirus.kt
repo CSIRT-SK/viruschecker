@@ -9,7 +9,7 @@ val logger = KotlinLogging.logger {  }
 interface Antivirus {
     val type: AntivirusType
 
-    fun scanFile(params: FileScanParameters): FileScanReport
+    suspend fun scanFile(params: FileScanParameters): FileScanReport
 }
 
 data class FileScanParameters(

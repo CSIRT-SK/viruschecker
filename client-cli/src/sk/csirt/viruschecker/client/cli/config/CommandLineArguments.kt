@@ -10,6 +10,7 @@ import java.time.Duration
 
 class CommandLineArguments(parser: ArgParser) {
     val gateway by parser.positional(
+        "URL",
         help = "Gateway url."
     )
 
@@ -19,12 +20,12 @@ class CommandLineArguments(parser: ArgParser) {
 
     val socketTimeout by parser.storing(
         "-t", "--timeout",
-        help = "Optional: Sets WebSocket socketTimeout in milliseconds. Default is $defaultTimeout."
+        help = "Optional: Sets socket timeout in milliseconds. Default is ${defaultTimeout.toMillis()}."
     ) { Duration.ofMillis(this.toLong()) }.default(defaultTimeout)
 
     val outputFile by parser.storing(
         "-o", "--out",
-        help = "Specify file to store report. Supports also csv and Markdown if the filename ends" +
+        help = "Specify file to store report. Csv format is supported if the filename ends" +
                 " with appropriate postfix."
     ) { File(this) }.default<File?>(null)
 }

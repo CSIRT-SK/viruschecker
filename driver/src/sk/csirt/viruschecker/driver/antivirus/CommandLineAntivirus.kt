@@ -1,8 +1,11 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import sk.csirt.viruschecker.driver.config.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
+import sk.csirt.viruschecker.driver.config.Constants
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -35,7 +38,7 @@ abstract class CommandLineAntivirus(
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
-    override fun scanFile(params: FileScanParameters): FileScanReport {
+    override suspend fun scanFile(params: FileScanParameters): FileScanReport = coroutineScope {
         logger.info("Scanning file with this parameters: $params")
         val reportFile = Paths.get(
             Constants.scanReportsDir,
@@ -45,7 +48,7 @@ abstract class CommandLineAntivirus(
         // Some antiviruses (Avast) cannot write reports properly when invoked from another process.
         // This will manually write their STDOUT to the file
         writeOutputToFileIfNotExists(reportFile, output)
-        return retrieveReport(params, reportFile).also {
+        retrieveReport(params, reportFile).also {
             logger.info("Retrieved report: $it")
         }
     }
@@ -60,26 +63,31 @@ abstract class CommandLineAntivirus(
         FileUtils.writeLines(reportFile, scanOutput)
     }
 
-    private fun runAntivirus(params: FileScanParameters, reportFile: File): List<String> {
+    private suspend fun runAntivirus(params: FileScanParameters, reportFile: File)
+            : List<String> {
         val processBuilder = ProcessBuilder()
         processBuilder.command(scanCommand.parse(params.fileToScan, reportFile))
-        val process = processBuilder.start()
+
         logger.debug("Waiting for antivirus. Command to run: $scanCommand")
-        val processReader = BufferedReader(InputStreamReader(process.inputStream))
-        val output = mutableListOf<String>()
-        var line: String? = processReader.readLine()
-        var i = 1
-        while (line != null) {
-            logger.debug("Output line [$i] from antivirus: $line")
-            output += line
-            line = processReader.readLine()
-            i++
+        val output = withContext(Dispatchers.IO) {
+            val process = processBuilder.start()
+            val processReader = BufferedReader(InputStreamReader(process.inputStream))
+            val output = mutableListOf<String>()
+            var line: String? = processReader.readLine()
+            var i = 1
+            while (line != null) {
+                logger.debug("Output line [$i] from antivirus: $line")
+                output += line
+                line = processReader.readLine()
+                i++
+            }
+            output
         }
         logger.debug("Antivirus task completed. Command successfully executed: $scanCommand")
         return output
     }
 
-    private fun retrieveReport(
+    private suspend fun retrieveReport(
         params: FileScanParameters,
         reportFile: File
     ): FileScanReport {
@@ -103,7 +111,7 @@ abstract class CommandLineAntivirus(
         ).also { logger.debug(it.toString()) }
     }
 
-    protected abstract fun parseReportFile(
+    protected abstract suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
     ): Sequence<ReportEntry>

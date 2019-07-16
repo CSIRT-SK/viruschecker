@@ -1,5 +1,7 @@
 package sk.csirt.viruschecker.driver.antivirus
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
@@ -15,7 +17,7 @@ class Avast(
 
     override val type: AntivirusType = AntivirusType.AVAST
 
-    override fun parseReportFile(
+    override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
     ): Sequence<ReportEntry> {
@@ -23,7 +25,7 @@ class Avast(
         // The line below is a poor way to handle this.
 //        sleep(500)
         return sequenceOf(
-            FileUtils.readLines(reportFile, Charset.defaultCharset())
+            withContext(Dispatchers.IO) { FileUtils.readLines(reportFile, Charset.defaultCharset()) }
                 .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
                 .takeIf { it.isNotEmpty() }
                 ?.first()

@@ -24,6 +24,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+@KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Route.scanFile(antivirus: Antivirus) {
     post<DriverRoutes.ScanFile> {
@@ -46,7 +47,7 @@ fun Route.scanFile(antivirus: Antivirus) {
 }
 
 @KtorExperimentalAPI
-private fun processFile(fileItem: PartData.FileItem, virusChecker: Antivirus): FileScanResponse {
+private suspend fun processFile(fileItem: PartData.FileItem, virusChecker: Antivirus): FileScanResponse {
     val filename = fileItem.originalFileName ?: "file${UUID.randomUUID()}"
 
     val report: FileScanReport = virusChecker.scanFile(

@@ -11,6 +11,7 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.routing.routing
+import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
@@ -31,6 +32,7 @@ fun main(args: Array<String>) = mainBody {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {

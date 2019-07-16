@@ -1,6 +1,7 @@
 package sk.csirt.viruschecker.client.cli
 
 import com.xenomachina.argparser.ArgParser
+import com.xenomachina.argparser.mainBody
 import io.ktor.application.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -19,7 +20,7 @@ private val logger = KotlinLogging.logger { }
 
 lateinit var parsedArgs: CommandLineArguments
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>) = mainBody {
     parsedArgs = ArgParser(args).parseInto(::CommandLineArguments)
     io.ktor.server.netty.EngineMain.main(args)
 }
