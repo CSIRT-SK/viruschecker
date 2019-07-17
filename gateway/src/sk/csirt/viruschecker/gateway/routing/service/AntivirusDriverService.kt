@@ -31,18 +31,6 @@ abstract class AntivirusDriverService(
                 result = result
             )
         }
-//            .map { (driverUrl, deferredT) ->
-//            try {
-//                deferredT.await().also {
-//                    logger.info { "Retrieved report from $driverUrl: $it" }
-//                }.let {
-//                    MultiDriverResponse(driverUrl, it)
-//                }
-//            } catch (e: Throwable) {
-//                logger.error { "Failed http post to $driverUrl, cause is \n${e.message}" }
-//                MultiDriverResponse(driverUrl, null)
-//            }
-//        }
     }
 
     data class MultiDriverResponse<R>(
