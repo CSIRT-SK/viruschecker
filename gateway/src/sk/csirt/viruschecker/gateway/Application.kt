@@ -23,12 +23,15 @@ import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
 import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
 import sk.csirt.viruschecker.gateway.config.CommandLineArguments
+import sk.csirt.viruschecker.gateway.config.checkedDriverUrls
 import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
 import sk.csirt.viruschecker.gateway.routing.driversInfo
 import sk.csirt.viruschecker.gateway.routing.findByHash
+import sk.csirt.viruschecker.gateway.routing.index
 import sk.csirt.viruschecker.gateway.routing.multiScanFile
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
+import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 
 private val logger = KotlinLogging.logger {  }
 
@@ -74,14 +77,12 @@ fun Application.module() {
 
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<ScanReportService>()
-    val antivirusDriverInfoService by inject<DriverInfoService>()
+//    val antivirusDriverInfoService by inject<DriverInfoService>()
+    val checkedUrls by inject<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
 
     routing {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-        }
-
-        driversInfo(antivirusDriverInfoService)
+        index()
+        driversInfo(checkedUrls)
         multiScanFile(scanService)
         findByHash(scanReportService)
 

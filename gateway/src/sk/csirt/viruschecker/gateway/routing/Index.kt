@@ -16,7 +16,7 @@ fun Route.index() {
     get<GatewayRoutes.Index> {
         call.respond(
             GatewayInfoResponse(
-                version = DriverScanService::class.java.`package`.implementationVersion ?: ideRunMessage
+                gatewayVersion = DriverScanService::class.java.`package`.implementationVersion ?: ideRunMessage
             )
         )
     }

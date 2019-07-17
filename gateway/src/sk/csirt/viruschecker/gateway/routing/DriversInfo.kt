@@ -8,16 +8,15 @@ import io.ktor.response.respond
 import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
 import sk.csirt.viruschecker.routing.GatewayRoutes
+import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 
 private val logger = KotlinLogging.logger { }
 
 @KtorExperimentalLocationsAPI
-fun Route.driversInfo(driverInfoService: DriverInfoService) {
+fun Route.driversInfo(checkedUrls: List<UrlAntivirusDriverInfoResponse>) {
     get<GatewayRoutes.DriversInfo> {
-        logger.debug { "Receiving driver info" }
-        val driversInfo = driverInfoService.info()
         logger.info { "Sending driver info to ${call.request.local.remoteHost}" }
-        call.respond(driversInfo)
+        call.respond(checkedUrls)
     }
 }
 

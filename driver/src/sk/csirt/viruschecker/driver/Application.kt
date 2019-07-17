@@ -59,7 +59,6 @@ fun Application.module() {
     }
 
     install(Locations)
-
        install(Koin) {
         modules(driverDependencyInjectionModule)
         properties(PropertiesFactory.loadOrCreateDefault())
@@ -70,7 +69,6 @@ fun Application.module() {
     routing {
         index(virusChecker)
         scanFile(virusChecker)
-
     }
 
 

@@ -49,6 +49,7 @@ subprojects {
     compileKotlin {
         kotlinOptions {
 //            freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
+//            freeCompilerArgs = ["-Xallow-result-return-type"]
             jvmTarget = '1.8'
         }
     }
@@ -56,6 +57,7 @@ subprojects {
     compileTestKotlin {
         kotlinOptions {
 //            freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
+//            freeCompilerArgs = ["-Xallow-result-return-type"]
             jvmTarget = '1.8'
         }
     }

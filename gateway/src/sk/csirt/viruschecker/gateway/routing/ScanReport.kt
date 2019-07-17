@@ -15,10 +15,10 @@ private val logger = KotlinLogging.logger { }
 @KtorExperimentalLocationsAPI
 fun Route.findByHash(scanReportService: ScanReportService){
     get<GatewayRoutes.ScanReport>{ params ->
-        logger.info { "Retrieving report for hash ${params.sha256}" }
+        logger.info { "Retrieving report for sha256 ${params.sha256}" }
         val scanReport = scanReportService.findBySha256(params.sha256)
         if(scanReport == null){
-            call.respond(HttpStatusCode.NotFound, "Hash not found!")
+            call.respond(HttpStatusCode.NoContent, "Hash not found!")
         }else{
             call.respond(scanReport)
         }

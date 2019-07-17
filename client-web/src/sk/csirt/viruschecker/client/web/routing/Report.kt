@@ -17,7 +17,7 @@ import java.time.ZoneId
 @KtorExperimentalLocationsAPI
 fun Route.showReport(reportService: ReportByHashService) {
     get<WebRoutes.ScanReport> { params ->
-        val scanReport = reportService.findReportBySha256(params.hash)
+        val scanReport = reportService.findReportBySha256(params.sha256)
         call.respondDefaultHtml {
             h2 { +"Scan report for ${scanReport.filename}" }
 

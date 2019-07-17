@@ -19,8 +19,8 @@ object WebRoutes {
     @Location(index)
     class Index()
 
-    const val scanReport = "/scanReport/{hash}"
+    const val scanReport = "/scanReport/{sha256}"
     @KtorExperimentalLocationsAPI
     @Location(scanReport)
-    data class ScanReport(val hash: String)
+    data class ScanReport(val sha256: String)
 }

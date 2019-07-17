@@ -1,9 +1,8 @@
 package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
 
 abstract class AntivirusDriverService(
@@ -14,22 +13,36 @@ abstract class AntivirusDriverService(
 
     suspend fun <T> multiDriverRequest(
         block: suspend (driverUrl: String, client: HttpClient) -> T
-    ): List<MultiDriverResponse<Result<T>>> = coroutineScope {
+    ): List<MultiDriverResponse<Result<T>>> = supervisorScope {
         driverUrls.map { driverUrl ->
             driverUrl to async {
                 logger.info { "Requesting from $driverUrl" }
                 block(driverUrl, client)
             }
         }.map { (driverUrl, deferredT) ->
-            runCatching { deferredT.await() }
-                .onSuccess {
-                    logger.info { logger.info("Retrieved report from $driverUrl: $it") }
-                }.onFailure {
+            val result = runCatching { deferredT.await() }
+                .onFailure {
                     logger.error { "Failed http post to $driverUrl, cause is \n${it.message}" }
-                }.let {
-                    MultiDriverResponse(driverUrl, it)
+                }.onSuccess {
+                    logger.info { "Retrieved report from $driverUrl: $it" }
                 }
+            MultiDriverResponse(
+                driverUrl = driverUrl,
+                result = result
+            )
         }
+//            .map { (driverUrl, deferredT) ->
+//            try {
+//                deferredT.await().also {
+//                    logger.info { "Retrieved report from $driverUrl: $it" }
+//                }.let {
+//                    MultiDriverResponse(driverUrl, it)
+//                }
+//            } catch (e: Throwable) {
+//                logger.error { "Failed http post to $driverUrl, cause is \n${e.message}" }
+//                MultiDriverResponse(driverUrl, null)
+//            }
+//        }
     }
 
     data class MultiDriverResponse<R>(

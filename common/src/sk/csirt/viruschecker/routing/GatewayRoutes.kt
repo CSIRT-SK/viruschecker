@@ -19,7 +19,7 @@ object GatewayRoutes {
     @Location(index)
     class Index
 
-    const val scanReport = "/scanReport"
+    const val scanReport = "/scanReport/{sha256}"
     @KtorExperimentalLocationsAPI
     @Location(scanReport)
     data class ScanReport(val sha256: String)

@@ -14,10 +14,11 @@ import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.gateway.persistence.repository.KeyValueScanReportRepository
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.hash.HashHolder
+import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 import java.io.File
 import java.time.Instant
 
-private val checkedDriverUrls = named("checked.driver.urls")
+internal val checkedDriverUrls = named("checked.driver.urls")
 private val database = named("scan.report.database")
 
 val gatewayDependencyInjectionModule = module {
@@ -54,10 +55,15 @@ val gatewayDependencyInjectionModule = module {
     single { DriverInfoService(parsedArgs.driverUrls, get()) }
     single(checkedDriverUrls) {
         runBlocking { get<DriverInfoService>().info() }
-            .filter { it.success }
-            .map { it.url }
     }
-    single { DefaultDriverScanService(get(checkedDriverUrls), get()) }
+    single {
+        DefaultDriverScanService(
+            get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
+                .filter { it.success }
+                .map { it.url },
+            get()
+        )
+    }
     single { CachedDriverScanService(get(), get()) }
 
 }

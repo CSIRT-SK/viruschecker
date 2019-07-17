@@ -15,7 +15,8 @@ class CommandLineArguments(parser: ArgParser) {
 
     val socketTimeout by parser.storing(
         "-t", "--timeout",
-        help = "Optional: Set socket timeout in milliseconds. Default is $defaultTimeout."
+        help = "Optional: Set socket timeout in milliseconds. Default is value " +
+                "${defaultTimeout.toMillis()}."
     ) { Duration.ofMillis(this.toLong()) }.default(defaultTimeout)
 
 }
