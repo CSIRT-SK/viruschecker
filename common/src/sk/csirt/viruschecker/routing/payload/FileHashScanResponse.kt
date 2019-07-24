@@ -13,12 +13,12 @@ data class FileScanResponse(
     val date: Instant,
     val filename: String,
     val status: ScanStatusResponse,
-    val results: List<ScanResultResponse>
+    val results: List<AntivirusReportResponse>
 ) {
     constructor(
         date: Instant,
         filename: String,
-        results: List<ScanResultResponse>
+        results: List<AntivirusReportResponse>
     ) : this(
         date = date,
         filename = filename,
@@ -27,7 +27,7 @@ data class FileScanResponse(
     )
 }
 
-data class ScanResultResponse(
+data class AntivirusReportResponse(
     val antivirus: String,
     val status: ScanStatusResponse,
     val malwareDescription: String

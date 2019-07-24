@@ -6,11 +6,11 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.routing.Routing
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.service.DriverInfoGatewayService
+import sk.csirt.viruschecker.client.service.GatewayInfoService
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
 
 @KtorExperimentalLocationsAPI
-fun Routing.index(antivirusDriverInfoService: DriverInfoGatewayService) {
+fun Routing.index(antivirusDriverInfoService: GatewayInfoService) {
     get<WebRoutes.Index> {
         val version = WebRoutes.Index::class.java.`package`.implementationVersion
             ?: "Not available, run the app as JAR"

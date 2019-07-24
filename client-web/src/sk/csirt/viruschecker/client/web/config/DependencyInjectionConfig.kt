@@ -2,14 +2,14 @@ package sk.csirt.viruschecker.client.web.config
 
 import org.koin.dsl.module
 import sk.csirt.viruschecker.client.config.httpClient
-import sk.csirt.viruschecker.client.service.DriverInfoGatewayService
-import sk.csirt.viruschecker.client.service.MultiScanService
-import sk.csirt.viruschecker.client.service.ReportByHashService
+import sk.csirt.viruschecker.client.service.GatewayInfoService
+import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.client.service.GatewayReportService
 import sk.csirt.viruschecker.client.web.parsedArgs
 
 val webClientDependencyInjectionModule = module {
     single { httpClient(parsedArgs.socketTimeout) }
-    single { DriverInfoGatewayService(parsedArgs.gateway, get()) }
-    single { ReportByHashService(parsedArgs.gateway, get()) }
-    single { MultiScanService(parsedArgs.gateway, get()) }
+    single { GatewayInfoService(parsedArgs.gateway, get()) }
+    single { GatewayReportService(parsedArgs.gateway, get()) }
+    single { GatewayScanService(parsedArgs.gateway, get()) }
 }

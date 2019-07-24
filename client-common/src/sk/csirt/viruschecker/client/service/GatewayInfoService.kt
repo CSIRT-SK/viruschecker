@@ -5,11 +5,9 @@ import io.ktor.client.request.get
 import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
-import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
 
-class DriverInfoGatewayService(
+class GatewayInfoService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {

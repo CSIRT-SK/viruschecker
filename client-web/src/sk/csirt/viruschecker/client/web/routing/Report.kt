@@ -5,7 +5,7 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.routing.Route
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.service.ReportByHashService
+import sk.csirt.viruschecker.client.service.GatewayReportService
 import sk.csirt.viruschecker.client.web.template.pAlert
 import sk.csirt.viruschecker.client.web.template.pOk
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @KtorExperimentalLocationsAPI
-fun Route.showReport(reportService: ReportByHashService) {
+fun Route.showReport(reportService: GatewayReportService) {
     get<WebRoutes.ScanReport> { params ->
         val (sha256, md5, sha1, scanReport) =
             reportService.findReportBySha256(params.sha256)

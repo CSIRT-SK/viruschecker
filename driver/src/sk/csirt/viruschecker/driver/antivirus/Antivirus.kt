@@ -2,7 +2,6 @@ package sk.csirt.viruschecker.driver.antivirus
 
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import mu.KotlinLogging
-import sk.csirt.viruschecker.hash.HashHolder
 import java.io.File
 
 val logger = KotlinLogging.logger { }
@@ -10,7 +9,7 @@ val logger = KotlinLogging.logger { }
 interface Antivirus {
     val type: AntivirusType
 
-    suspend fun scanFile(params: FileScanParameters): FileScanReport
+    suspend fun scanFile(params: FileScanParameters): FileScanResult
 }
 
 data class FileScanParameters(
@@ -18,35 +17,35 @@ data class FileScanParameters(
     val originalFileName: String = fileToScan.name
 )
 
-data class ScanReport(
+data class ScanResult(
     val antivirusType: AntivirusType,
-    val status: ScanStatusReport,
-    val reports: List<AntivirusReport>
+    val status: ScanStatusResult,
+    val reports: List<AntivirusReportResult>
 ){
     constructor(
         antivirusType: AntivirusType,
-        reports: List<AntivirusReport>
+        reports: List<AntivirusReportResult>
     ) : this(
         antivirusType = antivirusType,
         reports = reports,
-        status = reports.maxBy { it.status }?.status ?: ScanStatusReport.NOT_AVAILABLE
+        status = reports.maxBy { it.status }?.status ?: ScanStatusResult.NOT_AVAILABLE
     )
 }
 
-data class FileScanReport(
+data class FileScanResult(
     val filename: String,
-    val scanReport: ScanReport
+    val scanReport: ScanResult
 )
 
-data class AntivirusReport(
+data class AntivirusReportResult(
     val antivirusName: String,
-    val status: ScanStatusReport,
+    val status: ScanStatusResult,
     val malwareDescription: String
 )
 
 /**
  * Do not change the order of constants!
  */
-enum class ScanStatusReport {
+enum class ScanStatusResult {
     NOT_AVAILABLE, OK, INFECTED
 }

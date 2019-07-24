@@ -26,7 +26,7 @@ class DefaultDriverScanService(
     FileScanService {
     private val logger = KotlinLogging.logger { }
 
-    override suspend fun scanFile(scanParams: MultiScanRequest): FileHashScanResponse =
+    override suspend fun scanFile(scanParams: GatewayScanRequest): FileHashScanResponse =
         coroutineScope {
             val (fileToScan, originalFileName) = scanParams
             logger.info { "Computing hashes for $fileToScan" }
@@ -58,7 +58,7 @@ class DefaultDriverScanService(
                         date = Instant.now(),
                         filename = originalFileName,
                         results = listOf(
-                            ScanResultResponse(
+                            AntivirusReportResponse(
                                 antivirus = "Unknown",
                                 malwareDescription = "Connection to $driverUrl was unsuccessful.",
                                 status = ScanStatusResponse.NOT_AVAILABLE

@@ -5,7 +5,7 @@
 //import mu.KotlinLogging
 //import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 //import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
-//import sk.csirt.viruschecker.routing.payload.ScanResultResponse
+//import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 //import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 //import sk.csirt.viruschecker.routing.payload.FileScanResponse
 //import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
@@ -64,7 +64,7 @@
 //                            date = dateTimeFormatter.parse(it.scanDate, Instant::from),
 //                            filename = "hash",
 //                            results = it.scans.map { (antivirus, scanInfo) ->
-//                                ScanResultResponse(
+//                                AntivirusReportResponse(
 //                                    antivirus = "$antivirus (VirusTotal)",
 //                                    malwareDescription = scanInfo.result,
 //                                    status = if (scanInfo.isDetected)

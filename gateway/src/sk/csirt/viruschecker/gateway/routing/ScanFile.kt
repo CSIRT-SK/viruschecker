@@ -15,7 +15,7 @@ import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.routing.payload.MultiScanRequest
+import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import java.io.File
 import java.nio.file.Paths
 import java.time.Instant
@@ -30,41 +30,49 @@ fun Route.multiScanFile(scanService: FileScanService) {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
 
-        var multiScanRequest = MultiScanRequest(
-            fileToScan = File(""),
-            originalFilename = "",
-            useExternalDrivers = false
-        )
+        var fileToScan: File? = null
+        var originalFilename = ""
+        var useExternalDrivers = false
 
         multipart.forEachPart { part ->
             when (part) {
                 is PartData.FormItem -> {
-                    multiScanRequest = multiScanRequest.copy(
-                        useExternalDrivers = part.value.toBoolean()
-                    )
+                    useExternalDrivers = part.value.toBoolean()
                 }
                 is PartData.FileItem -> {
-                    multiScanRequest = multiScanRequest.copy(
-                        fileToScan = part.toTempFile(),
-                        originalFilename = part.originalFileName ?: "scan${Instant.now()}"
-                    )
+                    fileToScan = part.toTempFile()
+                    originalFilename = part.originalFileName ?: "scan${Instant.now()}"
                 }
             }
             part.dispose()
         }
-        logger.info { "Received this scan parameters: $multiScanRequest" }
 
-//        scanService.scanFile(multiScanRequest).let {
-//            call.respond(it)
-//        }
-        runCatching { scanService.scanFile(multiScanRequest) }
-            .onSuccess {
-                call.respond(it)
-            }
-            .onFailure {
-                call.respond(HttpStatusCode.BadRequest, "File was not scanned.")
-            }
-            .getOrThrow()
+
+        logger.info {
+            "Received request to scan file $originalFilename using " +
+                    "${if (useExternalDrivers) "also" else "no"} external drivers."
+        }
+
+        if (fileToScan == null) {
+            call.respond(HttpStatusCode.BadRequest, "File was not received.")
+        }
+
+        runCatching {
+            scanService.scanFile(
+                GatewayScanRequest(
+                    fileToScan = fileToScan!!,
+                    useExternalDrivers = useExternalDrivers,
+                    originalFilename = originalFilename
+                )
+            )
+        }.onSuccess {
+            call.respond(it)
+        }.onFailure {
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                "File was not scanned. Reason is ${it.message}"
+            )
+        }.getOrThrow()
     }
 }
 

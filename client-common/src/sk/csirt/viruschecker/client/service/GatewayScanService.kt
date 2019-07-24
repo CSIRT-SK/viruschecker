@@ -7,21 +7,20 @@ import io.ktor.http.ContentDisposition
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.PartData
-import kotlinx.coroutines.coroutineScope
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.MultiScanRequest
+import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import java.io.FileInputStream
 
-class MultiScanService(
+class GatewayScanService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun scanFile(params: MultiScanRequest): FileHashScanResponse =
+    suspend fun scanFile(params: GatewayScanRequest): FileHashScanResponse =
         client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
             this.body = MultiPartFormDataContent(listOf(
                 PartData.FileItem(

@@ -7,7 +7,6 @@ import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.charset.Charset
-import java.time.LocalDateTime
 
 class Microsoft(
     scanCommand: RunProgramCommand
@@ -37,13 +36,13 @@ class Microsoft(
         val infectedCount = infectedCountString?.toIntOrNull()
 
         return when {
-            infectedCountString == null -> Report(ScanStatusReport.NOT_AVAILABLE, "NA")
-            infectedCountString == "no" -> Report(ScanStatusReport.OK, "OK")
+            infectedCountString == null -> Report(ScanStatusResult.NOT_AVAILABLE, "NA")
+            infectedCountString == "no" -> Report(ScanStatusResult.OK, "OK")
             infectedCount != null -> {
                 val description = lines.first { it.startsWith("Threat") }.split(": ")[1]
-                Report(ScanStatusReport.INFECTED, description)
+                Report(ScanStatusResult.INFECTED, description)
             }
-            else -> Report(ScanStatusReport.NOT_AVAILABLE, "NA")
+            else -> Report(ScanStatusResult.NOT_AVAILABLE, "NA")
         }
 
     }

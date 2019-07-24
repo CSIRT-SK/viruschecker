@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import java.io.File
 import java.nio.charset.Charset
-import java.time.LocalDateTime
 
 class Eset(
     scanCommand: RunProgramCommand
@@ -35,15 +34,15 @@ class Eset(
                 line.split(", ")[1].let { status ->
                     Report(
                         when {
-                            "result=\"\"" == status -> ScanStatusReport.NOT_AVAILABLE
-                            "OK" in status -> ScanStatusReport.OK
-                            else -> ScanStatusReport.INFECTED
+                            "result=\"\"" == status -> ScanStatusResult.NOT_AVAILABLE
+                            "OK" in status -> ScanStatusResult.OK
+                            else -> ScanStatusResult.INFECTED
                         },
                         status.split("=")[1].let {
                             it.substring(1, it.length - 1)
                         }
                     )
                 }
-            }.maxBy { it.status } ?: Report(ScanStatusReport.NOT_AVAILABLE, "")
+            }.maxBy { it.status } ?: Report(ScanStatusResult.NOT_AVAILABLE, "")
 }
 

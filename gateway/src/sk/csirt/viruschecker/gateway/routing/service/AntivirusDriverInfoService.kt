@@ -6,7 +6,7 @@ import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.config.Drivers
 import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 import sk.csirt.viruschecker.routing.DriverRoutes
-import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
+import sk.csirt.viruschecker.routing.payload.DriverInfoResponse
 
 class DriverInfoService(
     driverUrls: Drivers,
@@ -15,7 +15,7 @@ class DriverInfoService(
     private val logger = KotlinLogging.logger { }
     suspend fun info(): List<UrlAntivirusDriverInfoResponse> =
         multiDriverRequest(useExternalDrivers = true) { driverUrl, client ->
-            val info = client.get<AntivirusDriverInfoResponse>("$driverUrl${DriverRoutes.index}")
+            val info = client.get<DriverInfoResponse>("$driverUrl${DriverRoutes.index}")
             UrlAntivirusDriverInfoResponse(
                 url = driverUrl,
                 success = true,
@@ -26,7 +26,7 @@ class DriverInfoService(
                 UrlAntivirusDriverInfoResponse(
                     url = driverUrl,
                     success = false,
-                    info = AntivirusDriverInfoResponse(
+                    info = DriverInfoResponse(
                         driverVersion = "ERROR: Could not reach driver.",
                         antivirus = "NA"
                     )

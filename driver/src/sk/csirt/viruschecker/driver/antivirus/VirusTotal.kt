@@ -18,7 +18,7 @@ class VirusTotal(apiKey: String) : Antivirus {
 
     override val type: AntivirusType = AntivirusType.VIRUS_TOTAL
 
-    override suspend fun scanFile(params: FileScanParameters): FileScanReport {
+    override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val virusTotalRef = VirustotalPublicV2Impl()
         val fileToScan = params.fileToScan
         val sha256 = withContext(Dispatchers.IO) { fileToScan.sha256() }.value
@@ -33,16 +33,16 @@ class VirusTotal(apiKey: String) : Antivirus {
                 .onSuccess { logger.info { "VirusTotal success for file ${fileToScan.canonicalPath}." } }
                 .getOrThrow()
 
-        val emptyReport = FileScanReport(
+        val emptyReport = FileScanResult(
             filename = params.originalFileName,
-            scanReport = ScanReport(
+            scanReport = ScanResult(
                 antivirusType = type,
-                status = ScanStatusReport.NOT_AVAILABLE,
+                status = ScanStatusResult.NOT_AVAILABLE,
                 reports = listOf(
-                    AntivirusReport(
+                    AntivirusReportResult(
                         antivirusName = type.antivirusName,
                         malwareDescription = "${type.antivirusName} did not recognize this hash",
-                        status = ScanStatusReport.NOT_AVAILABLE
+                        status = ScanStatusResult.NOT_AVAILABLE
                     )
                 )
             )
@@ -52,18 +52,18 @@ class VirusTotal(apiKey: String) : Antivirus {
             scanInformation == null -> emptyReport
             "Scan finished" in scanInformation.verboseMessage ->
                 scanInformation.let {
-                    FileScanReport(
+                    FileScanResult(
                         filename = params.originalFileName,
-                        scanReport = ScanReport(
+                        scanReport = ScanResult(
                             antivirusType = type,
                             reports = it.scans.map { (antivirus, info) ->
-                                AntivirusReport(
+                                AntivirusReportResult(
                                     antivirusName = "$antivirus (${type.antivirusName})",
                                     malwareDescription = info.result ?: "",
                                     status = when {
-                                        info.result == null -> ScanStatusReport.NOT_AVAILABLE
-                                        info.isDetected -> ScanStatusReport.INFECTED
-                                        else -> ScanStatusReport.OK
+                                        info.result == null -> ScanStatusResult.NOT_AVAILABLE
+                                        info.isDetected -> ScanStatusResult.INFECTED
+                                        else -> ScanStatusResult.OK
                                     }
                                 )
                             }

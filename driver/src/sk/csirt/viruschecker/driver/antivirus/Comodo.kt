@@ -24,10 +24,10 @@ class Comodo(scanCommand: RunProgramCommand) : CommandLineAntivirus(scanCommand)
         .let {
             when {
                 it == "Not Virus" ->
-                    Report(ScanStatusReport.OK, it)
+                    Report(ScanStatusResult.OK, it)
                 it.startsWith("Found Virus") ->
-                    Report(ScanStatusReport.INFECTED, it.split(" is ")[1])
-                else -> Report(ScanStatusReport.NOT_AVAILABLE, "")
+                    Report(ScanStatusResult.INFECTED, it.split(" is ")[1])
+                else -> Report(ScanStatusResult.NOT_AVAILABLE, "")
             }
         }
 }

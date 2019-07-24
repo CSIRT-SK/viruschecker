@@ -2,11 +2,8 @@ package sk.csirt.viruschecker.client.cli.config
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.config.defaultTimeout
-import sk.csirt.viruschecker.routing.payload.MultiScanRequest
 import java.io.File
-import java.nio.charset.Charset
 import java.time.Duration
 
 class CommandLineArguments(parser: ArgParser) {

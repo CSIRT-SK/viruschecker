@@ -7,7 +7,7 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
-import sk.csirt.viruschecker.routing.payload.AntivirusDriverInfoResponse
+import sk.csirt.viruschecker.routing.payload.DriverInfoResponse
 import sk.csirt.viruschecker.routing.DriverRoutes
 
 private val logger = KotlinLogging.logger { }
@@ -18,7 +18,7 @@ private const val ideRunMessage = "Version not available. Driver application is 
 @KtorExperimentalLocationsAPI
 fun Route.index(virusChecker: Antivirus) {
     get<DriverRoutes.Index> {
-        call.respond(AntivirusDriverInfoResponse(
+        call.respond(DriverInfoResponse(
             antivirus = virusChecker.type.antivirusName,
             driverVersion = Antivirus::class.java.`package`.implementationVersion
                 ?: ideRunMessage

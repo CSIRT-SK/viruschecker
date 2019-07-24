@@ -42,7 +42,7 @@ abstract class CommandLineAntivirus(
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
-    override suspend fun scanFile(params: FileScanParameters): FileScanReport = coroutineScope {
+    override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
         logger.info("Scanning file with this parameters: $params")
         val reportFile = Paths.get(
             Constants.scanReportsDir,
@@ -95,15 +95,15 @@ abstract class CommandLineAntivirus(
     private suspend fun retrieveReport(
         reportFile: File,
         params: FileScanParameters
-    ): FileScanReport {
+    ): FileScanResult {
         val (status, description) = parseReportFile(reportFile, params)
-        return FileScanReport(
+        return FileScanResult(
             filename = params.originalFileName,
-            scanReport = ScanReport(
+            scanReport = ScanResult(
                 antivirusType = type,
                 status = status,
                 reports = listOf(
-                    AntivirusReport(
+                    AntivirusReportResult(
                         status = status,
                         malwareDescription = description,
                         antivirusName = type.antivirusName
@@ -118,6 +118,6 @@ abstract class CommandLineAntivirus(
         params: FileScanParameters
     ): Report
 
-    protected data class Report(val status: ScanStatusReport, val malwareDescription: String)
+    protected data class Report(val status: ScanStatusResult, val malwareDescription: String)
 
 }

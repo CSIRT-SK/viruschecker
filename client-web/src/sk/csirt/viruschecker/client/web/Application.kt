@@ -19,9 +19,9 @@ import io.ktor.locations.Locations
 import io.ktor.response.respond
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
-import sk.csirt.viruschecker.client.service.DriverInfoGatewayService
-import sk.csirt.viruschecker.client.service.MultiScanService
-import sk.csirt.viruschecker.client.service.ReportByHashService
+import sk.csirt.viruschecker.client.service.GatewayInfoService
+import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.client.service.GatewayReportService
 import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
 import sk.csirt.viruschecker.client.web.routing.index
@@ -99,9 +99,9 @@ fun Application.module() {
     }
 
 
-    val scanService by inject<MultiScanService>()
-    val scanReportService by inject<ReportByHashService>()
-    val antivirusDriverInfoService by inject<DriverInfoGatewayService>()
+    val scanService by inject<GatewayScanService>()
+    val scanReportService by inject<GatewayReportService>()
+    val antivirusDriverInfoService by inject<GatewayInfoService>()
 
     routing {
         index(antivirusDriverInfoService)

@@ -32,11 +32,11 @@ class Avast(
                 line.split("\t")[1].let {
                     Report(
                         when {
-                            "OK" in it -> ScanStatusReport.OK
-                            else -> ScanStatusReport.INFECTED
+                            "OK" in it -> ScanStatusResult.OK
+                            else -> ScanStatusResult.INFECTED
                         },
                         it
                     )
                 }
-            } ?: Report(ScanStatusReport.NOT_AVAILABLE, "")
+            } ?: Report(ScanStatusResult.NOT_AVAILABLE, "")
 }
