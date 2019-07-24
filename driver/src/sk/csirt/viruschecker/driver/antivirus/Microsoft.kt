@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 import java.time.LocalDateTime
 
 class Microsoft(
-    scanCommand: ScanCommand
+    scanCommand: RunProgramCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
@@ -20,8 +20,13 @@ class Microsoft(
     override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Sequence<ReportEntry> {
-        val lines = withContext(Dispatchers.IO) { FileUtils.readLines(reportFile, Charset.defaultCharset()) }
+    ): Report {
+        val lines = withContext(Dispatchers.IO) {
+            FileUtils.readLines(
+                reportFile,
+                Charset.defaultCharset()
+            )
+        }
             .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
         val infectedCountString = lines.firstOrNull {
             it.startsWith("Scanning ") &&
@@ -31,20 +36,15 @@ class Microsoft(
         logger.debug { "Found $infectedCountString threats." }
         val infectedCount = infectedCountString?.toIntOrNull()
 
-        val (status, description) = when {
-            infectedCountString == null -> ReportEntry.Status.NOT_AVAILABLE to "NA"
-            infectedCountString == "no" -> ReportEntry.Status.OK to "OK"
+        return when {
+            infectedCountString == null -> Report(ScanStatusReport.NOT_AVAILABLE, "NA")
+            infectedCountString == "no" -> Report(ScanStatusReport.OK, "OK")
             infectedCount != null -> {
                 val description = lines.first { it.startsWith("Threat") }.split(": ")[1]
-                ReportEntry.Status.INFECTED to description
+                Report(ScanStatusReport.INFECTED, description)
             }
-            else -> ReportEntry.Status.NOT_AVAILABLE to "NA"
+            else -> Report(ScanStatusReport.NOT_AVAILABLE, "NA")
         }
 
-        return sequenceOf(ReportEntry(
-            datetime = LocalDateTime.now(),
-            status = status,
-            description = description
-        ))
     }
 }

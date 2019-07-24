@@ -1,8 +1,11 @@
 package sk.csirt.viruschecker.utils
 
 import kotlinx.coroutines.*
+import org.apache.commons.io.FileUtils
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.charset.Charset
 
 val tempDirectory = System.getProperty("java.io.tmpdir")
 
@@ -31,3 +34,13 @@ suspend fun InputStream.copyToSuspend(
 }
 
 suspend fun <T> Iterable<Deferred<T>>.await() = map { it.await() }
+
+fun Iterable<String>.cleanCommentsAndEmptyLines() =
+    asSequence()
+        .filterNot { it.startsWith("#") }
+        .filterNot { it.isBlank() }
+        .map { line ->
+            line.indexOfFirst { '#' == it }
+                .takeIf { it > 0 }
+                ?.let { line.substring(0, it) } ?: line
+        }.toList()

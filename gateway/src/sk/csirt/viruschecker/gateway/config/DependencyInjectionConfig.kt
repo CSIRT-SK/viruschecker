@@ -6,23 +6,25 @@ import org.koin.dsl.module
 import sk.csirt.viruschecker.gateway.routing.service.DefaultDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
 import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
-import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
+import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.parsedArgs
 import sk.csirt.viruschecker.gateway.persistence.ScanReportDatabase
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.gateway.persistence.repository.KeyValueScanReportRepository
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
-import sk.csirt.viruschecker.hash.HashHolder
 import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 import java.io.File
 import java.time.Instant
 
 internal val checkedDriverUrls = named("checked.driver.urls")
+internal val checkedDrivers = named("checked.drivers")
 private val database = named("scan.report.database")
 
 val gatewayDependencyInjectionModule = module {
-    val sha256Sample = "f87a48a0f14418b6b49a17d9616cfa0385ab7339cbb4f5b602f48a7a9ea71bcd"
+    val sha256Sample = "2f66755d1d48dab1d49441087077cdb4ef4161dca5fb536446c2c20d1ee596fb"
+    val sha1Sample = "27cdb0eb9e1fe3fb6a91cec02e2b21c8251e091c"
+    val md5Sample = "597c538cf3ea4f2f97cb1b9481af443e"
     single(database) {
         ScanReportDatabase(
             file = File(getProperty<String>("database.file")),
@@ -32,12 +34,8 @@ val gatewayDependencyInjectionModule = module {
                 sha256 = sha256Sample,
                 filename = "thisFileDoesNotExists.txt",
                 date = Instant.now(),
-                otherHashes = listOf(
-                    HashHolder(
-                        value = "f4c7ed3d8c5d0ca5ff98b22bfbf977fc",
-                        algorithm = "MD5"
-                    )
-                ),
+                md5 = md5Sample,
+                sha1 = sha1Sample,
                 reports = (1..7).map {
                     AntivirusReportEntity(
                         antivirus = "Antivirus-$it",
@@ -50,17 +48,34 @@ val gatewayDependencyInjectionModule = module {
         )
     }
     single<ScanReportRepository> { KeyValueScanReportRepository(get(database)) }
-    single { ScanReportService(get()) }
+    single { PersistentScanReportService(get()) }
     single { httpClient(parsedArgs.socketTimeout) }
-    single { DriverInfoService(parsedArgs.driverUrls, get()) }
+    single {
+        DriverInfoService(
+            parsedArgs.drivers,
+            get()
+        )
+    }
+
     single(checkedDriverUrls) {
         runBlocking { get<DriverInfoService>().info() }
+            .filter { it.success }
     }
+
+    single(checkedDrivers) {
+        get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
+            .partition { it.url in parsedArgs.drivers.external }
+            .let {
+                Drivers(
+                    internal = it.second.map { it.url },
+                    external = it.first.map { it.url }
+                )
+            }
+    }
+
     single {
         DefaultDriverScanService(
-            get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
-                .filter { it.success }
-                .map { it.url },
+            get(checkedDrivers),
             get()
         )
     }

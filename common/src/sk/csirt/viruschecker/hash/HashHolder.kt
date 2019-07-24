@@ -30,18 +30,26 @@ sealed class HashAlgorithm(
             "0".repeat(hashLength - hashText.length) + hashText
         else
             hashText
-       return HashHolder(hashTextPadded, algorithm)
+        return HashHolder(hashTextPadded, algorithm)
     }
+
+    override fun toString(): String = algorithm
 
     class Sha256 : HashAlgorithm("SHA-256", 64)
 
-    class Md5: HashAlgorithm("MD5", 32)
+    class Md5 : HashAlgorithm("MD5", 32)
+
+    class Sha1 : HashAlgorithm("SHA-1", 40)
 }
 
-data class HashHolder(val value: String, val algorithm: String): Serializable
+data class HashHolder(val value: String, val algorithm: String) : Serializable {
+    constructor(value: String, algorithm: HashAlgorithm) : this(value, algorithm.toString())
+}
 
 fun InputStream.sha256(): HashHolder = HashAlgorithm.Sha256().hash(this)
 fun InputStream.md5(): HashHolder = HashAlgorithm.Md5().hash(this)
+fun InputStream.sha1(): HashHolder = HashAlgorithm.Sha1().hash(this)
 
 fun File.sha256(): HashHolder = this.inputStream().buffered().sha256()
 fun File.md5(): HashHolder = this.inputStream().buffered().md5()
+fun File.sha1(): HashHolder = this.inputStream().buffered().sha1()

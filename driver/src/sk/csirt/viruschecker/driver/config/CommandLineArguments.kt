@@ -10,10 +10,12 @@ class CommandLineArguments(parser: ArgParser) {
         "--avast" to AntivirusType.AVAST,
         "--avira" to AntivirusType.AVIRA,
         "--bitdefender" to AntivirusType.BITDEFENDER,
+        "--comodo" to AntivirusType.COMODO,
         "--eset" to AntivirusType.ESET,
         "--kaspersky" to AntivirusType.KASPERSKY,
         "--microsoft" to AntivirusType.MICROSOFT,
         "--symantec" to AntivirusType.SYMANTEC,
+        "--virustotal" to AntivirusType.VIRUS_TOTAL,
         help = "Antivirus to use."
     )
 

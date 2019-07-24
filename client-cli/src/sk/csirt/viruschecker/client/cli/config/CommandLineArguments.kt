@@ -4,6 +4,7 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.default
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.config.defaultTimeout
+import sk.csirt.viruschecker.routing.payload.MultiScanRequest
 import java.io.File
 import java.nio.charset.Charset
 import java.time.Duration
@@ -24,6 +25,10 @@ class CommandLineArguments(parser: ArgParser) {
                 "${defaultTimeout.toMillis()}."
     ) { Duration.ofMillis(this.toLong()) }.default(defaultTimeout)
 
+    val useExternalDrivers by parser.flagging(
+        "-e", "--useExternalServices",
+        help = "Use also external services like VirusTotal."
+    )
     val outputFile by parser.storing(
         "-o", "--out",
         help = "Specify file to store report. Csv format is supported if the filename ends" +

@@ -7,19 +7,23 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import mu.KotlinLogging
-import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
+import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.routing.GatewayRoutes
 
 private val logger = KotlinLogging.logger { }
 
 @KtorExperimentalLocationsAPI
-fun Route.findByHash(scanReportService: ScanReportService){
-    get<GatewayRoutes.ScanReport>{ params ->
-        logger.info { "Retrieving report for sha256 ${params.sha256}" }
-        val scanReport = scanReportService.findBySha256(params.sha256)
-        if(scanReport == null){
+fun Route.findByHash(
+    scanReportService: PersistentScanReportService
+) {
+    get<GatewayRoutes.ScanReport> { params ->
+        val hash = params.sha256
+        logger.info { "Retrieving report for sha256 $hash." }
+        val scanReport = scanReportService.findBySha256(hash)
+
+        if (scanReport == null) {
             call.respond(HttpStatusCode.NoContent, "Hash not found!")
-        }else{
+        } else {
             call.respond(scanReport)
         }
     }

@@ -17,9 +17,12 @@ import kotlinx.io.core.Input
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.routing.DriverRoutes
+import sk.csirt.viruschecker.routing.payload.ScanResultResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.Instant
 import java.util.*
 
 private val logger = KotlinLogging.logger { }
@@ -47,7 +50,10 @@ fun Route.scanFile(antivirus: Antivirus) {
 }
 
 @KtorExperimentalAPI
-private suspend fun processFile(fileItem: PartData.FileItem, virusChecker: Antivirus): FileScanResponse {
+private suspend fun processFile(
+    fileItem: PartData.FileItem,
+    virusChecker: Antivirus
+): FileScanResponse {
     val filename = fileItem.originalFileName ?: "file${UUID.randomUUID()}"
 
     val report: FileScanReport = virusChecker.scanFile(
@@ -66,9 +72,14 @@ private fun Input.toCheckParameters(filename: String, path: Path): FileScanParam
 }
 
 fun FileScanReport.toFileScanResponse() = FileScanResponse(
+    date = Instant.now(),
     filename = filename,
-    antivirus = antivirus.commonName,
-    status = FileScanResponse.Status.valueOf(status.name),
-    malwareDescription = malwareDescription
+    results = scanReport.reports.map {
+        ScanResultResponse(
+            antivirus = it.antivirusName,
+            status = ScanStatusResponse.valueOf(it.status.name),
+            malwareDescription = it.malwareDescription
+        )
+    }
 )
 

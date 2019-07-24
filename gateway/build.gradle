@@ -21,6 +21,7 @@ dependencies {
     compile "io.ktor:ktor-client-gson:$ktor_version"
     compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
     compile "net.openhft:chronicle-map:$chronicle_map_version"
+    compile "com.kanishka.api:VirustotalPublicV2.0:+"
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: apache_commons_version
     compile "org.koin:koin-ktor:$koin_version"

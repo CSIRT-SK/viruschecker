@@ -11,8 +11,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
-import java.io.File
+import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
+import sk.csirt.viruschecker.routing.payload.MultiScanRequest
 import java.io.FileInputStream
 
 class MultiScanService(
@@ -21,8 +21,8 @@ class MultiScanService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun scanFile(params: MultiScanParameters): FileMultiScanResponse = coroutineScope {
-        client.post<FileMultiScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
+    suspend fun scanFile(params: MultiScanRequest): FileHashScanResponse =
+        client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
             this.body = MultiPartFormDataContent(listOf(
                 PartData.FileItem(
                     partHeaders = Headers.build {
@@ -34,13 +34,15 @@ class MultiScanService(
                     },
                     dispose = { },
                     provider = { FileInputStream(params.fileToScan).asInput() }
+                ),
+                PartData.FormItem(
+                    value = params.useExternalDrivers.toString(),
+                    dispose = { },
+                    partHeaders = Headers.Empty
                 )
-            ))
+            )
+            )
         }
-    }
 }
 
-data class MultiScanParameters(
-    val fileToScan: File,
-    val originalFilename: String
-)
+

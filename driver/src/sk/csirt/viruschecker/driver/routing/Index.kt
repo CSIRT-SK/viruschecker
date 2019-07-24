@@ -19,7 +19,7 @@ private const val ideRunMessage = "Version not available. Driver application is 
 fun Route.index(virusChecker: Antivirus) {
     get<DriverRoutes.Index> {
         call.respond(AntivirusDriverInfoResponse(
-            antivirus = virusChecker.type.commonName,
+            antivirus = virusChecker.type.antivirusName,
             driverVersion = Antivirus::class.java.`package`.implementationVersion
                 ?: ideRunMessage
         ))

@@ -13,8 +13,8 @@ dependencies {
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-websockets:$ktor_version"
     compile "io.ktor:ktor-gson:$ktor_version"
-
     compile "org.koin:koin-ktor:$koin_version"
+    compile "com.kanishka.api:VirustotalPublicV2.0:+"
 
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }

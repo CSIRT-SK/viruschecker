@@ -7,10 +7,9 @@ import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.nio.charset.Charset
-import java.time.LocalDateTime
 
 class Avast(
-    scanCommand: ScanCommand
+    scanCommand: RunProgramCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
@@ -20,31 +19,24 @@ class Avast(
     override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Sequence<ReportEntry> {
-        // Avast seems to fill report files with data after the the ashCmd.exe returns.
-        // The line below is a poor way to handle this.
-//        sleep(500)
-        return sequenceOf(
-            withContext(Dispatchers.IO) { FileUtils.readLines(reportFile, Charset.defaultCharset()) }
-                .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
-                .takeIf { it.isNotEmpty() }
-                ?.first()
-                ?.let { line ->
-                    line.split("\t")[1].let {
-                        ReportEntry(
-                            datetime = LocalDateTime.now(),
-                            status = when {
-                                "OK" in it -> ReportEntry.Status.OK
-                                else -> ReportEntry.Status.INFECTED
-                            },
-                            description = it
-                        )
-                    }
-                } ?: ReportEntry(
-                datetime = LocalDateTime.now(),
-                status = ReportEntry.Status.NOT_AVAILABLE,
-                description = ""
+    ): Report =
+        withContext(Dispatchers.IO) {
+            FileUtils.readLines(
+                reportFile,
+                Charset.defaultCharset()
             )
-        )
-    }
+        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+            .takeIf { it.isNotEmpty() }
+            ?.first()
+            ?.let { line ->
+                line.split("\t")[1].let {
+                    Report(
+                        when {
+                            "OK" in it -> ScanStatusReport.OK
+                            else -> ScanStatusReport.INFECTED
+                        },
+                        it
+                    )
+                }
+            } ?: Report(ScanStatusReport.NOT_AVAILABLE, "")
 }

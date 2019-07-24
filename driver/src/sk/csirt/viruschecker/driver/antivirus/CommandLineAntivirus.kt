@@ -10,22 +10,26 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.nio.file.Paths
-import java.time.LocalDateTime
 import java.util.*
 
+typealias AntivirusOutput = List<String>
 
-data class ScanCommand(
+data class RunProgramCommand(
     val command: String
 ) {
 
-    fun parse(fileToScan: File, fileToReport: File) =
-        command.split(" ").map {
-            when {
-                SCAN_FILE in it -> it.replace(SCAN_FILE, fileToScan.canonicalPath)
-                REPORT_FILE in it -> it.replace(REPORT_FILE, fileToReport.canonicalPath)
-                else -> it
-            }
+    fun parse(
+        fileToScan: File? = null,
+        fileToReport: File? = null
+    ) = command.split(" ").map {
+        when {
+            SCAN_FILE in it ->
+                it.replace(SCAN_FILE, fileToScan?.canonicalPath ?: "")
+            REPORT_FILE in it ->
+                it.replace(REPORT_FILE, fileToReport?.canonicalPath ?: "")
+            else -> it
         }
+    }
 
     companion object Placeholder {
         const val SCAN_FILE = "[SCAN-FILE]"
@@ -34,7 +38,7 @@ data class ScanCommand(
 }
 
 abstract class CommandLineAntivirus(
-    private val scanCommand: ScanCommand
+    private val scanCommand: RunProgramCommand
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
@@ -44,11 +48,11 @@ abstract class CommandLineAntivirus(
             Constants.scanReportsDir,
             "report-${params.fileToScan.nameWithoutExtension}-${UUID.randomUUID()}.txt"
         ).toFile()
-        val output = runAntivirus(params, reportFile)
-        // Some antiviruses (Avast) cannot write reports properly when invoked from another process.
+        val output = runAntivirusToScan(params, reportFile)
+        // Some antiviruses (Avast) cannot write results properly when invoked from another process.
         // This will manually write their STDOUT to the file
         writeOutputToFileIfNotExists(reportFile, output)
-        retrieveReport(params, reportFile).also {
+        retrieveReport(reportFile, params).also {
             logger.info("Retrieved report: $it")
         }
     }
@@ -63,12 +67,13 @@ abstract class CommandLineAntivirus(
         FileUtils.writeLines(reportFile, scanOutput)
     }
 
-    private suspend fun runAntivirus(params: FileScanParameters, reportFile: File)
-            : List<String> {
-        val processBuilder = ProcessBuilder()
-        processBuilder.command(scanCommand.parse(params.fileToScan, reportFile))
+    private suspend fun runAntivirusToScan(params: FileScanParameters, reportFile: File)
+            : AntivirusOutput = runAntivirus(scanCommand.parse(params.fileToScan, reportFile))
 
-        logger.debug("Waiting for antivirus. Command to run: $scanCommand")
+    protected suspend fun runAntivirus(command: List<String>): AntivirusOutput {
+        val processBuilder = ProcessBuilder()
+        processBuilder.command(command)
+        logger.debug("Waiting for antivirusName. Command to run: $scanCommand")
         val output = withContext(Dispatchers.IO) {
             val process = processBuilder.start()
             val processReader = BufferedReader(InputStreamReader(process.inputStream))
@@ -76,7 +81,7 @@ abstract class CommandLineAntivirus(
             var line: String? = processReader.readLine()
             var i = 1
             while (line != null) {
-                logger.debug("Output line [$i] from antivirus: $line")
+                logger.debug("Output line [$i] from antivirusName: $line")
                 output += line
                 line = processReader.readLine()
                 i++
@@ -88,50 +93,31 @@ abstract class CommandLineAntivirus(
     }
 
     private suspend fun retrieveReport(
-        params: FileScanParameters,
-        reportFile: File
+        reportFile: File,
+        params: FileScanParameters
     ): FileScanReport {
-        logger.debug("Retrieving report from $reportFile for file $params")
-        val parsedEntries = parseReportFile(reportFile, params)
-        val nonSkippedEntries = parsedEntries
-            .filterNot { it.status == ReportEntry.Status.NOT_AVAILABLE }
-        // This is for archive files (zip, rar, ...).
-        // Many files in archives may be OK, but it
-        // only takes one file to be infected to declare the whole archive as infected.
-        val determinedStatus =
-            nonSkippedEntries.firstOrNull { it.status == ReportEntry.Status.INFECTED }
-                ?: nonSkippedEntries.firstOrNull { it.status == ReportEntry.Status.OK }
+        val (status, description) = parseReportFile(reportFile, params)
         return FileScanReport(
             filename = params.originalFileName,
-            status = FileScanReport.Status.valueOf(
-                determinedStatus?.status?.name ?: FileScanReport.Status.NOT_AVAILABLE.name
-            ),
-            antivirus = type,
-            malwareDescription = determinedStatus?.description ?: ""
-        ).also { logger.debug(it.toString()) }
+            scanReport = ScanReport(
+                antivirusType = type,
+                status = status,
+                reports = listOf(
+                    AntivirusReport(
+                        status = status,
+                        malwareDescription = description,
+                        antivirusName = type.antivirusName
+                    )
+                )
+            )
+        )
     }
 
     protected abstract suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Sequence<ReportEntry>
+    ): Report
 
+    protected data class Report(val status: ScanStatusReport, val malwareDescription: String)
 
-    protected class ReportEntry(
-        val datetime: LocalDateTime,
-        val status: Status,
-        val description: String
-    ) {
-        enum class Status {
-            OK, INFECTED, NOT_AVAILABLE;
-
-            companion object {
-                fun fromCommonName(name: String) = when (name) {
-                    "ok" -> OK
-                    "detected" -> INFECTED
-                    else -> NOT_AVAILABLE
-                }
-            }
-        }
-    }
 }

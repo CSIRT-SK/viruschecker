@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.driver.config.CommandLineArguments
-import sk.csirt.viruschecker.driver.config.PropertiesFactory
+import sk.csirt.viruschecker.driver.config.DriverPropertiesFactory
 import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
 import sk.csirt.viruschecker.driver.routing.index
 import sk.csirt.viruschecker.driver.routing.scanFile
@@ -61,7 +61,7 @@ fun Application.module() {
     install(Locations)
        install(Koin) {
         modules(driverDependencyInjectionModule)
-        properties(PropertiesFactory.loadOrCreateDefault())
+        properties(DriverPropertiesFactory.loadOrCreateDefault())
     }
 
     val virusChecker by inject<Antivirus>(parsedArgs.antivirus)

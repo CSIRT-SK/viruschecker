@@ -1,10 +1,10 @@
 package sk.csirt.viruschecker.client.reporting
 
-import sk.csirt.viruschecker.routing.payload.FileMultiScanResponse
+import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 
 class CommandLineReporter : Reporter {
 
-    override fun saveReport(result: FileMultiScanResponse) {
+    override fun saveReport(result: FileHashScanResponse) {
 
 //        val fileInfoHead = "| "
 //        val fileInfoLine = "| ${result.filename} | ${result.date} |"

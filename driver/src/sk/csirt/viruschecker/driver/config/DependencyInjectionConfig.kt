@@ -3,33 +3,30 @@ package sk.csirt.viruschecker.driver.config
 import org.koin.dsl.module
 import sk.csirt.viruschecker.driver.antivirus.*
 
-object Properties {
-
-    val keepReportsDays = "keep.reports.days"
-    val scanTimeout = "scan.socketTimeout.millis"
-
-    val avast = "avast"
-    val eset = "eset"
-    val kaspersky = "kaspersky"
-    val microsoft = "microsoft"
-}
-
 val driverDependencyInjectionModule = module {
 
     single<Antivirus>(AntivirusType.AVAST) {
-        Avast(ScanCommand(getProperty(Properties.avast)))
+        Avast(RunProgramCommand(getProperty(Properties.Windows.avast)))
     }
 
     single<Antivirus>(AntivirusType.ESET) {
-        Eset(ScanCommand(getProperty(Properties.eset)))
+        Eset(RunProgramCommand(getProperty(Properties.Windows.eset)))
     }
 
     single<Antivirus>(AntivirusType.KASPERSKY) {
-        Kaspersky(ScanCommand(getProperty(Properties.kaspersky)))
+        Kaspersky(RunProgramCommand(getProperty(Properties.Windows.kaspersky)))
     }
 
     single<Antivirus>(AntivirusType.MICROSOFT) {
-        Microsoft(ScanCommand(getProperty(Properties.microsoft)))
+        Microsoft(RunProgramCommand(getProperty(Properties.Windows.microsoft)))
+    }
+
+    single<Antivirus>(AntivirusType.COMODO) {
+        Comodo(RunProgramCommand(getProperty(Properties.Linux.comodo)))
+    }
+
+    single<Antivirus>(AntivirusType.VIRUS_TOTAL) {
+        VirusTotal(getProperty(Properties.virusTotal))
     }
 
 }

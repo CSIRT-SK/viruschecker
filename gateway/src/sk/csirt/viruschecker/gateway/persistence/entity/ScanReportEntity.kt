@@ -1,14 +1,14 @@
 package sk.csirt.viruschecker.gateway.persistence.entity
 
-import sk.csirt.viruschecker.hash.HashHolder
 import java.io.Serializable
 import java.time.Instant
 
 data class ScanReportEntity(
     val sha256: String,
+    val sha1: String,
+    val md5: String,
     val filename: String,
     val date: Instant,
-    val otherHashes: List<HashHolder>,
     val reports: List<AntivirusReportEntity>
 ): Serializable
 
@@ -41,17 +41,17 @@ data class AntivirusReportEntity(
 //        sb.append(hashes[ih].algorithm).append("]; ")
 //
 //        sb.append("[")
-//        val reports = toWrite.reports
-//        for (ir in 0..reports.size - 2) {
-//            sb.append(reports[ir].antivirus).append("; ")
-//            sb.append(reports[ir].status).append("; ")
-//            sb.append(reports[ir].malwareDescription).append(", ")
+//        val results = toWrite.results
+//        for (ir in 0..results.size - 2) {
+//            sb.append(results[ir].antivirus).append("; ")
+//            sb.append(results[ir].status).append("; ")
+//            sb.append(results[ir].malwareDescription).append(", ")
 //
 //        }
-//        val ir = reports.size - 1
-//        sb.append(reports[ir].antivirus).append("; ")
-//        sb.append(reports[ir].status).append("; ")
-//        sb.append(reports[ir].malwareDescription).append("]")
+//        val ir = results.size - 1
+//        sb.append(results[ir].antivirus).append("; ")
+//        sb.append(results[ir].status).append("; ")
+//        sb.append(results[ir].malwareDescription).append("]")
 //
 //        out.writeUtf8(sb.toString())
 //    }

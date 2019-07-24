@@ -5,7 +5,7 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import sk.csirt.viruschecker.gateway.routing.service.DriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.GatewayInfoResponse
 
@@ -16,7 +16,7 @@ fun Route.index() {
     get<GatewayRoutes.Index> {
         call.respond(
             GatewayInfoResponse(
-                gatewayVersion = DriverScanService::class.java.`package`.implementationVersion ?: ideRunMessage
+                gatewayVersion = FileScanService::class.java.`package`.implementationVersion ?: ideRunMessage
             )
         )
     }

@@ -11,8 +11,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class Kaspersky(
-        scanCommand: ScanCommand
-//        updateCommand: ScanCommand
+    scanCommand: RunProgramCommand
+//        updateCommand: RunProgramCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
@@ -22,23 +22,25 @@ class Kaspersky(
     override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Sequence<ReportEntry> {
-        val linesWithScannedFile = withContext(Dispatchers.IO) { FileUtils.readLines(reportFile, Charset.defaultCharset()) }
-            .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
-            .asSequence()
-            .filterNot { it.startsWith(";") }
-            .filter { params.fileToScan.name in it }
-        return linesWithScannedFile
-            .map { line ->
-                line.split("\t").let {
-                    ReportEntry(
-                        datetime = LocalDateTime.parse(
-                            it[0].trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                        ),
-                        status = ReportEntry.Status.fromCommonName(it[2].trim()),
-                        description = if (it.size > 3) it[3].trim() else "OK"
-                    )
-                }
+    ): Report = withContext(Dispatchers.IO) {
+        FileUtils.readLines(
+            reportFile,
+            Charset.defaultCharset()
+        )
+    }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+        .asSequence()
+        .filterNot { it.startsWith(";") }
+        .filter { params.fileToScan.name in it }
+        .map { line ->
+            line.split("\t").let {
+                Report(
+                    when (it[2].trim()) {
+                        "ok" -> ScanStatusReport.OK
+                        "detected" -> ScanStatusReport.INFECTED
+                        else -> ScanStatusReport.NOT_AVAILABLE
+                    },
+                    if (it.size > 3) it[3].trim() else "OK"
+                )
             }
-    }
+        }.maxBy { it.status } ?: Report(ScanStatusReport.NOT_AVAILABLE, "")
 }

@@ -4,24 +4,20 @@ package sk.csirt.viruschecker.gateway
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
-import io.ktor.http.ContentType
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.request.path
-import io.ktor.response.respondText
-import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
-import sk.csirt.viruschecker.gateway.persistence.service.ScanReportService
+import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.config.CommandLineArguments
 import sk.csirt.viruschecker.gateway.config.checkedDriverUrls
 import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
@@ -30,7 +26,6 @@ import sk.csirt.viruschecker.gateway.routing.findByHash
 import sk.csirt.viruschecker.gateway.routing.index
 import sk.csirt.viruschecker.gateway.routing.multiScanFile
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
-import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
 import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 
 private val logger = KotlinLogging.logger {  }
@@ -76,8 +71,7 @@ fun Application.module() {
     }
 
     val scanService by inject<CachedDriverScanService>()
-    val scanReportService by inject<ScanReportService>()
-//    val antivirusDriverInfoService by inject<DriverInfoService>()
+    val scanReportService by inject<PersistentScanReportService>()
     val checkedUrls by inject<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
 
     routing {
