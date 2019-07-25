@@ -24,11 +24,11 @@ class CommandLineArguments(parser: ArgParser) {
 
     val useExternalDrivers by parser.flagging(
         "-e", "--useExternalServices",
-        help = "Use also external services like VirusTotal."
+        help = "Send file hash to external services like VirusTotal."
     )
     val outputFile by parser.storing(
         "-o", "--out",
-        help = "Specify file to store report. Csv format is supported if the filename ends" +
+        help = "Outpuy file to store report. Csv format is supported if the filename ends" +
                 " with appropriate postfix."
     ) { File(this) }.default<File?>(null)
 }

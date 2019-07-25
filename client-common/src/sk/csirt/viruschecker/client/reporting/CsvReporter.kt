@@ -29,17 +29,17 @@ class CsvReporter(private val file: File) : Reporter {
                 )
             ).use { csvPrinter ->
                 result.report.results.map {
-                    ReportLine(
-                        file = result.report.filename,
-                        date = LocalDateTime.ofInstant(result.report.date, ZoneId.systemDefault()),
-                        antivirus = it.antivirus,
-                        status = it.status.name,
-                        malwareDescription = it.malwareDescription,
-                        sha256 = result.sha256,
-                        sha1 = result.sha1,
-                        md5 = result.md5
+                   listOf(
+                        result.report.filename,
+                        LocalDateTime.ofInstant(result.report.date, ZoneId.systemDefault()),
+                        it.antivirus,
+                        it.status.name,
+                        it.malwareDescription,
+                        result.sha256,
+                        result.sha1,
+                        result.md5
                     )
-                }.also { csvPrinter.printRecord(it) }
+                }.forEach { csvPrinter.printRecord(it) }
             }
         }
     }

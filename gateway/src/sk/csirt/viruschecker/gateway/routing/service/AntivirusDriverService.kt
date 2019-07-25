@@ -1,6 +1,7 @@
 package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
@@ -17,14 +18,14 @@ abstract class AntivirusDriverService(
         block: suspend (driverUrl: String, client: HttpClient) -> T
     ): List<MultiDriverResponse<Result<T>>> = supervisorScope {
         drivers.get(useExternalDrivers).map { driverUrl ->
-            driverUrl to async {
+            driverUrl to async(IO) {
                 logger.info { "Requesting from $driverUrl" }
                 block(driverUrl, client)
             }
         }.map { (driverUrl, deferredT) ->
             val result = runCatching { deferredT.await() }
                 .onFailure {
-                    logger.error { "Failed http post to $driverUrl, cause is \n${it.message}" }
+                    logger.error { "Failed http post to $driverUrl, cause is \n${it.stackTrace}" }
                 }.onSuccess {
                     logger.info { "Retrieved report from $driverUrl: $it" }
                 }

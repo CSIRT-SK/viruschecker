@@ -1,5 +1,7 @@
 package sk.csirt.viruschecker.hash
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
 import java.io.Serializable
@@ -10,17 +12,33 @@ sealed class HashAlgorithm(
     private val algorithm: String,
     private val hashLength: Int
 ) {
-    private val digest: MessageDigest = MessageDigest.getInstance(algorithm)
 
-    open fun hash(inputStream: InputStream): HashHolder {
+    suspend fun hash(file: File) =
+        hash(file.inputStream().buffered())
 
-        inputStream.use {
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            var sizeRead = inputStream.read(buffer)
-            while (sizeRead != -1) {
-                digest.update(buffer, 0, sizeRead)
-                sizeRead = inputStream.read(buffer)
+    suspend fun hash(inputStream: InputStream): HashHolder {
+        val digest = withContext(Dispatchers.IO) {
+            val digest = MessageDigest.getInstance(algorithm)
+            inputStream.use { inputStream ->
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var sizeRead = inputStream.read(buffer)
+                while (sizeRead != -1) {
+                    digest.update(buffer, 0, sizeRead)
+                    sizeRead = inputStream.read(buffer)
+                }
             }
+//            AsynchronousFileChannel.open(file.toPath()).use { channel ->
+//                val buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE)
+//
+//                var sizeRead = channel.aRead(buffer, 0)
+//                var totalRead = sizeRead
+//                while (sizeRead != -1) {
+//                    digest.update(buffer.moveToByteArray(), 0, sizeRead)
+//                    sizeRead = channel.aRead(buffer, totalRead)
+//                    totalRead += sizeRead
+//                }
+//            }
+            digest
         }
 
         val hashBytes = digest.digest()
@@ -46,10 +64,10 @@ data class HashHolder(val value: String, val algorithm: String) : Serializable {
     constructor(value: String, algorithm: HashAlgorithm) : this(value, algorithm.toString())
 }
 
-fun InputStream.sha256(): HashHolder = HashAlgorithm.Sha256().hash(this)
-fun InputStream.md5(): HashHolder = HashAlgorithm.Md5().hash(this)
-fun InputStream.sha1(): HashHolder = HashAlgorithm.Sha1().hash(this)
+suspend fun InputStream.sha256(): HashHolder = HashAlgorithm.Sha256().hash(this)
+suspend fun InputStream.md5(): HashHolder = HashAlgorithm.Md5().hash(this)
+suspend fun InputStream.sha1(): HashHolder = HashAlgorithm.Sha1().hash(this)
 
-fun File.sha256(): HashHolder = this.inputStream().buffered().sha256()
-fun File.md5(): HashHolder = this.inputStream().buffered().md5()
-fun File.sha1(): HashHolder = this.inputStream().buffered().sha1()
+suspend fun File.sha256(): HashHolder = this.inputStream().buffered().sha256()
+suspend fun File.md5(): HashHolder = this.inputStream().buffered().md5()
+suspend fun File.sha1(): HashHolder = this.inputStream().buffered().sha1()

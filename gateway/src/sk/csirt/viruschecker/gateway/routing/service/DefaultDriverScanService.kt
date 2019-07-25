@@ -7,13 +7,14 @@ import io.ktor.http.ContentDisposition
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.PartData
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.config.Drivers
-import sk.csirt.viruschecker.hash.*
+import sk.csirt.viruschecker.hash.md5
+import sk.csirt.viruschecker.hash.sha1
+import sk.csirt.viruschecker.hash.sha256
 import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.*
 import java.io.FileInputStream
@@ -30,9 +31,9 @@ class DefaultDriverScanService(
         coroutineScope {
             val (fileToScan, originalFileName) = scanParams
             logger.info { "Computing hashes for $fileToScan" }
-            val sha256Deferred = async(Dispatchers.IO) { fileToScan.sha256() }
-            val sha1Deffered = async(Dispatchers.IO) { fileToScan.sha1() }
-            val md5Deffered = async(Dispatchers.IO) { fileToScan.md5() }
+            val sha256Deferred = async { fileToScan.sha256() }
+            val sha1Deffered = async { fileToScan.sha1() }
+            val md5Deffered = async { fileToScan.md5() }
 
             multiDriverRequest(
                 useExternalDrivers = scanParams.useExternalDrivers
@@ -53,6 +54,7 @@ class DefaultDriverScanService(
                     ))
                 }
             }.map { (driverUrl, result) ->
+                result.getOrThrow()
                 result.getOrDefault(
                     FileScanResponse(
                         date = Instant.now(),

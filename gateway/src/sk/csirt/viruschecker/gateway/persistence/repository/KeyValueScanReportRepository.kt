@@ -7,10 +7,10 @@ class KeyValueScanReportRepository(
     private val storage: ConcurrentMap<CharSequence, ScanReportEntity>
 ) : ScanReportRepository {
 
-    override fun save(item: ScanReportEntity): ScanReportEntity {
+    override suspend fun save(item: ScanReportEntity): ScanReportEntity {
         storage[item.sha256] = item
         return item
     }
 
-    override fun findBySha256(hash: String): ScanReportEntity? = storage[hash]
+    override suspend fun findBySha256(hash: String): ScanReportEntity? = storage[hash]
 }

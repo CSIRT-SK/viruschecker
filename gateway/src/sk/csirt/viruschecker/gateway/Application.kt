@@ -17,10 +17,11 @@ import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
-import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
+import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.gateway.config.CommandLineArguments
 import sk.csirt.viruschecker.gateway.config.checkedDriverUrls
 import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
+import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.routing.driversInfo
 import sk.csirt.viruschecker.gateway.routing.findByHash
 import sk.csirt.viruschecker.gateway.routing.index
@@ -33,7 +34,7 @@ private val logger = KotlinLogging.logger {  }
 lateinit var parsedArgs: CommandLineArguments
 
 fun main(args: Array<String>) = mainBody {
-    parsedArgs = ArgParser(args).parseInto(::CommandLineArguments)
+    parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
     io.ktor.server.netty.EngineMain.main(args)
 }
 

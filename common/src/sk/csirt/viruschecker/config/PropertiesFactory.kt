@@ -15,7 +15,7 @@ interface PropertiesFactory {
 
     val propertiesFile: File get() = Paths.get(propertiesName).toAbsolutePath().toFile()
 
-    val defaultContent: String
+    val defaultProperties: String
 
     fun loadOrCreateDefault(): Map<String, Any> {
         if (propertiesFile.exists().not()) {
@@ -26,7 +26,7 @@ interface PropertiesFactory {
     }
 
     private fun createDefaultProperties() {
-        FileUtils.write(propertiesFile, defaultContent, Charset.defaultCharset())
+        FileUtils.write(propertiesFile, defaultProperties, Charset.defaultCharset())
     }
 
     private fun loadProperties(propertiesFile: File): Map<String, Any> =

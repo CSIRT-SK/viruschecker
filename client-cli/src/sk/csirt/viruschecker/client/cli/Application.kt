@@ -2,17 +2,18 @@ package sk.csirt.viruschecker.client.cli
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
-import io.ktor.application.*
+import io.ktor.application.Application
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import sk.csirt.viruschecker.client.cli.config.CommandLineArguments
 import sk.csirt.viruschecker.client.config.httpClient
-import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.DefaultReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
 import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.config.filterArgsForArgParser
+import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import kotlin.system.exitProcess
 
@@ -21,7 +22,7 @@ private val logger = KotlinLogging.logger { }
 lateinit var parsedArgs: CommandLineArguments
 
 fun main(args: Array<String>) = mainBody {
-    parsedArgs = ArgParser(args).parseInto(::CommandLineArguments)
+    parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
     io.ktor.server.netty.EngineMain.main(args)
 }
 

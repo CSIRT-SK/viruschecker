@@ -15,6 +15,7 @@ dependencies {
     compile "io.ktor:ktor-gson:$ktor_version"
     compile "org.koin:koin-ktor:$koin_version"
     compile "com.kanishka.api:VirustotalPublicV2.0:+"
+    compile "org.apache.commons:commons-lang3:$apache_commons_lang_version"
 
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }

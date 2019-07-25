@@ -1,17 +1,17 @@
 package sk.csirt.viruschecker.gateway.persistence.service
 
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
+import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
+import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
-import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
-import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 
 class PersistentScanReportService(
     private val reportRepository: ScanReportRepository
 ) : ScanReportService {
-    override fun save(response: FileHashScanResponse) {
+    override suspend fun save(response: FileHashScanResponse) {
         ScanReportEntity(
             date = response.report.date,
             filename = response.report.filename,
@@ -28,7 +28,7 @@ class PersistentScanReportService(
         ).also { reportRepository.save(it) }
     }
 
-    override fun findBySha256(hash: String): FileHashScanResponse? =
+    override suspend fun findBySha256(hash: String): FileHashScanResponse? =
         reportRepository.findBySha256(hash)?.let {
             val reports = it.reports.map {
                 AntivirusReportResponse(

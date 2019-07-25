@@ -61,7 +61,7 @@ private suspend fun processFile(
 ): FileScanResponse {
     val filename = fileItem.originalFileName ?: "file${UUID.randomUUID()}"
 
-    val report: FileScanResult = virusChecker.scanFile(
+    val report: FileScanResult = virusChecker.scanFileAndClean(
         fileItem.provider().toCheckParameters(filename, Paths.get(Constants.scanDir))
     )
     return report.toFileScanResponse()

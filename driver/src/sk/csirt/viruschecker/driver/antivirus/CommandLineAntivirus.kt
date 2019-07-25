@@ -2,6 +2,7 @@ package sk.csirt.viruschecker.driver.antivirus
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
@@ -54,6 +55,10 @@ abstract class CommandLineAntivirus(
         writeOutputToFileIfNotExists(reportFile, output)
         retrieveReport(reportFile, params).also {
             logger.info("Retrieved report: $it")
+        }.also {
+            launch {
+                reportFile.delete()
+            }
         }
     }
 

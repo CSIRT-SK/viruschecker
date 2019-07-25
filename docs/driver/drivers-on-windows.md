@@ -22,14 +22,14 @@ These steps describe how to setup Windows 7 VM in VirtualBox.
 
 * Type some name, e.g. "VC-Base".
 
-* In the *Memory size* dialog, type 1536 MB. Remember that later we will run 5+ such machines. 
+* In the *Memory size* dialog, type 1536 MB. Remember that later we will run at least four such machines. 
 
 * In the following dialogs, just leave the recommended options.
 
 The virtual machine is now created, however, we need to specify a few additional options like 
 networking or location of the installation media.
 
-* Now in *Oracle VM VirtualBox Manager* right click on the newly created VM and select *Settings*.
+* Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select *Settings*.
 
 * Navigate to the *Network* tab and switch the *Attached to* option from *NAT* to *Bridged 
 Adapter*. 
@@ -56,8 +56,6 @@ installation process.
     * Run the *VBoxWindowsAdditions.exe* and follow the installation steps.
     * After restarting the virtual machine, click on *Devices* top menu item and set *Shared 
     Clipboard* and *Drag and Drop* settings to *Host To Guest*. 
-
-
     
 
 * (Optional) For the sake of saving some computer resources, it may be helpful to use the Windows 
@@ -65,7 +63,7 @@ Classic or Basic theme.
 
 #### 1.2.1 Setup firewall
 
-Now we need to modify the firewall settings to allow the future deployed *driver executable* to 
+Now we need to modify the firewall settings to allow the future deployed *driver* executable to 
 communicate with the host operating system. 
 
 * On the virtual machine, press the *Start* button, search the program called "Windows 
@@ -88,8 +86,8 @@ Firewall with Advanced Security" and open it.
 The driver application requires Java 8 or newer.
 The free and open source Java distributions like AdoptOpenJDK are fully sufficient.
 
-On the **host** system copy the driver Java executable located at 
-`driver/build/libs/driver-[VERSION]-all.jar`
+Copy the driver executable *jar* file from  **host** located at 
+`.../driver/build/libs/driver-[VERSION]-all.jar`
 to the virtual machine. 
 If the Guest Additions are working properly then you may just drag & drop the file from your 
 system's file manager to the virtual machine.
@@ -181,70 +179,13 @@ In my case the path is `C:\Program Files\AVAST Software\Avast`.
     
 * A reboot of the virtual machine is now recommended. 
 
-### 2.2 Avira (free)
-
-Download and install the Avira Free Antivirus.
-
-#### 2.2.1 Configuration
-
-Open the Avira window and navigate to *Antivirus* item. Click on the `v` symbol at right to the 
-*Quick Scan* button and in the popped up menu select *Disable Real-Time Protection* options.
-
-
-In the *Settings* window disable the following features:
-
-* In the *Protection* tab permanently disable the *Core shields*, *Ransomware Shield*, 
-*Firewall* and *Real site* features. 
-
-* In the *Privacy* tab, disable the *Sensitive Data Shield*.
-
-* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
-
-* In the *Licensing* window click on the green symbol `x` located to the right of 
-*License key* label.
-
-* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
-
-* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
-
-#### 2.2.2 Command line utility
-
-Avast provides the command line utility called *ashCmd.exe* that may be used to scan the 
-selected file for malware and to store human readable reports to specified file.
-
-By default, our driver application assumes that the *ashCmd.exe* program is available in the *Path* 
-system variable. To do this, follow these steps:
-
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
-
-* On the left-hand side open the *Advanced system settings*.
-
-* Press the *Environment Variables* button.
-
-* Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
-the *Edit...* button below.
-
-* Add the installation path of the Eset to the beginning of *Variable value* text. 
-In my case the path is `C:\Program Files (x86)\Avira\Antivirus`.
-  
-    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
-    
-    ```C:\Program Files (x86)\Avira\Antivirus;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
-    
-* A reboot of the virtual machine is now recommended. 
-
-### 2.3 Bitdefender
-
-(TODO)
-
-### 2.4 Eset (paid)
+### 2.2 Eset (paid)
 
 Install any of the Eset antivirus software, i.e. *Eset Nod32*, *Eset Internet Security*, ... .
 This guide assumes the installation of Eset Internet Security, however, in the case of other Eset
  products the steps are basically the same.
 
-#### 2.4.1 Configuration
+#### 2.2.1 Configuration
 
 Open the Eset window and click on the setup icon at the left side of the window. 
 Disable all features in the *Computer protection*, *Internet protection*, *Network protection* 
@@ -267,7 +208,7 @@ LiveGrid@ reputation system* and *Enable ESET LiveGrid@ feedback system* options
 
 * In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
 
-#### 2.4.2 Command line utility
+#### 2.2.2 Command line utility
 
 Eset provides the command line utility called *ecls.exe* that may be used to scan the 
 selected file for malware and to store human readable reports to specified file.
@@ -294,13 +235,13 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
     
 * A reboot of the virtual machine is now recommended. 
 
-### 2.5 Kaspersky (free)
+### 2.3 Kaspersky (free)
 
 Install the Kaspersky Free Antivirus. 
 If you have the paid version, you can use it as well, but for our purposes the free version is 
 sufficient.
 
-#### 2.5.1 Configuration
+#### 2.3.1 Configuration
 
 Open the Kaspersky window and click on the settings icon at the bottom of the window. The list of 
 features to disable includes:
@@ -321,7 +262,7 @@ features to disable includes:
     * In the *Reports and Quarantine settings* uncheck the *Store reports no longer than* 
         checkbox.
 
-#### 2.5.2 Command line utility
+#### 2.3.2 Command line utility
 
 Kaspersky provides the command line utility called *avp.com* that may be used to scan the 
 selected file or directory for malware and to store human readable reports to specified file.
@@ -349,77 +290,12 @@ the *Edit...* button below.
     
 * A reboot of the virtual machine is now recommended. 
 
-### 2.6 Symantec (paid)
-
-/** WIP
-
-Install any of the Symantec paid antivirus offer.
-This guide assumes the installation of Symantec Internet Security, however, another 
-Symantec products should be basically the same.
-
-Mention should be made that Symantec requires updated Windows, otherwise the installation wizard 
-refuses to start.
-In my case three iterations of Windows 7 updates were sufficient to successfully install the 
-antivirus.
-
-#### 2.6.1 Configuration
-
-Open the Eset window and click on the setup icon at the left side of the window. 
-Disable all features in the *Computer protection*, *Internet protection*, *Network protection* 
-and *Security protection* options.
-
-Click on the *Advanced setup* icon at the bottom side of the window, or just press *F5* key.
-
-* In the *Detection engine* -> *Real-time file system protection* tab, uncheck the *Enable 
-Real-time file system protection*. 
-
-* In the *Detection engine* -> *Cloud-based protection* tab, uncheck the *Enable ESET 
-LiveGrid@ reputation system* and *Enable ESET LiveGrid@ feedback system* options.
-
-* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
-
-* In the *Licensing* window click on the green symbol `x` located to the right of 
-*License key* label.
-
-* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
-
-* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
-
-#### 2.6.2 Command line utility
-
-Eset provides the command line utility called *ecls.exe* that may be used to scan the 
-selected file for malware and to store human readable reports to specified file.
-
-By default, our driver application assumes that the *ecls.exe* program is available in the *Path* 
-system variable. To do this, follow these steps:
-
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
-
-* On the left-hand side open the *Advanced system settings*.
-
-* Press the *Environment Variables* button.
-
-* Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
-the *Edit...* button below.
-
-* Add the installation path of the Avast to the beginning of *Variable value* text. 
-In our case the path is `C:\Program Files\Microsoft Security Client`, since we assume Windows 7 
-is installed. 
-In newer version of Windows the path should be `C:\Program Files\Windows Defender`.
-  
-    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
-    
-    ```C:\Program Files\Microsoft Security Client;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
-    
-* A reboot of the virtual machine is now recommended. 
-
-### 2.7 Windows Defender/Microsoft Security Essentials (free)
+### 2.4 Windows Defender/Microsoft Security Essentials (free)
 
 If you have a Windows 7 VM then you need to install Microsoft Security Essentials as Windows 
 Defender on this system is unusable for our purposes.
  
-#### 2.7.1 Configuration
+#### 2.4.1 Configuration
 
 ##### A) Microsoft Security Essentials (Windows 7)
 
@@ -454,7 +330,7 @@ Disable the following features:
 
 (TODO) Disable telemetry
 
-#### 2.7.3 Command line utility
+#### 2.4.3 Command line utility
 
 Microsoft provides the command line utility called *MpCmdRun.exe* that may be used to scan the 
 selected file for malware.
@@ -495,7 +371,7 @@ machine.
 
 * Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
     * `[NAME-OF-PROGRAM]` is the name of the driver program.
-    * `[ANTIVIRUS]` must be one of the following: `--avast`, `--avira`, `--bitdefender`, `--eset`, `--kaspersky`, `--symantec`, `--windefender`. (TODO: 
+    * `[ANTIVIRUS]` must be one of the following: `--avast`, `--eset`, `--kaspersky`, `--windefender`. (TODO: 
      auto-detection of the installed antivirus)
         * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --eset`
 

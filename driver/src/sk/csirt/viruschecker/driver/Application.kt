@@ -16,6 +16,7 @@ import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
+import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.driver.config.CommandLineArguments
 import sk.csirt.viruschecker.driver.config.DriverPropertiesFactory
@@ -23,12 +24,12 @@ import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
 import sk.csirt.viruschecker.driver.routing.index
 import sk.csirt.viruschecker.driver.routing.scanFile
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
 lateinit var parsedArgs: CommandLineArguments
 
 fun main(args: Array<String>) = mainBody {
-    parsedArgs = ArgParser(args).parseInto(::CommandLineArguments)
+    parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
     io.ktor.server.netty.EngineMain.main(args)
 }
 
@@ -59,7 +60,7 @@ fun Application.module() {
     }
 
     install(Locations)
-       install(Koin) {
+    install(Koin) {
         modules(driverDependencyInjectionModule)
         properties(DriverPropertiesFactory.loadOrCreateDefault())
     }

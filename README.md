@@ -5,10 +5,10 @@ This is a repository for an offline based virus checker application stack, simil
 
 It contains several executable modules:
 
-- **driver**: This program provides REST API to communicate with some antivirus software installed 
-on the same machine.  
-- **client-cli**:  This is a simple console REST client. The client part serves to upload 
-files toseveral *driver*s at once and to read/export scan reports.  
+- **driver** program provides REST API to communicate with some antivirus software installed 
+on the same machine.
+- **gateway** serves to upload files to several *driver*s in parallel. 
+- **client-cli**: This is a simple console REST client. One can use it to upload files to gateway.  
 - **client-web**: This is a simple graphical web frontend with the same purpose as **client-cli**.
 
 There are also some helper modules that contains shared dependencies or classes.
@@ -49,11 +49,28 @@ These steps describe how to build and deploy this program from scratch and they 
 
 The following subsections thoroughly describe each of the five steps. 
 
+### Installation of prerequisites
+
+As of this moment, the project depends on external VirusTotal API client [library](https://github.com/kdkanishka/Virustotal-Public-API-V2.0-Client).
+This library is not provided in public artifact repositories like MavenCentral or JCenter.
+Therefore it needs to be compiled and linked manually.
+To do this install *Maven* and then execute the following commands.
+
+```bash
+git clone https://github.com/kdkanishka/Virustotal-Public-API-V2.0-Client.git
+cd Virustotal-Public-API-V2.0-Client
+mvn clean install -DskipTests
+```
+
+In the future we aim to implement our own client.
+
 1 Compiling the source code
 ---------------------------
 
 To build this software a JDK 1.8 is required (OpenJDK is sufficient).
 The newer JDK versions should work as well, but it was not tested.
+
+### Installation of prerequisites
 
 Open terminal in this directory and
 - on Windows machine run
@@ -71,15 +88,13 @@ Open terminal in this directory and
 The driver provides a unified REST API to simplify communication with supported antivirus solutions.
 As of this moment the supported antivirus software includes
 - Avast
-- Kaspersky
+- Comodo
 - Eset
+- Kaspersky
 - Windows defender
 
-Support for following AVs is under active development
-
-- Avira
-- Bitdefender
-- Symantec
+In addition to this, the driver also supports VirusTotal online virus database.
+However, only SHA-256 hashes are uploaded to VirusTotal.
 
 The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
 
@@ -93,15 +108,18 @@ machines using Virtual Box or on Linux based Docker containers.
 The first way allows you to reuse some spare licenses for Windows or antivirus solutions.
 The other way is usually less demanding on computer resources.
 
-* Deploying on [Windows virtual machine using Virtual Box](docs/driver/drivers-on-windows.md)
+* Deploying on [Windows virtual machine using VirtualBox](docs/driver/drivers-on-windows.md)
 
-* (TODO) Deploying on [Linux containers using Docker](docs/driver/drivers-on-docker.md)
+* Deploying on [Linux virtual machine using VirtualBox](docs/driver/drivers-on-linux.md)
+
+* Deploying on [Linux containers using Docker](docs/driver/drivers-on-docker.md)
+
+* Enable VirusTotal hash database [guide](docs/driver/driver-virustotal.md)
 
 Of course nothing restricts you to deploy some drivers on Windows and other on Docker.
 Or you can deploy driver on any other platform which supports JRE 8 and at least one of the 
 supported antivirus.
-
-(TODO) Adding custom antiviruses.   
+ 
 
 ### 2.1 Driver REST API
 

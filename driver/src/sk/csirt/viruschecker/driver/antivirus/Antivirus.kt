@@ -1,7 +1,10 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import sk.csirt.viruschecker.driver.config.AntivirusType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
+import sk.csirt.viruschecker.driver.config.AntivirusType
 import java.io.File
 
 val logger = KotlinLogging.logger { }
@@ -10,6 +13,15 @@ interface Antivirus {
     val type: AntivirusType
 
     suspend fun scanFile(params: FileScanParameters): FileScanResult
+
+    suspend fun scanFileAndClean(params: FileScanParameters)
+            : FileScanResult = supervisorScope {
+        val result = scanFile(params)
+        launch(Dispatchers.IO) {
+            params.fileToScan.delete()
+        }
+        result
+    }
 }
 
 data class FileScanParameters(
@@ -21,7 +33,7 @@ data class ScanResult(
     val antivirusType: AntivirusType,
     val status: ScanStatusResult,
     val reports: List<AntivirusReportResult>
-){
+) {
     constructor(
         antivirusType: AntivirusType,
         reports: List<AntivirusReportResult>

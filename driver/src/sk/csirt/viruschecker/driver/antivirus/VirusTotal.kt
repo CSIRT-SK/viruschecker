@@ -21,7 +21,7 @@ class VirusTotal(apiKey: String) : Antivirus {
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val virusTotalRef = VirustotalPublicV2Impl()
         val fileToScan = params.fileToScan
-        val sha256 = withContext(Dispatchers.IO) { fileToScan.sha256() }.value
+        val sha256 = fileToScan.sha256().value
         val scanInformation =
             runCatching { withContext(Dispatchers.IO) { virusTotalRef.getScanReport(sha256) } }
                 .onFailure {
@@ -29,9 +29,11 @@ class VirusTotal(apiKey: String) : Antivirus {
                         "VirusTotal error for file ${fileToScan.canonicalPath}. " +
                                 "Cause: ${it.stackTrace}"
                     }
-                }
-                .onSuccess { logger.info { "VirusTotal success for file ${fileToScan.canonicalPath}." } }
-                .getOrThrow()
+                }.onSuccess {
+                    logger.info {
+                        "VirusTotal success for file ${fileToScan.canonicalPath}."
+                    }
+                }.getOrThrow()
 
         val emptyReport = FileScanResult(
             filename = params.originalFileName,

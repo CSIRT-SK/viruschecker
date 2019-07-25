@@ -2,9 +2,9 @@ package sk.csirt.viruschecker.driver.antivirus
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import sk.csirt.viruschecker.driver.config.AntivirusType
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
+import sk.csirt.viruschecker.driver.config.AntivirusType
 import java.io.File
 import java.nio.charset.Charset
 
@@ -25,8 +25,8 @@ class Microsoft(
                 reportFile,
                 Charset.defaultCharset()
             )
-        }
-            .also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+
         val infectedCountString = lines.firstOrNull {
             it.startsWith("Scanning ") &&
                     "found" in it &&
