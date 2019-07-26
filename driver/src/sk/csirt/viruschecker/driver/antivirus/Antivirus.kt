@@ -11,6 +11,8 @@ val logger = KotlinLogging.logger { }
 interface Antivirus {
     val antivirusName: String
 
+    val isInternal: Boolean
+
     suspend fun scanFile(params: FileScanParameters): FileScanResult
 
     suspend fun scanFileAndClean(params: FileScanParameters)

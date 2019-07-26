@@ -12,9 +12,9 @@ import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.DefaultReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
 import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
@@ -36,7 +36,7 @@ fun Application.module() {
     val scanService = GatewayScanService(gatewayUrl, client)
     val scanReport = runBlocking {
         scanService.scanFile(
-            GatewayScanRequest(
+            ScanParameters(
                 fileToScan, fileToScan.name,
                 parsedArgs.useExternalDrivers
             )

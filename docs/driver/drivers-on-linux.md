@@ -66,6 +66,7 @@ communicate with the host operating system.
 ```bash
 sudo ufv allow from <place-host-ip-here> to any port 8080 proto tcp
 ```
+The above command will open port 8080 which is a default port of the driver program's REST API.
  
 #### 1.2.2 Install Java and copy the driver
 

@@ -20,6 +20,7 @@ fun Route.index(virusChecker: Antivirus) {
     get<DriverRoutes.Index> {
         call.respond(DriverInfoResponse(
             antivirus = virusChecker.antivirusName,
+            usesExternalServices = virusChecker.isInternal,
             driverVersion = Antivirus::class.java.`package`.implementationVersion
                 ?: ideRunMessage
         ))

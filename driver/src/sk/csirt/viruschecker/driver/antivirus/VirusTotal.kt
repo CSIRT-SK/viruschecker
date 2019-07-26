@@ -17,6 +17,8 @@ class VirusTotal(apiKey: String) : Antivirus {
 
     override val antivirusName: String = AntivirusType.VIRUS_TOTAL.antivirusName
 
+    override val isInternal = false
+
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val virusTotalRef = VirustotalPublicV2Impl()
         val fileToScan = params.fileToScan

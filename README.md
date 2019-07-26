@@ -1,15 +1,15 @@
 Virus Checker
 =============
 
-This is a repository for an offline based virus checker application stack, similar to VirusTotal.
+This repository contains an offline based virus checker application stack, similar to VirusTotal.
 
 It contains several executable modules:
 
 - **driver** program provides REST API to communicate with some antivirus software installed 
-on the same machine.
-- **gateway** serves to upload files to several *driver*s in parallel. 
-- **client-cli**: This is a simple console REST client. One can use it to upload files to gateway.  
-- **client-web**: This is a simple graphical web frontend with the same purpose as **client-cli**.
+on the same machine or with the external services.
+- **gateway** serves to upload files to several *driver* instances in parallel. 
+- **client-cli** is a simple console REST client to upload files to gateway and export the reports to `csv` files.  
+- **client-web** is a simple graphical web frontend with the same purpose as **client-cli**.
 
 There are also some helper modules that contains shared dependencies or classes.
 
@@ -31,6 +31,7 @@ Before diving further we denote the following terms:
 - JDK = Java Development Kit
 - JRE = Java Runtime Environment
 - VM = Virtual Machine
+- VM/C = Virtual Machine or Container
 
 Installation
 ============
@@ -40,35 +41,21 @@ These steps describe how to build and deploy this program from scratch and they 
 
 1. Compile the source code
 2. Deploy antivirus driver programs
-   - Create container/virtual machine for each different antivirus.
+   - Create virtual machine/container for supported antivirus programs.
+     You can create one virtual machine/container for all antivirus programs you want to use or 
+     create separated virtual machines/containers for each antivirus.
    - Install and configure each antivirus
-   - Deploy and configure driver program for each antivirus.
-3. Deploy sk.csirt.gateway application.
+   - Deploy driver programs.
+3. Deploy gateway application.
 4. Deploy web client application.
 5. (Optional) Deploy console client application.
 
 The following subsections thoroughly describe each of the five steps. 
 
-### Installation of prerequisites
-
-As of this moment, the project depends on external VirusTotal API client [library](https://github.com/kdkanishka/Virustotal-Public-API-V2.0-Client).
-This library is not provided in public artifact repositories like MavenCentral or JCenter.
-Therefore it needs to be compiled and linked manually.
-To do this install *Maven* and then execute the following commands.
-
-```bash
-git clone https://github.com/kdkanishka/Virustotal-Public-API-V2.0-Client.git
-cd Virustotal-Public-API-V2.0-Client
-mvn clean install -DskipTests
-```
-
-In the future we aim to implement our own client.
-
 1 Compiling the source code
 ---------------------------
 
-To build this software a JDK 1.8 is required (OpenJDK is sufficient).
-The newer JDK versions should work as well, but it was not tested.
+To build this software a JDK 1.8 or newer is required (OpenJDK is sufficient).
 
 Open terminal in this directory and
 - on Windows machine run
@@ -101,8 +88,18 @@ In the following subsections we provide a step-by-step instructions for successf
 The recommended setup for the whole Virus Checker system is to have each antivirus and it's 
 corresponding driver program installed on separated virtual machine or container.
 
+###### Note
+If you wish to save some HW resources, you may install several antivirus programs on a single 
+virtual machine. 
+Although the driver fully supports processing multiple different antivirus programs
+in parallel, several antivirus programs running on a single operating system may cause an 
+unpredictable behavior.
+In theory, you should be fine with such setup if you disable automatic scanners on each antivirus. 
+###### ----------
+
 We provide documentation for two ways of deploying driver programs - on Windows based virtual 
-machines using Virtual Box or on Linux based Docker containers.
+machines or on Linux based virtual machines. 
+We assume that the VirtualBox is used as an virtualization platform.
 The first way allows you to reuse some spare licenses for Windows or antivirus solutions.
 The other way is usually less demanding on computer resources.
 
@@ -110,13 +107,14 @@ The other way is usually less demanding on computer resources.
 
 * Deploying on [Linux virtual machine using VirtualBox](docs/driver/drivers-on-linux.md)
 
-* Deploying on [Linux containers using Docker](docs/driver/drivers-on-docker.md)
+* (TODO) Deploying on [Linux containers using Docker](docs/driver/drivers-on-docker.md)
 
 * Enable VirusTotal hash database [guide](docs/driver/driver-virustotal.md)
 
-Of course nothing restricts you to deploy some drivers on Windows and other on Docker.
-Or you can deploy driver on any other platform which supports JRE 8 and at least one of the 
-supported antivirus.
+As of this moment, the commercial antivirus programs are supported only on Windows, while the free 
+ones are supported only on Linux.
+If you want to run some commercial antivirus like Eset on Linux or implement your own driver for a 
+currently unsupported antivirus you may visit this [guide](docs/driver/extensions.md).
 
 ### 2.1 Run the driver program
 
@@ -124,20 +122,27 @@ The location of the compiled Java executable is `driver/build/libs/driver-[VERSI
 We will assume that this executable file was copied to `~/virus-checker` or `C:\virus-checker` folder on the virtual 
 machine.
  
-* Open terminal   
+* On the virtual machine, open terminal in the folder with the driver executable.   
 
-* Type `cd virus-checker`.  
-
-* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
+* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUSES]` and press enter.
     * `[NAME-OF-PROGRAM]` is the name of the driver program.
-    * `[ANTIVIRUS]` must be one of the following: `--comodo`. (TODO: 
+    * `[ANTIVIRUSES]` must be one or more of the following: `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`. (TODO: 
      auto-detection of the installed antivirus)
-        * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --eset`
+
+* Examples:
+    * `java -jar driver-1.0.0-all.jar COMODO` if you have only Comodo Antivirus installed on this virtual machine.
+    * `java -jar driver-1.0.0-all.jar ESET COMODO` if you have both Comodo and Eset installed on this virtual machine.
 
 To test the successful launch of the driver program open the web browser and go to 
 `http://127.0.0.1:8080/`.
 The driver should respond with JSON containing some basic info about itself.
 More info about the web API can be found in the following subsection. 
+
+You may specify port other than `8080` with the `-port=` parameter, e.g. 
+`java -jar driver-1.0.0-all.jar ESET COMODO -port=9595`.
+Please be aware, that ports `7979` and `8181` are default ports of the client programs.
+
+Drivers alg
 
 ### 2.1 Driver REST API
 
@@ -145,6 +150,11 @@ One can communicate with the driver using its REST web API.
 You can use it directly or with the provided gateway or client applications.
 
 The API endpoints are documented [here](docs/rest-api/rest-api.md)
+
+### 2.2 Extend driver
+
+If you want to support some new antivirus in driver or modify the existing configuration, this [guide](docs/driver/extensions.md)
+is the place to go.
 
 3 Deploy gateway
 ----------------
@@ -160,12 +170,14 @@ However, it was tested only on Ubuntu 18.04.
 The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 
 Create a new text file and put the full urls of running driver programs, one url per line.
-For example, if you have two running drivers on (virtual) machines with IPv4 addresses 
-`192.168.1.112` and `192.168.1.115`, the file should look like below.
+For example, if you have three running drivers on (virtual) machines with IPv4 addresses 
+`192.168.1.112`, `192.168.1.115` and `192.168.1.118`, the file should look like below.
 ```dtd
 http://192.168.1.112:8080
 http://192.168.1.115:8080
+http://192.168.1.118:8080
 ```
+
 Save the file as, for example, `driverUrls.txt`.
 
 Assuming Java is in the *Path*, run terminal in this directory.
@@ -179,8 +191,12 @@ More info about the web API can be found in the following subsection.
 
 Remember to open port 8080 for TCP if you wish to connect to the gateway from outside. 
 
+###### Note
 
-    
+Default port of the gateway is 8080 which is also used by driver program by default.
+If you wish to deploy the driver on the same system
+
+   
 4 Deploy client cli application
 -------------------------------
 

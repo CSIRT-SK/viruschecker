@@ -3,16 +3,16 @@ package sk.csirt.viruschecker.gateway.config
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import sk.csirt.viruschecker.gateway.routing.service.DefaultDriverScanService
-import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
-import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
-import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.parsedArgs
 import sk.csirt.viruschecker.gateway.persistence.ScanReportDatabase
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.gateway.persistence.repository.KeyValueScanReportRepository
+import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
+import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.DefaultDriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
 import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
 import java.io.File
 import java.time.Instant
@@ -52,7 +52,7 @@ val gatewayDependencyInjectionModule = module {
     single { httpClient(parsedArgs.socketTimeout) }
     single {
         DriverInfoService(
-            parsedArgs.drivers,
+            parsedArgs.driverUrls,
             get()
         )
     }
@@ -64,7 +64,7 @@ val gatewayDependencyInjectionModule = module {
 
     single(checkedDrivers) {
         get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
-            .partition { it.url in parsedArgs.drivers.external }
+            .partition { it.info.usesExternalServices }
             .let {
                 Drivers(
                     internal = it.second.map { it.url },

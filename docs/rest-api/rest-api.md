@@ -27,16 +27,26 @@ None
     Type: *application/json*
     ``` 
     structure AntivirusDriverInfoResponse:
+        antivirus: String,
+        usesExternalServices: Boolean,
         driverVersion: String,
-        antivirus: String
     ``` 
-    Example:
+    Example 1:
     ``` 
     {
-        "driverVersion": "0.14.1",
-        "antivirus": "Eset"
+        "antivirus": "Comodo",
+        "usesExternalServices": "false"
+        "driverVersion": "0.18.1",
     }
-    ```               
+    ```
+    Example 2:
+     ``` 
+     {
+         "antivirus": "VirusTotal",
+         "usesExternalServices": "true"
+         "driverVersion": "0.18.1",
+     }
+     ```               
 
 Scan file
 ---------
@@ -56,29 +66,73 @@ Type: *multipart/form-data*
     Type: *application/json*
     ``` 
     structure FileScanResponse:
+        date: DateTimeUTC,
         filename: String,
-        antivirus: String,
-        status: Status,
-        malwareDescription: String
+        status: ScannedStatusResponse,
+        results:  List<AntivirusReportResponse>
     ``` 
 
-    *Status schema*
+    *ScannedStatusResponse schema*
     ```
-    enumeration Status:
+    enumeration ScannedStatusResponse:
         NOT_AVAILABLE,
         OK,
         INFECTED
     ```
+  
+    *AntivirusScanResponse schema*
+    ```
+    structure AntivirusReportResponse:
+        antivirus: String,
+        status: ScannedStatusResponse,
+        malwareDescription: String
+    ```
 
-    Example:
+    Example 1:
     ``` 
     {
+        "date": "2019-07-17T07:24:23.530Z",
         "filename": "eicar.exe",
-        "antivirus": "Eset",
         "status": "INFECTED",
-        "malwareDescription": "Eicar test file"
+        "results": [
+            {
+                 "antivirus": "Avast",
+                 "status": "INFECTED",
+                 "malwareDescription": "EICAR Test-NOT virus"
+            },
+            {
+                "antivirus": "Eset",
+                "status": "INFECTED",
+                "malwareDescription": "Eicar test file"
+            }
+        ]
     }
     ```
+
+    Example 2:
+    ``` 
+    {
+        "date": "2019-07-17T07:24:23.530Z",
+        "filename": "zipWithEicar.zip",
+        "status": "INFECTED",
+        "results": [
+            {
+                 "antivirus": "Avast",
+                 "status": "OK",
+                 "malwareDescription": "OK"
+            },
+            {
+                "antivirus": "Eset",
+                "status": "INFECTED",
+                "malwareDescription": "Eicar test file"
+            }
+        ]
+    }
+    ```
+  
+* **400 Bad Request**
+    
+    If file was not recieved.
 
 Gateway REST API
 ================
@@ -115,10 +169,10 @@ None
     Example:
     ``` 
     {
-        "gatewayVersion": "0.14.1",
+        "gatewayVersion": "0.18.1",
     }
     ```    
-
+    
 Drivers info
 ------------
 
@@ -150,8 +204,10 @@ None
     ``` 
     structure AntivirusDriverInfoResponse:
         driverVersion: String,
+        usesExternalServices: Boolean,
         antivirus: String
     ``` 
+  
     Example 1:
     ``` 
     [
@@ -159,7 +215,8 @@ None
             "url: "http:192.168.1.112",
             "success": "true" 
             "info": {
-                "driverVersion": "0.14.1",
+                "driverVersion": "0.18.1",
+                "usesExternalServices": "false",
                 "antivirus": "Avast"
             }
         },
@@ -167,12 +224,22 @@ None
             "url: "http:192.168.1.115",
             "success": "true" 
             "info": {
-                "driverVersion": "0.14.1",
+                "driverVersion": "0.16.0",
+                "usesExternalServices": "false",
                 "antivirus": "Eset"
             }
         },
         {
             "url: "http:192.168.1.118",
+            "success": "true" 
+            "info": {
+                "driverVersion": "0.18.1",
+                "usesExternalServices": "true",
+                "antivirus": "VirusTotal"
+            }
+        },
+        {
+            "url: "http:192.168.1.121",
             "success": "false" 
             "info": {
                 "driverVersion": "ERROR: Could not reach driver.",
@@ -193,100 +260,83 @@ Upload virus file to all deployed drivers in parallel and returns scan report.
 
 Type: *multipart/form-data*
 
+Example: 
+```
+Content-Type: multipart/form-data; boundary=---------------------------9051914041544843365972754266
+Content-Length: ...
+
+-----------------------------9051914041544843365972754266
+Content-Disposition: form-data; name="externalDrivers"
+
+true    #Note: this value determined if the external drivers like VirusTotal will be used
+-----------------------------9051914041544843365972754266
+Content-Disposition: form-data; name="file"; filename="eicar.exe"
+```
+
+
 #### Response body schema 
 
 * **200 OK**
 
     Type: *application/json*
     ``` 
-    structure MultiFileScanResponse
+    structure FileHashScanResponse
+        sha256: String,
+        md5: String,
+        sha1: String,
+        report: FileScanResponse
+    ``` 
+
+    *FileScanResponse schema*  (identical with driver's API POST /scanFile)
+    ```
+    structure FileScanResponse:
         date: DateTimeUTC,
-        sha256: String.
         filename: String,
-        status: Status,
-        otherHashes: List<Hash>,
-        reports: List<AntivirusScanResponse>
+        status: ScannedStatusResponse,
+        results:  List<AntivirusReportResponse>
     ``` 
+    
+     *ScannedStatusResponse schema*
+     ```
+     enumeration ScannedStatusResponse:
+         NOT_AVAILABLE,
+         OK,
+         INFECTED
+     ```
+      
+     *AntivirusScanResponse schema*
+     ```
+     structure AntivirusReportResponse:
+         antivirus: String,
+         status: ScannedStatusResponse,
+         malwareDescription: String
+     ```
 
-    *Status schema*
-    ```
-    enumeration Status:
-        NOT_AVAILABLE,
-        OK,
-        INFECTED
-    ```
-
-    *Hash schema*
-    ```
-    structure Hash:
-        value: String,
-        algorithm: String
-    ```
-
-    *AntivirusScanResponse schema*
-    ``` 
-    structure AntivirusScanResponse
-        antivirus: String,
-        status: Status.
-        malwareDescription: String
-    ``` 
-
-    Example 1:
+    Example:
     ``` 
     {
-        "date": "2019-07-17T07:24:23.530Z",
-        "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f".
-        "filename": "eicar.exe",
-        "status": "INFECTED",
-        "otherHashes": [
-            {
-                "44d88612fea8a8f36de82e1278abb02f",
-                "MD5"
-            }
-        ],
-        "reports": [
-            {
-                 "antivirus": "Avast",
-                 "status": "INFECTED",
-                 "malwareDescription": "EICAR Test-NOT virus"
-            },
-            {
-                "antivirus": "Eset",
-                "status": "INFECTED",
-                "malwareDescription": "Eicar test file"
-            }
-        ]
-    }
+        "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+        "md5": "44d88612fea8a8f36de82e1278abb02f",
+        "sha1": "3395856ce81f2b7382dee72602f798b642f14140"
+        "report": {
+            "date": "2019-07-17T07:24:23.530Z",
+            "filename": "eicar.exe",
+            "status": "INFECTED",
+            "results": [
+                {
+                    "antivirus": "Avast",
+                    "status": "INFECTED",
+                    "malwareDescription": "EICAR Test-NOT virus"
+                },
+                {
+                    "antivirus": "Eset",
+                    "status": "INFECTED",
+                    "malwareDescription": "Eicar test file"
+                }
+            ]    
+        } 
     ```
-
-    Example 2:
-    ``` 
-    {
-        "date": "2019-07-17T07:24:23.530Z",
-        "sha256": "999722a3258c9a3ff0a680fa6c09b12616db879e6dbb18a828489cf6e49369a1".
-        "filename": "zipWithEicar.zip",
-        "status": "INFECTED",
-        "otherHashes": [
-            {
-                "1b0df9b117c619475a30dafea0bc20fb",
-                "MD5"
-            }
-        ],
-        "reports": [
-            {
-                 "antivirus": "Avast",
-                 "status": "OK",
-                 "malwareDescription": "OK"
-            },
-            {
-                "antivirus": "Eset",
-                "status": "INFECTED",
-                "malwareDescription": "Eicar test file"
-            }
-        ]
-    }
-    ```
-
+      
 * **400 Bad Request**
     
     If file upload is unsuccessful.

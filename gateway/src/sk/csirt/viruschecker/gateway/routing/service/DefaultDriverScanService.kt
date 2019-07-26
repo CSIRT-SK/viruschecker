@@ -16,7 +16,10 @@ import sk.csirt.viruschecker.hash.md5
 import sk.csirt.viruschecker.hash.sha1
 import sk.csirt.viruschecker.hash.sha256
 import sk.csirt.viruschecker.routing.DriverRoutes
-import sk.csirt.viruschecker.routing.payload.*
+import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
+import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
+import sk.csirt.viruschecker.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 import java.io.FileInputStream
 import java.time.Instant
 
@@ -27,7 +30,7 @@ class DefaultDriverScanService(
     FileScanService {
     private val logger = KotlinLogging.logger { }
 
-    override suspend fun scanFile(scanParams: GatewayScanRequest): FileHashScanResponse =
+    override suspend fun scanFile(scanParams: ScanParameters): FileHashScanResponse =
         coroutineScope {
             val (fileToScan, originalFileName) = scanParams
             logger.info { "Computing hashes for $fileToScan" }

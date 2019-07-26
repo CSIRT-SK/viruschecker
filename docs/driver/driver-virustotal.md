@@ -1,7 +1,7 @@
-Deploy driver program on Linux based virtual machines 
-=====================================================
+Deploy driver for VirusTotal 
+============================
 
-Driver application can be run in a special mode available via `--virustotal` command line switch.
+Driver application can be run in a special mode available via `VIRUS_TOTAL` command line parameter.
 Instead of scanning the uploaded file via it's REST API, it will calculate the SHA-256 hash of the 
 file and check it against the VirusTotal online database.
 
@@ -32,13 +32,28 @@ replace the `<insert-your-api-key>` with your api key.
 
 This mode is OS agnostic and can be run as
 ```bash
-java -jar <name-of-driver> --virustotal
+java -jar <name-of-driver> VIRUS_TOTAL
 ```
+
+Although driver programs supports serving multiple antivirus programs installed on the same 
+(virtual) machine, the `VIRUS_TOTAL` parameter is deliberately incompatible with other antivirus 
+parameters and it will cause a runtime exception if `VIRUS_TOTAL` parameter is specified with 
+another antivirus. It means that, for example `java -jar <name-of-driver> VIRUS_TOTAL COMODO` will 
+instantly crash.
 
 If you do not wish to run the driver in this mode in it's own VM/container, but rather alongside 
-other instance of the *driver* program or *gateway* then it is necessary to set different port to 
+with other instance of the *driver* program then it is necessary to set different port to 
 avoid complications due to multiple processes accessing the same port.  
 
+Therefore to run for example driver for Comodo and VirusTotal on the same (virtual) machine, 
+just run them as two separate processes.
+
 ```bash
-java -jar <name-of-driver> --virustotal -port=<some-port-other-than-8080-or-7979>
+java -jar <name-of-driver> COMODO
+java -jar <name-of-driver> VIRUS_TOTAL -port=<some-port-other-than-8080-or-7979>
 ```
+
+
+
+Also remember to open the port in the firewall.
+Firewall configurations for both [Windows](/docs/driver/drivers-on-windows.md) and [Linux](/docs/driver/drivers-on-linux.md) are described in section *1.2.1 Setup firewall*.

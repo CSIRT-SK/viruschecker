@@ -16,9 +16,9 @@ import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import kotlinx.html.*
 import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.client.web.parsedArgs
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
-import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import sk.csirt.viruschecker.utils.copyToSuspend
 import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
@@ -101,7 +101,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
     post<WebRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
 //        var title = ""
-        var multiScanRequest = GatewayScanRequest(
+        var scanParameters = ScanParameters(
             fileToScan = File(""),
             originalFilename = "",
             useExternalDrivers = false
@@ -112,7 +112,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
         multipart.forEachPart { part ->
             when (part) {
                 is PartData.FormItem -> {
-                    multiScanRequest = multiScanRequest.copy(
+                    scanParameters = scanParameters.copy(
                         useExternalDrivers = part.value.toBoolean()
                     )
                 }
@@ -124,7 +124,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
 
                     part.streamProvider()
                         .use { its -> file.outputStream().buffered().use { its.copyToSuspend(it) } }
-                    multiScanRequest = multiScanRequest.copy(
+                    scanParameters = scanParameters.copy(
                         fileToScan = file,
                         originalFilename = part.originalFileName ?: file.name
                     )
@@ -134,12 +134,12 @@ fun Route.scanFile(scanService: GatewayScanService) {
         }
 
         val responseLambda: suspend (ApplicationCall) -> Unit =
-            if (multiScanRequest.fileToScan.exists().not()) {
+            if (scanParameters.fileToScan.exists().not()) {
                 { call ->
                     call.respond(HttpStatusCode.InternalServerError, "File was not uploaded")
                 }
             } else {
-                val report = scanService.scanFile(multiScanRequest);
+                val report = scanService.scanFile(scanParameters);
                 { call ->
                     call.respondRedirect(call.url(WebRoutes.ScanReport(report.sha256)), false)
                 }

@@ -38,18 +38,12 @@ data class Drivers(val internal: List<String>, val external: List<String>) {
 }
 
 class CommandLineArguments(parser: ArgParser) {
-    val drivers by parser.positional(
+    val driverUrls by parser.positional(
         help = "List of urls containing virus checker drivers."
     ) {
         FileUtils.readLines(File(this), Charset.defaultCharset())
             .map { it.trim() }
             .filterNot { it.startsWith("#") }
-            .partition { it.startsWith("ext:") }
-            .let {
-                Drivers(
-                    internal = it.second.map { it },
-                    external = it.first.map { it.replace("ext:", "") })
-            }
     }
 
     val socketTimeout: Duration by parser.storing(

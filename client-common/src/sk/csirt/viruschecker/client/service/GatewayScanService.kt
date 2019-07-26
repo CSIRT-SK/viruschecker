@@ -11,8 +11,14 @@ import kotlinx.io.streams.asInput
 import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
+import java.io.File
 import java.io.FileInputStream
+
+data class ScanParameters(
+    val fileToScan: File,
+    val originalFilename: String,
+    val useExternalDrivers: Boolean
+)
 
 class GatewayScanService(
     private val gatewayUrl: String,
@@ -20,7 +26,7 @@ class GatewayScanService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun scanFile(params: GatewayScanRequest): FileHashScanResponse =
+    suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
         client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
             this.body = MultiPartFormDataContent(listOf(
                 PartData.FileItem(

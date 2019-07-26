@@ -43,6 +43,8 @@ abstract class CommandLineAntivirus(
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
+    override val isInternal = true
+
     override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
         logger.info("Scanning file with this parameters: $params")
         val reportFile = Paths.get(

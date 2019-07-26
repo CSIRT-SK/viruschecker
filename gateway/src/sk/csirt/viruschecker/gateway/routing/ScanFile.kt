@@ -14,8 +14,8 @@ import io.ktor.util.asStream
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.gateway.routing.service.FileScanService
+import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.routing.payload.GatewayScanRequest
 import java.io.File
 import java.nio.file.Paths
 import java.time.Instant
@@ -59,7 +59,7 @@ fun Route.multiScanFile(scanService: FileScanService) {
 
         runCatching {
             scanService.scanFile(
-                GatewayScanRequest(
+                ScanParameters(
                     fileToScan = fileToScan!!,
                     useExternalDrivers = useExternalDrivers,
                     originalFilename = originalFilename
