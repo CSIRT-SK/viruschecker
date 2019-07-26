@@ -14,7 +14,7 @@ class Microsoft(
 
     private val logger = KotlinLogging.logger { }
 
-    override val type: AntivirusType = AntivirusType.MICROSOFT
+    override val antivirusName: String = AntivirusType.MICROSOFT.antivirusName
 
     override suspend fun parseReportFile(
         reportFile: File,

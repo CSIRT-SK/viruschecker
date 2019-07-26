@@ -20,6 +20,7 @@ import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
 import sk.csirt.viruschecker.driver.config.CommandLineArguments
 import sk.csirt.viruschecker.driver.config.DriverPropertiesFactory
+import sk.csirt.viruschecker.driver.config.defaultAntivirusQualifier
 import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
 import sk.csirt.viruschecker.driver.routing.index
 import sk.csirt.viruschecker.driver.routing.scanFile
@@ -27,6 +28,7 @@ import sk.csirt.viruschecker.driver.routing.scanFile
 private val logger = KotlinLogging.logger { }
 
 lateinit var parsedArgs: CommandLineArguments
+private val viruscheckerDriverProperties = DriverPropertiesFactory.loadOrCreateDefault()
 
 fun main(args: Array<String>) = mainBody {
     parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
@@ -62,16 +64,14 @@ fun Application.module() {
     install(Locations)
     install(Koin) {
         modules(driverDependencyInjectionModule)
-        properties(DriverPropertiesFactory.loadOrCreateDefault())
+        properties(viruscheckerDriverProperties)
     }
 
-    val virusChecker by inject<Antivirus>(parsedArgs.antivirus)
+    val antivirus by inject<Antivirus>(defaultAntivirusQualifier)
 
     routing {
-        index(virusChecker)
-        scanFile(virusChecker)
+        index(antivirus)
+        scanFile(antivirus)
     }
-
-
 }
 

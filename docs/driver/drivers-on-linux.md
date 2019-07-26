@@ -4,7 +4,8 @@ Deploy driver program on Linux based virtual machines
 We will use the Linux based VMs, more specifically the Ubuntu 18.04 VMs.
 Any modern linux distribution is, however, equally suitable.
 
-## 1 Create virtual machines
+1 Create virtual machines
+-------------------------
 
 At first, we will install and configure a single VM.
 This VM will serve as base VM for cloning, where each clone VM will be separately fitted with 
@@ -93,7 +94,8 @@ This will create a backup of the virtual machine in the exactly same state as it
 After the snapshot is complete, you may shut down the virtual machine classically using 
 *Start*->*Shut down*.
 
-## 2 Install and configure antivirus
+2 Install and configure antivirus
+---------------------------------
 
 Driver program supports the aforementioned antivirus solutions.
 If you have performed the steps in the previous section, then it is highly recommended to clone the 
@@ -167,23 +169,3 @@ It should be located at `/opt/COMODO`.
 The driver is preconfigured to this location and therefore no additional settings should be 
 necessary. 
 
-## 3 Run the driver program.
-
-The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
-We will assume that this executable file was copied to `~/virus-checker` folder on the virtual 
-machine.
- 
-* Open terminal   
-
-* Type `cd virus-checker`.  
-
-* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
-    * `[NAME-OF-PROGRAM]` is the name of the driver program.
-    * `[ANTIVIRUS]` must be one of the following: `--comodo`. (TODO: 
-     auto-detection of the installed antivirus)
-        * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --eset`
-
-To test the successful launch of the driver program open the web browser and go to 
-`http://127.0.0.1:8080/`.
-The driver should respond with JSON containing some basic info about itself.
-More info about the web API can be found in the following subsection.

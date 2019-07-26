@@ -4,13 +4,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
-import sk.csirt.viruschecker.driver.config.AntivirusType
 import java.io.File
 
 val logger = KotlinLogging.logger { }
 
 interface Antivirus {
-    val type: AntivirusType
+    val antivirusName: String
 
     suspend fun scanFile(params: FileScanParameters): FileScanResult
 
@@ -30,15 +29,12 @@ data class FileScanParameters(
 )
 
 data class ScanResult(
-    val antivirusType: AntivirusType,
     val status: ScanStatusResult,
     val reports: List<AntivirusReportResult>
 ) {
     constructor(
-        antivirusType: AntivirusType,
         reports: List<AntivirusReportResult>
     ) : this(
-        antivirusType = antivirusType,
         reports = reports,
         status = reports.maxBy { it.status }?.status ?: ScanStatusResult.NOT_AVAILABLE
     )

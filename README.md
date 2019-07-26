@@ -70,8 +70,6 @@ In the future we aim to implement our own client.
 To build this software a JDK 1.8 is required (OpenJDK is sufficient).
 The newer JDK versions should work as well, but it was not tested.
 
-### Installation of prerequisites
-
 Open terminal in this directory and
 - on Windows machine run
     ```bash 	
@@ -119,7 +117,27 @@ The other way is usually less demanding on computer resources.
 Of course nothing restricts you to deploy some drivers on Windows and other on Docker.
 Or you can deploy driver on any other platform which supports JRE 8 and at least one of the 
 supported antivirus.
+
+### 2.1 Run the driver program
+
+The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
+We will assume that this executable file was copied to `~/virus-checker` or `C:\virus-checker` folder on the virtual 
+machine.
  
+* Open terminal   
+
+* Type `cd virus-checker`.  
+
+* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
+    * `[NAME-OF-PROGRAM]` is the name of the driver program.
+    * `[ANTIVIRUS]` must be one of the following: `--comodo`. (TODO: 
+     auto-detection of the installed antivirus)
+        * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --eset`
+
+To test the successful launch of the driver program open the web browser and go to 
+`http://127.0.0.1:8080/`.
+The driver should respond with JSON containing some basic info about itself.
+More info about the web API can be found in the following subsection. 
 
 ### 2.1 Driver REST API
 

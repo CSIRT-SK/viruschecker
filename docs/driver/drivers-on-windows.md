@@ -6,7 +6,8 @@ Windows 8.1 is, however, more future proof as it has longer support.
 Right now we do not recommend Windows 10 because of its forced updates that cannot be completely 
 deactivated.
 
-## 1 Create virtual machines
+1 Create virtual machines
+-------------------------
 
 At first, we will install and configure a single VM.
 This VM will serve as base VM for cloning, where each clone VM will be separately fitted with 
@@ -103,11 +104,15 @@ This will create a backup of the virtual machine in the exactly same state as it
 After the snapshot is complete, you may shut down the virtual machine classically using 
 *Start*->*Shut down*.
 
-## 2 Install and configure antivirus
+2 Install and configure antivirus
+---------------------------------
 
 Driver program supports the aforementioned antivirus solutions.
-If you have performed the steps in the previous section, then it is highly recommended to clone the 
+If you have performed the steps in the previous section, then it is highly to clone the 
 virtual machine and install each antivirus on different clone.
+
+In theory, you can install all antiviruses on the same operating system since the automatic scans 
+will be disabled.
 
 #### 2.0.1 Clone the machine
 
@@ -356,26 +361,3 @@ In my case the path is `C:\Program Files\AVAST Software\Avast`.
     ```C:\Program Files\AVAST Software\Avast;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
 * A reboot of the virtual machine is now recommended.
-
-## 3 Run the driver program.
-
-The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
-We will assume that this executable file was copied at `C:\virus-checker` folder on the virtual 
-machine.
- 
-* Press *Start* button, search and open the "Windows Powershell"   
-
-* Type `cd C:\virus-checker`. You can copy the command and in the blue Powershell window paste it
- with right mouse click (if on Windows 7, the newer versions have much better Powershell terminal 
- which supports Ctrl+V shortcut). 
-
-* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUS]` and press enter.
-    * `[NAME-OF-PROGRAM]` is the name of the driver program.
-    * `[ANTIVIRUS]` must be one of the following: `--avast`, `--eset`, `--kaspersky`, `--windefender`. (TODO: 
-     auto-detection of the installed antivirus)
-        * Concrete example of the above command may be `java -jar driver-1.0.0-all.jar --eset`
-
-To test the successful launch of the driver program open the web browser and go to 
-`http://127.0.0.1:8080/`.
-The driver should respond with JSON containing some basic info about itself.
-More info about the web API can be found in the following subsection.

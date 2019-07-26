@@ -14,7 +14,7 @@ class Eset(
 
     private val logger = KotlinLogging.logger { }
 
-    override val type: AntivirusType = AntivirusType.ESET
+    override val antivirusName: String = AntivirusType.ESET.antivirusName
 
     override suspend fun parseReportFile(
         reportFile: File,

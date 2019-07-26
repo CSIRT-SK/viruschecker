@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 
 class Comodo(scanCommand: RunProgramCommand) : CommandLineAntivirus(scanCommand) {
 
-    override val type: AntivirusType = AntivirusType.COMODO
+    override val antivirusName: String = AntivirusType.COMODO.antivirusName
 
     override suspend fun parseReportFile(
         reportFile: File,

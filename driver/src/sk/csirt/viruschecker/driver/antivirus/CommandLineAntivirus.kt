@@ -105,13 +105,12 @@ abstract class CommandLineAntivirus(
         return FileScanResult(
             filename = params.originalFileName,
             scanReport = ScanResult(
-                antivirusType = type,
                 status = status,
                 reports = listOf(
                     AntivirusReportResult(
                         status = status,
                         malwareDescription = description,
-                        antivirusName = type.antivirusName
+                        antivirusName = antivirusName
                     )
                 )
             )

@@ -9,14 +9,13 @@ import sk.csirt.viruschecker.driver.config.AntivirusType
 import sk.csirt.viruschecker.hash.sha256
 
 class VirusTotal(apiKey: String) : Antivirus {
-
     private val logger = KotlinLogging.logger { }
 
     init {
         VirusTotalConfig.getConfigInstance().virusTotalAPIKey = apiKey
     }
 
-    override val type: AntivirusType = AntivirusType.VIRUS_TOTAL
+    override val antivirusName: String = AntivirusType.VIRUS_TOTAL.antivirusName
 
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val virusTotalRef = VirustotalPublicV2Impl()
@@ -38,12 +37,11 @@ class VirusTotal(apiKey: String) : Antivirus {
         val emptyReport = FileScanResult(
             filename = params.originalFileName,
             scanReport = ScanResult(
-                antivirusType = type,
                 status = ScanStatusResult.NOT_AVAILABLE,
                 reports = listOf(
                     AntivirusReportResult(
-                        antivirusName = type.antivirusName,
-                        malwareDescription = "${type.antivirusName} did not recognize this hash",
+                        antivirusName = antivirusName,
+                        malwareDescription = "${antivirusName} did not recognize this hash",
                         status = ScanStatusResult.NOT_AVAILABLE
                     )
                 )
@@ -57,10 +55,9 @@ class VirusTotal(apiKey: String) : Antivirus {
                     FileScanResult(
                         filename = params.originalFileName,
                         scanReport = ScanResult(
-                            antivirusType = type,
                             reports = it.scans.map { (antivirus, info) ->
                                 AntivirusReportResult(
-                                    antivirusName = "$antivirus (${type.antivirusName})",
+                                    antivirusName = "$antivirus (${antivirusName})",
                                     malwareDescription = info.result ?: "",
                                     status = when {
                                         info.result == null -> ScanStatusResult.NOT_AVAILABLE
