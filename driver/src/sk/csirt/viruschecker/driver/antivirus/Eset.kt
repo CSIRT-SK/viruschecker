@@ -19,8 +19,8 @@ class Eset(
     override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Report =
-        withContext(Dispatchers.IO) {
+    ): Report {
+        val reports = withContext(Dispatchers.IO) {
             FileUtils.readLines(
                 reportFile,
                 Charset.defaultCharset()
@@ -43,6 +43,19 @@ class Eset(
                         }
                     )
                 }
-            }.maxBy { it.status } ?: Report(ScanStatusResult.NOT_AVAILABLE, "")
-}
+            }
 
+        val status = reports.maxBy { it.status }?.status ?: return Report(
+            status = ScanStatusResult.NOT_AVAILABLE,
+            malwareDescription = ""
+        )
+
+        return reports.filter { it.status == status }
+            .reduce { acc, report ->
+                acc.copy(
+                    status = status,
+                    malwareDescription = "${acc.malwareDescription}, ${report.malwareDescription}"
+                )
+            }
+    }
+}

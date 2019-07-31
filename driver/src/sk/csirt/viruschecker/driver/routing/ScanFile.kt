@@ -35,7 +35,7 @@ fun Route.scanFile(antiviruses: Antivirus) {
     post<DriverRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
-        val responses =  mutableListOf<FileScanResponse>()
+        val responses = mutableListOf<FileScanResponse>()
 
         multipart.forEachPart { part ->
             when (part) {
@@ -46,9 +46,9 @@ fun Route.scanFile(antiviruses: Antivirus) {
             part.dispose()
         }
 
-        if(responses.isEmpty()){
+        if (responses.isEmpty()) {
             call.respond(HttpStatusCode.BadRequest, "File was not received.")
-        }else{
+        } else {
             call.respond(responses.first())
         }
     }
@@ -59,7 +59,8 @@ private suspend fun processFile(
     fileItem: PartData.FileItem,
     virusChecker: Antivirus
 ): FileScanResponse {
-    val filename = fileItem.originalFileName ?: "file${UUID.randomUUID()}"
+    val filename = fileItem.originalFileName?.replace(" ", "-")
+        ?: "file${UUID.randomUUID()}"
 
     val report: FileScanResult = virusChecker.scanFileAndClean(
         fileItem.provider().toCheckParameters(filename, Paths.get(Constants.scanDir))

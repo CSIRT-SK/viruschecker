@@ -10,23 +10,23 @@ internal val defaultAntivirusQualifier = named("antivirus")
 val driverDependencyInjectionModule = module {
 
     single<Antivirus>(AntivirusType.AVAST) {
-        Avast(RunProgramCommand(getProperty(Properties.Windows.avast)))
+        Avast(RunProgramCommand(getProperty(Properties.avast)))
     }
 
     single<Antivirus>(AntivirusType.ESET) {
-        Eset(RunProgramCommand(getProperty(Properties.Windows.eset)))
+        Eset(RunProgramCommand(getProperty(Properties.eset)))
     }
 
     single<Antivirus>(AntivirusType.KASPERSKY) {
-        Kaspersky(RunProgramCommand(getProperty(Properties.Windows.kaspersky)))
+        Kaspersky(RunProgramCommand(getProperty(Properties.kaspersky)))
     }
 
     single<Antivirus>(AntivirusType.MICROSOFT) {
-        Microsoft(RunProgramCommand(getProperty(Properties.Windows.microsoft)))
+        Microsoft(RunProgramCommand(getProperty(Properties.microsoft)))
     }
 
     single<Antivirus>(AntivirusType.COMODO) {
-        Comodo(RunProgramCommand(getProperty(Properties.Linux.comodo)))
+        Comodo(RunProgramCommand(getProperty(Properties.comodo)))
     }
 
     single<Antivirus>(AntivirusType.VIRUS_TOTAL) {

@@ -20,25 +20,40 @@ class Kaspersky(
     override suspend fun parseReportFile(
         reportFile: File,
         params: FileScanParameters
-    ): Report = withContext(Dispatchers.IO) {
-        FileUtils.readLines(
-            reportFile,
-            Charset.defaultCharset()
+    ): Report {
+        val reports = withContext(Dispatchers.IO) {
+            FileUtils.readLines(
+                reportFile,
+                Charset.defaultCharset()
+            )
+        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+            .asSequence()
+            .filterNot { it.startsWith(";") }
+            .filter { params.fileToScan.name in it }
+            .map { line ->
+                line.split("\t").let {
+                    Report(
+                        when (it[2].trim()) {
+                            "ok" -> ScanStatusResult.OK
+                            "detected" -> ScanStatusResult.INFECTED
+                            else -> ScanStatusResult.NOT_AVAILABLE
+                        },
+                        if (it.size > 3) it[3].trim() else "OK"
+                    )
+                }
+            }
+        val status = reports.maxBy { it.status }?.status ?: return Report(
+            status = ScanStatusResult.NOT_AVAILABLE,
+            malwareDescription = ""
         )
-    }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
-        .asSequence()
-        .filterNot { it.startsWith(";") }
-        .filter { params.fileToScan.name in it }
-        .map { line ->
-            line.split("\t").let {
-                Report(
-                    when (it[2].trim()) {
-                        "ok" -> ScanStatusResult.OK
-                        "detected" -> ScanStatusResult.INFECTED
-                        else -> ScanStatusResult.NOT_AVAILABLE
-                    },
-                    if (it.size > 3) it[3].trim() else "OK"
+
+        return reports.filter { it.status == status }
+            .reduce { acc, report ->
+                acc.copy(
+                    status = status,
+                    malwareDescription = "${acc.malwareDescription}, ${report.malwareDescription}"
                 )
             }
-        }.maxBy { it.status } ?: Report(ScanStatusResult.NOT_AVAILABLE, "")
+    }
+
 }
