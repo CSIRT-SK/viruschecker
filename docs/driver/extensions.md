@@ -544,7 +544,7 @@ ${Properties.virusTotal}=<insert-your-api-key>
 We need to create a template for command used to execute Kaspersky antivirus. 
 One can see that the template we need already exists, see lines
 
-```kotlin
+```properties
 ...
 
 # Kaspersky
@@ -557,7 +557,7 @@ ${Properties.kaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunPro
 
 Our new template will look almost the same
 
-```kotlin
+```properties
 ...
 
 # MyKaspersky
