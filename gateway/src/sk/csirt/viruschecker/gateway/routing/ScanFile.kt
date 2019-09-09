@@ -32,12 +32,12 @@ fun Route.multiScanFile(scanService: FileScanService) {
 
         var fileToScan: File? = null
         var originalFilename = ""
-        var useExternalDrivers = false
+        var useExternalServices = false
 
         multipart.forEachPart { part ->
             when (part) {
                 is PartData.FormItem -> {
-                    useExternalDrivers = part.value.toBoolean()
+                    useExternalServices = part.value.toBoolean()
                 }
                 is PartData.FileItem -> {
                     fileToScan = part.toTempFile()
@@ -50,7 +50,7 @@ fun Route.multiScanFile(scanService: FileScanService) {
 
         logger.info {
             "Received request to scan file $originalFilename using " +
-                    "${if (useExternalDrivers) "also" else "no"} external drivers."
+                    "${if (useExternalServices) "also" else "no"} external drivers."
         }
 
         if (fileToScan == null) {
@@ -61,7 +61,7 @@ fun Route.multiScanFile(scanService: FileScanService) {
             scanService.scanFile(
                 ScanParameters(
                     fileToScan = fileToScan!!,
-                    useExternalDrivers = useExternalDrivers,
+                    useExternalDrivers = useExternalServices,
                     originalFilename = originalFilename
                 )
             )

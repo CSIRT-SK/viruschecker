@@ -8,7 +8,7 @@ import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import sk.csirt.viruschecker.hash.sha256
 
-class VirusTotal(apiKey: String) : Antivirus {
+class VirusTotal(apiKey: String) : ExternalAntivirus {
     private val logger = KotlinLogging.logger { }
 
     init {
@@ -17,9 +17,7 @@ class VirusTotal(apiKey: String) : Antivirus {
 
     override val antivirusName: String = AntivirusType.VIRUS_TOTAL.antivirusName
 
-    override val isInternal = false
-
-    override suspend fun scanFile(params: FileScanParameters): FileScanResult {
+    override suspend fun externalScanFile(params: FileScanParameters): FileScanResult {
         val virusTotalRef = VirustotalPublicV2Impl()
         val fileToScan = params.fileToScan
         val sha256 = fileToScan.sha256().value

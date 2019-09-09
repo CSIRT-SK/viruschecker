@@ -1,6 +1,5 @@
 package sk.csirt.viruschecker.client.web.routing
 
-import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -19,6 +18,7 @@ import sk.csirt.viruschecker.client.service.GatewayScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.client.web.parsedArgs
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
+import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 import sk.csirt.viruschecker.utils.copyToSuspend
 import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
@@ -53,41 +53,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
                 }
                 +" Upload hash to external services like VirusTotal"
                 br(); br()
-//                label {
-//                    htmlFor = useExternalDrivers
-//                    +"Would you like to use external services like VirusTotal as well?"
-//                    br()
-//                    listOf(
-//                        false.toString() to "Do not use external services (default)",
-//                        true.toString() to "Upload hash to external services"
-//                    ).forEach { (virusTotalOption, label) ->
-//                        input {
-//                            type = InputType.checkBox
-//                            name = useExternalDrivers
-//                            value = virusTotalOption
-//
-//                            label {
-//                                htmlFor = virusTotalOption
-//                                +label
-//                            }
-//                        }
-//                    }
 
-//                    listOf(
-//                        false.toString() to "Do not use external services (default)",
-//                        true.toString() to "Upload hash to external services"
-//                    ).forEach { (virusTotalOption, label) ->
-//                        input {
-//                            type = InputType.radio
-//                            name = useExternalDrivers
-//                            value = virusTotalOption
-//                            label {
-//                                htmlFor = virusTotalOption
-//                                +label
-//                            }
-//                        }
-//                    }
-//            }
                 submitInput(classes = "pure-button pure-button-primary") { value = "Scan file" }
             }
         }
@@ -133,17 +99,21 @@ fun Route.scanFile(scanService: GatewayScanService) {
             part.dispose()
         }
 
-        val responseLambda: suspend (ApplicationCall) -> Unit =
-            if (scanParameters.fileToScan.exists().not()) {
-                { call ->
-                    call.respond(HttpStatusCode.InternalServerError, "File was not uploaded")
+        if (scanParameters.fileToScan.exists().not()) {
+            call.respond(HttpStatusCode.InternalServerError, "File was not uploaded")
+        } else {
+            val scanResult = scanService.scanFile(scanParameters)
+                .let { scanResult ->
+                    scanResult.copy(
+                        report = scanResult.report.copy(
+                            results = scanResult.report.results.filterNot {
+                                it.status == ScanStatusResponse.SCAN_REFUSED
+                            }
+                        )
+                    )
                 }
-            } else {
-                val report = scanService.scanFile(scanParameters);
-                { call ->
-                    call.respondRedirect(call.url(WebRoutes.ScanReport(report.sha256)), false)
-                }
-            }
-        responseLambda(call)
+            call.respondRedirect(call.url(WebRoutes.ScanReport(scanResult.sha256)), false)
+        }
+//        responseLambda(call)
     }
 }

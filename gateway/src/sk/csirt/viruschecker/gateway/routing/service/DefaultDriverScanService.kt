@@ -11,7 +11,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
-import sk.csirt.viruschecker.gateway.config.Drivers
 import sk.csirt.viruschecker.hash.md5
 import sk.csirt.viruschecker.hash.sha1
 import sk.csirt.viruschecker.hash.sha256
@@ -24,7 +23,7 @@ import java.io.FileInputStream
 import java.time.Instant
 
 class DefaultDriverScanService(
-    drivers: Drivers,
+    drivers: List<String>,
     client: HttpClient
 ) : AntivirusDriverService(drivers, client),
     FileScanService {
@@ -38,11 +37,14 @@ class DefaultDriverScanService(
             val sha1Deffered = async { fileToScan.sha1() }
             val md5Deffered = async { fileToScan.md5() }
 
-            multiDriverRequest(
-                useExternalDrivers = scanParams.useExternalDrivers
-            ) { driverUrl, client ->
+            multiDriverRequest { driverUrl, client ->
                 client.post<FileScanResponse>("$driverUrl${DriverRoutes.scanFile}") {
                     this.body = MultiPartFormDataContent(listOf(
+                        PartData.FormItem(
+                            value = scanParams.useExternalDrivers.toString(),
+                            dispose = { },
+                            partHeaders = Headers.Empty
+                        ),
                         PartData.FileItem(
                             partHeaders = Headers.build {
                                 this[HttpHeaders.ContentDisposition] =
@@ -57,7 +59,6 @@ class DefaultDriverScanService(
                     ))
                 }
             }.map { (driverUrl, result) ->
-                result.getOrThrow()
                 result.getOrDefault(
                     FileScanResponse(
                         date = Instant.now(),
@@ -74,17 +75,17 @@ class DefaultDriverScanService(
             }.flatMap {
                 it.results
             }.let {
-                FileHashScanResponse(
-                    report = FileScanResponse(
-                        date = Instant.now(),
-                        filename = originalFileName,
-                        results = it.sortedBy { it.antivirus }
-                    ),
-                    md5 = md5Deffered.await().value,
-                    sha1 = sha1Deffered.await().value,
-                    sha256 = sha256Deferred.await().value
-                )
-            }
+                    FileHashScanResponse(
+                        report = FileScanResponse(
+                            date = Instant.now(),
+                            filename = originalFileName,
+                            results = it.sortedBy { it.antivirus }
+                        ),
+                        md5 = md5Deffered.await().value,
+                        sha1 = sha1Deffered.await().value,
+                        sha256 = sha256Deferred.await().value
+                    )
+                }
         }
 
 }

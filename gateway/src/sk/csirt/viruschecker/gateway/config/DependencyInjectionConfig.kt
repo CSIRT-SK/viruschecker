@@ -18,7 +18,6 @@ import java.io.File
 import java.time.Instant
 
 internal val checkedDriverUrls = named("checked.driver.urls")
-internal val checkedDrivers = named("checked.drivers")
 private val database = named("scan.report.database")
 
 val gatewayDependencyInjectionModule = module {
@@ -47,6 +46,7 @@ val gatewayDependencyInjectionModule = module {
             name = database.value
         )
     }
+
     single<ScanReportRepository> { KeyValueScanReportRepository(get(database)) }
     single { PersistentScanReportService(get()) }
     single { httpClient(parsedArgs.socketTimeout) }
@@ -62,20 +62,9 @@ val gatewayDependencyInjectionModule = module {
             .filter { it.success }
     }
 
-    single(checkedDrivers) {
-        get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls)
-            .partition { it.info.usesExternalServices }
-            .let {
-                Drivers(
-                    internal = it.second.map { it.url },
-                    external = it.first.map { it.url }
-                )
-            }
-    }
-
     single {
         DefaultDriverScanService(
-            get(checkedDrivers),
+            get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls).map{ it.url },
             get()
         )
     }

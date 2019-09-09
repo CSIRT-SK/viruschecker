@@ -35,46 +35,57 @@ fun Route.scanFile(antiviruses: Antivirus) {
     post<DriverRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
-        val responses = mutableListOf<FileScanResponse>()
+        var useExternalServices = false
+        var fileItem: PartData.FileItem? = null
 
         multipart.forEachPart { part ->
             when (part) {
+                is PartData.FormItem -> {
+                    useExternalServices = part.value.toBoolean()
+                }
                 is PartData.FileItem -> {
-                    processFile(part, antiviruses).also { responses.add(it) }
+                    fileItem = part
                 }
             }
-            part.dispose()
         }
 
-        if (responses.isEmpty()) {
+        if (fileItem == null) {
             call.respond(HttpStatusCode.BadRequest, "File was not received.")
-        } else {
-            call.respond(responses.first())
         }
+
+        val response = processFile(fileItem!!, useExternalServices, antiviruses)
+        fileItem!!.dispose()
+
+        call.respond(response)
     }
 }
 
 @KtorExperimentalAPI
 private suspend fun processFile(
     fileItem: PartData.FileItem,
+    useExternalServices: Boolean,
     virusChecker: Antivirus
 ): FileScanResponse {
     val filename = fileItem.originalFileName?.replace(" ", "-")
         ?: "file${UUID.randomUUID()}"
 
     val report: FileScanResult = virusChecker.scanFileAndClean(
-        fileItem.provider().toCheckParameters(filename, Paths.get(Constants.scanDir))
+        fileItem.provider().toCheckParameters(
+            filename,
+            Paths.get(Constants.scanDir),
+            useExternalServices
+        )
     )
     return report.toFileScanResponse()
 }
 
 @KtorExperimentalAPI
-private fun Input.toCheckParameters(filename: String, path: Path): FileScanParameters {
+private fun Input.toCheckParameters(filename: String, path: Path, useExternalServices: Boolean): FileScanParameters {
     val saveFilename = "${UUID.randomUUID()}_$filename"
     val savedFile = path.resolve(saveFilename).toFile()
     sk.csirt.viruschecker.driver.antivirus.logger.debug("Copying received file into ${savedFile.canonicalPath}")
     FileUtils.copyInputStreamToFile(asStream(), savedFile)
-    return FileScanParameters(savedFile, filename)
+    return FileScanParameters(savedFile, filename, useExternalServices)
 }
 
 fun FileScanResult.toFileScanResponse() = FileScanResponse(

@@ -135,7 +135,10 @@ The following sub-subsections comprise the recommended steps to install and conf
 You need the *Avast Pro Antivirus* or *Avast Interner Security*.
 
 This guide assumes the installation of Avast Interner Security, however the other case is similar.
- 
+
+Optional: After launching the installer, click on *Customize* button and disable all components 
+except the *File Shield*.
+
 #### 2.1.1 Configuration
 
 Open the Avast window and click on the *Protection* tab at the left side of the window.
@@ -143,8 +146,12 @@ Then click on the, barely visible, cogwheel setup icon at the right side of the 
 
 In the *Settings* window disable the following features:
 
+* In the *General* -> *Update* navigate to the *Your application is up to date*, click on 
+*More options* and select the *Manual update* option. This will disable the automatic application 
+updates and keep only virus definitions to be updated.   
+
 * In the *Protection* tab permanently disable the *Core shields*, *Ransomware Shield*, 
-*Firewall* and *Real site* features. 
+*Firewall* and *Real site* features if they were. 
 
 * In the *Privacy* tab, disable the *Sensitive Data Shield*.
 
@@ -242,7 +249,7 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
 
 ### 2.3 Kaspersky (free)
 
-Install the Kaspersky Free Antivirus. 
+Install the Kaspersky Free Antivirus, now called the *Kaspersky Security Cloud*. 
 If you have the paid version, you can use it as well, but for our purposes the free version is 
 sufficient.
 
@@ -287,19 +294,25 @@ system variable. To do this, follow these steps:
 the *Edit...* button below.
 
 * Add the installation path of the Eset to the beginning of *Variable value* text. 
-  In my case the path is `C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0`
+  Example path is `C:\Program Files (x86)\Kaspersky Lab\Kaspersky Security Cloud 20.0`
     
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
     
-    ```C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    ```C:\Program Files (x86)\Kaspersky Lab\Kaspersky Security Cloud 20.0;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
 * A reboot of the virtual machine is now recommended. 
 
 ### 2.4 Windows Defender/Microsoft Security Essentials (free)
 
+Windows 8, 8,1 and 10 contains quite capable antivirus called Windows Defender.
+
+If you have already installed the other antivirus software, the defender will be disabled.
+On Windows 10 you can o turn it on again by clicking on *Start* -> *Settings* -> *Update & Security*
+ -> *Turn on Windows Defender*. 
+
 If you have a Windows 7 VM then you need to install Microsoft Security Essentials as Windows 
 Defender on this system is unusable for our purposes.
- 
+
 #### 2.4.1 Configuration
 
 ##### A) Microsoft Security Essentials (Windows 7)
@@ -323,7 +336,9 @@ This paragraph is intended for Windows Defender in Windows 10.
 Windows 8 version of defender has different UI, however the idea is similar - to disable all 
 automatic protection features except virus database updates.
   
-Run *Windows Security* app from start menu. 
+Run the *Windows Security* app from the *start* menu. 
+
+###### If you have already installed another antivirus software, the Defender will be disabled by default. Just click on *Turn on Windows Defender* in Windows Security app. 
 
 Disable the following features:
 
@@ -353,11 +368,24 @@ system variable. To do this, follow these steps:
 * Locate the *Path* variable in the bottom white field labeled as *System variables* and press 
 the *Edit...* button below.
 
-* Add the installation path of the Eset to the beginning of *Variable value* text. 
-In my case the path is `C:\Program Files\AVAST Software\Avast`.
+##### A) Microsoft Security Essentials (Windows 7)
+
+* Add the installation path of the Microsoft Security Essentials to the beginning of *Variable value* text. 
+In my case the path is `C:\Program Files\Microsoft Security Client`.
   
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
     
-    ```C:\Program Files\AVAST Software\Avast;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    ```C:\Program Files\Microsoft Security Client;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
+    
+* A reboot of the virtual machine is now recommended.
+
+##### B) Windows Defender (Windows 10)
+
+* Add the installation path of the Defender to the beginning of *Variable value* text. 
+In my case the path is `C:\Program Files\Microsoft Security Client`.
+  
+    If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
+    
+    ```C:\Program Files\Microsoft Security Client;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
 * A reboot of the virtual machine is now recommended.

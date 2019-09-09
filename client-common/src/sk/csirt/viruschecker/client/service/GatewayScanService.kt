@@ -28,24 +28,25 @@ class GatewayScanService(
 
     suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
         client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
-            this.body = MultiPartFormDataContent(listOf(
-                PartData.FileItem(
-                    partHeaders = Headers.build {
-                        this[HttpHeaders.ContentDisposition] =
-                            ContentDisposition.File.withParameter(
-                                "filename",
-                                params.originalFilename
-                            ).toString()
-                    },
-                    dispose = { },
-                    provider = { FileInputStream(params.fileToScan).asInput() }
-                ),
-                PartData.FormItem(
-                    value = params.useExternalDrivers.toString(),
-                    dispose = { },
-                    partHeaders = Headers.Empty
+            this.body = MultiPartFormDataContent(
+                listOf(
+                    PartData.FileItem(
+                        partHeaders = Headers.build {
+                            this[HttpHeaders.ContentDisposition] =
+                                ContentDisposition.File.withParameter(
+                                    "filename",
+                                    params.originalFilename
+                                ).toString()
+                        },
+                        dispose = { },
+                        provider = { FileInputStream(params.fileToScan).asInput() }
+                    ),
+                    PartData.FormItem(
+                        value = params.useExternalDrivers.toString(),
+                        dispose = { },
+                        partHeaders = Headers.Empty
+                    )
                 )
-            )
             )
         }
 }

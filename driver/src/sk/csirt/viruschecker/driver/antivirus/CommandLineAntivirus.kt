@@ -1,6 +1,7 @@
 package sk.csirt.viruschecker.driver.antivirus
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +44,6 @@ abstract class CommandLineAntivirus(
 ) : Antivirus {
     private val logger = KotlinLogging.logger { }
 
-    override val isInternal = true
-
     override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
         logger.info("Scanning file with this parameters: $params")
         val reportFile = Paths.get(
@@ -58,7 +57,7 @@ abstract class CommandLineAntivirus(
         retrieveReport(reportFile, params).also {
             logger.info("Retrieved report: $it")
         }.also {
-            launch {
+            launch(IO) {
                 reportFile.delete()
             }
         }

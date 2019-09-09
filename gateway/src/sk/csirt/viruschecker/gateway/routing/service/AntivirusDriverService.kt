@@ -5,19 +5,17 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
-import sk.csirt.viruschecker.gateway.config.Drivers
 
 abstract class AntivirusDriverService(
-    private val drivers: Drivers,
+    private val drivers: List<String>,
     private val client: HttpClient
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun <T> multiDriverRequest(
-        useExternalDrivers: Boolean,
+        suspend fun <T> multiDriverRequest(
         block: suspend (driverUrl: String, client: HttpClient) -> T
     ): List<MultiDriverResponse<Result<T>>> = supervisorScope {
-        drivers.get(useExternalDrivers).map { driverUrl ->
+        drivers.map { driverUrl ->
             driverUrl to async(IO) {
                 logger.info { "Requesting from $driverUrl" }
                 block(driverUrl, client)

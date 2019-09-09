@@ -80,7 +80,6 @@ fun Application.module() {
         driversInfo(checkedUrls)
         multiScanFile(scanService)
         findByHash(scanReportService)
-
     }
 
 

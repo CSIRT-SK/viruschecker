@@ -11,8 +11,6 @@ val logger = KotlinLogging.logger { }
 interface Antivirus {
     val antivirusName: String
 
-    val isInternal: Boolean
-
     suspend fun scanFile(params: FileScanParameters): FileScanResult
 
     suspend fun scanFileAndClean(params: FileScanParameters)
@@ -27,7 +25,8 @@ interface Antivirus {
 
 data class FileScanParameters(
     val fileToScan: File,
-    val originalFileName: String = fileToScan.name
+    val originalFileName: String = fileToScan.name,
+    val externalServicesAllowed: Boolean
 )
 
 data class ScanResult(
@@ -57,5 +56,5 @@ data class AntivirusReportResult(
  * Do not change the order of constants!
  */
 enum class ScanStatusResult {
-    NOT_AVAILABLE, OK, INFECTED
+    SCAN_REFUSED, NOT_AVAILABLE, OK, INFECTED
 }

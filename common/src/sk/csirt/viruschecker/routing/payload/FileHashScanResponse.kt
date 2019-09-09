@@ -37,5 +37,5 @@ data class AntivirusReportResponse(
  * Do not change the order of constants!
  */
 enum class ScanStatusResponse {
-    NOT_AVAILABLE, OK, INFECTED
+    SCAN_REFUSED, NOT_AVAILABLE, OK, INFECTED
 }
