@@ -13,7 +13,7 @@ import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportSer
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DefaultDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
-import sk.csirt.viruschecker.routing.payload.UrlAntivirusDriverInfoResponse
+import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
 import java.io.File
 import java.time.Instant
 
@@ -64,7 +64,7 @@ val gatewayDependencyInjectionModule = module {
 
     single {
         DefaultDriverScanService(
-            get<List<UrlAntivirusDriverInfoResponse>>(checkedDriverUrls).map{ it.url },
+            get<List<UrlDriverInfoResponse>>(checkedDriverUrls).map{ it.url },
             get()
         )
     }

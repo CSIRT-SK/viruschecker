@@ -26,23 +26,21 @@ None
 
     Type: *application/json*
     ``` 
-    structure AntivirusDriverInfoResponse:
+    structure DriverInfoResponse:
         antivirus: String,
-        usesExternalServices: Boolean,
         driverVersion: String,
     ``` 
     Example 1:
     ``` 
     {
-        "antivirus": "Comodo",
-        "usesExternalServices": "false"
+        "antivirus": "Comodo, VirusTotal",
         "driverVersion": "0.18.1",
     }
     ```
     Example 2:
      ``` 
      {
-         "antivirus": "VirusTotal",
+         "antivirus": "Eset, Avast",
          "usesExternalServices": "true"
          "driverVersion": "0.18.1",
      }
@@ -68,13 +66,14 @@ Type: *multipart/form-data*
     structure FileScanResponse:
         date: DateTimeUTC,
         filename: String,
-        status: ScannedStatusResponse,
+        status: ScanStatusResponse,
         results:  List<AntivirusReportResponse>
     ``` 
 
-    *ScannedStatusResponse schema*
+    *ScanStatusResponse schema*
     ```
-    enumeration ScannedStatusResponse:
+    enumeration ScanStatusResponse:
+        SCAN_REFUSED,
         NOT_AVAILABLE,
         OK,
         INFECTED
@@ -84,7 +83,7 @@ Type: *multipart/form-data*
     ```
     structure AntivirusReportResponse:
         antivirus: String,
-        status: ScannedStatusResponse,
+        status: ScanStatusResponse,
         malwareDescription: String
     ```
 
@@ -132,7 +131,7 @@ Type: *multipart/form-data*
   
 * **400 Bad Request**
     
-    If file was not recieved.
+    If file was not received.
 
 Gateway REST API
 ================
@@ -178,7 +177,7 @@ Drivers info
 
 ### GET `/driversInfo`
 
-Get information about deployed drivers to which this gateway is connected.
+Get information about the deployed drivers to which this gateway is connected.
 
 #### Request body schema 
 
@@ -194,17 +193,16 @@ None
     
     *UrlAntivirusDriverInfoResponse schema*
     ``` 
-    structure UrlAntivirusDriverInfoResponse:
+    structure UrlDriverInfoResponse:
         url: String,
         success: Boolean,   // If connection to driver on [url] was successfull.
         info: AntivirusDriverInfoResponse   
     ```
     
-    *AntivirusDriverInfoResponse schema*
+    *DriverInfoResponse schema*
     ``` 
-    structure AntivirusDriverInfoResponse:
+    structure DriverInfoResponse:
         driverVersion: String,
-        usesExternalServices: Boolean,
         antivirus: String
     ``` 
   
@@ -216,8 +214,7 @@ None
             "success": "true" 
             "info": {
                 "driverVersion": "0.18.1",
-                "usesExternalServices": "false",
-                "antivirus": "Avast"
+                "antivirus": "Avast, Eset"
             }
         },
         {
@@ -225,8 +222,7 @@ None
             "success": "true" 
             "info": {
                 "driverVersion": "0.16.0",
-                "usesExternalServices": "false",
-                "antivirus": "Eset"
+                "antivirus": "Comodo"
             }
         },
         {
@@ -234,7 +230,6 @@ None
             "success": "true" 
             "info": {
                 "driverVersion": "0.18.1",
-                "usesExternalServices": "true",
                 "antivirus": "VirusTotal"
             }
         },
@@ -254,7 +249,7 @@ Multi scan file
 
 ### POST `/multiScanFile`
 
-Upload virus file to all deployed drivers in parallel and returns scan report.
+Upload file to all deployed drivers in parallel and returns scan report.
 
 #### Request body schema 
 
@@ -268,7 +263,7 @@ Content-Length: ...
 -----------------------------9051914041544843365972754266
 Content-Disposition: form-data; name="externalDrivers"
 
-true    #Note: this value determined if the external drivers like VirusTotal will be used
+false   #(Note: this value determined if the external services like VirusTotal will be used)
 -----------------------------9051914041544843365972754266
 Content-Disposition: form-data; name="file"; filename="eicar.exe"
 ```
@@ -292,13 +287,14 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
     structure FileScanResponse:
         date: DateTimeUTC,
         filename: String,
-        status: ScannedStatusResponse,
+        status: ScanStatusResponse,
         results:  List<AntivirusReportResponse>
     ``` 
     
      *ScannedStatusResponse schema*
      ```
-     enumeration ScannedStatusResponse:
+     enumeration ScanStatusResponse:
+         SCAN_REFUSED
          NOT_AVAILABLE,
          OK,
          INFECTED
@@ -308,7 +304,7 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
      ```
      structure AntivirusReportResponse:
          antivirus: String,
-         status: ScannedStatusResponse,
+         status: ScanStatusResponse,
          malwareDescription: String
      ```
 
@@ -332,6 +328,11 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
                     "antivirus": "Eset",
                     "status": "INFECTED",
                     "malwareDescription": "Eicar test file"
+                },
+                {
+                      "antivirus": "VirusTotal",
+                      "status": "SCAN_REFUSED",
+                      "malwareDescription": "The caller did not want to use this external service."
                 }
             ]    
         } 
@@ -341,11 +342,10 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
     
     If file upload is unsuccessful.
     
-
 Retrieve scan report
 --------------------
 
-### GET   `/scanReport/{sha256}`
+### GET  `/scanReport/{sha256}`
 
 Get stored scan report of a file.
 

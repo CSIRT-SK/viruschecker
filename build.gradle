@@ -40,6 +40,8 @@ subprojects {
     }
 
     dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        compile "io.ktor:ktor-locations:$ktor_version"
         compile "ch.qos.logback:logback-classic:$logback_version"
         compile "com.xenomachina:kotlin-argparser:$argparser_version"
         compile "io.github.microutils:kotlin-logging:$koltin_logger_version"

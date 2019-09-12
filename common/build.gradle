@@ -1,4 +1,0 @@
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "io.ktor:ktor-locations:$ktor_version"
-}
