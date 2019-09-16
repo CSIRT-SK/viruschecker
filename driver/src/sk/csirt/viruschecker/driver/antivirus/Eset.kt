@@ -1,12 +1,7 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
-import java.io.File
-import java.nio.charset.Charset
 
 class Eset(
     scanCommand: RunProgramCommand
@@ -16,16 +11,11 @@ class Eset(
 
     override val antivirusName: String = AntivirusType.ESET.antivirusName
 
-    override suspend fun parseReportFile(
-        reportFile: File,
+    override suspend fun parseReport(
+        report: List<String>,
         params: FileScanParameters
     ): Report {
-        val reports = withContext(Dispatchers.IO) {
-            FileUtils.readLines(
-                reportFile,
-                Charset.defaultCharset()
-            )
-        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+        val reports = report
             .asSequence()
             .filter { it.startsWith("name=") }
             .filter { params.fileToScan.name in it }
@@ -40,22 +30,27 @@ class Eset(
                         },
                         status.split("=")[1].let {
                             it.substring(1, it.length - 1)
-                        }
+                        },
+                        virusDatabaseVersion = ""
                     )
                 }
             }
 
         val status = reports.maxBy { it.status }?.status ?: return Report(
             status = ScanStatusResult.NOT_AVAILABLE,
-            malwareDescription = ""
+            malwareDescription = "",
+            virusDatabaseVersion = ""
         )
 
         return reports.filter { it.status == status }
-            .reduce { acc, report ->
+            .reduce { acc, reportLine ->
                 acc.copy(
-                    status = status,
-                    malwareDescription = "${acc.malwareDescription}, ${report.malwareDescription}"
+                    malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
-            }
+            }.copy(
+                virusDatabaseVersion = report.first {
+                    "Module scanner" in it
+                }.split(",")[1].substring(" version ".length)
+            )
     }
 }

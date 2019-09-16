@@ -1,13 +1,17 @@
 package sk.csirt.viruschecker.client.web.template
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.application.ApplicationCall
 import io.ktor.html.HtmlContent
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.util.date.*
+import io.ktor.http.CacheControl
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.CachingOptions
+import io.ktor.http.content.Version
+import io.ktor.http.content.caching
+import io.ktor.http.content.versions
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.locations
+import io.ktor.response.respond
+import io.ktor.util.date.GMTDate
 import kotlinx.html.*
 import sk.csirt.viruschecker.client.web.routing.WebRoutes
 
@@ -21,14 +25,14 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
                                                title: String = "Virus Checker",
                                                block: DIV.() -> Unit) {
     val content = HtmlContent(HttpStatusCode.OK) {
-//        val session = sessions.get<YouKubeSession>()
         head {
             title { +title }
-            styleLink("http://yui.yahooapis.com/pure/0.6.0/pure-min.css")
-            styleLink("http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
-            styleLink(url(WebRoutes.MainCss()) {
-                protocol = URLProtocol.createOrDefault(request.origin.scheme)
-            })
+            styleLink("https://yui-s.yahooapis.com/pure/0.6.0/pure-min.css")
+            styleLink("https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
+            styleLink(locations.href(WebRoutes.MainCss()))
+//            styleLink(url(WebRoutes.MainCss()) {
+//                protocol = URLProtocol.createOrDefault(request.origin.scheme)
+//            })
         }
         body {
             div("pure-g") {

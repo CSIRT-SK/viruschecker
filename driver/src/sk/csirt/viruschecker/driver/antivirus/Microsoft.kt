@@ -1,12 +1,11 @@
 package sk.csirt.viruschecker.driver.antivirus
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
-import java.io.File
-import java.nio.charset.Charset
+import sk.csirt.viruschecker.driver.utils.readHKLMRegistryKey
 
 class Microsoft(
     scanCommand: RunProgramCommand
@@ -16,18 +15,18 @@ class Microsoft(
 
     override val antivirusName: String = AntivirusType.MICROSOFT.antivirusName
 
-    override suspend fun parseReportFile(
-        reportFile: File,
+    override suspend fun parseReport(
+        report: List<String>,
         params: FileScanParameters
-    ): Report {
-        val lines = withContext(Dispatchers.IO) {
-            FileUtils.readLines(
-                reportFile,
-                Charset.defaultCharset()
+    ): Report = coroutineScope {
+        val virusDatabaseVersionDeferred = async(Dispatchers.IO) {
+            readHKLMRegistryKey(
+                "HKLM\\SOFTWARE\\Microsoft\\Microsoft Antimalware\\Signature Updates",
+                "AVSignatureVersion"
             )
-        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+        }
 
-        val infectedCountString = lines.firstOrNull {
+        val infectedCountString = report.firstOrNull {
             it.startsWith("Scanning ") &&
                     "found" in it &&
                     it.endsWith(" threats.")
@@ -35,15 +34,17 @@ class Microsoft(
         logger.debug { "Found $infectedCountString threats." }
         val infectedCount = infectedCountString?.toIntOrNull()
 
-        return when {
-            infectedCountString == null -> Report(ScanStatusResult.NOT_AVAILABLE, "NA")
-            infectedCountString == "no" -> Report(ScanStatusResult.OK, "OK")
-            infectedCount != null -> {
-                val description = lines.first { it.startsWith("Threat") }.split(": ")[1]
-                Report(ScanStatusResult.INFECTED, description)
-            }
-            else -> Report(ScanStatusResult.NOT_AVAILABLE, "NA")
-        }
+        val virusDabaseVersion = virusDatabaseVersionDeferred.await()
 
+        // return from coroutine
+        when {
+            infectedCountString == null -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")
+            infectedCountString == "no" -> Report(ScanStatusResult.OK, "OK", virusDabaseVersion)
+            infectedCount != null -> {
+                val description = report.first { it.startsWith("Threat") }.split(": ")[1]
+                Report(ScanStatusResult.INFECTED, description, virusDabaseVersion)
+            }
+            else -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")
+        }
     }
 }

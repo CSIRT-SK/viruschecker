@@ -95,7 +95,8 @@ fun FileScanResult.toFileScanResponse() = FileScanResponse(
         AntivirusReportResponse(
             antivirus = it.antivirusName,
             status = ScanStatusResponse.valueOf(it.status.name),
-            malwareDescription = it.malwareDescription
+            malwareDescription = it.malwareDescription,
+            virusDatabaseVersion = it.virusDatabaseVersion
         )
     }
 )

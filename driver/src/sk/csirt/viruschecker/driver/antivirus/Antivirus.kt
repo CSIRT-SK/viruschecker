@@ -48,6 +48,7 @@ data class FileScanResult(
 
 data class AntivirusReportResult(
     val antivirusName: String,
+    val virusDatabaseVersion: String,
     val status: ScanStatusResult,
     val malwareDescription: String
 )

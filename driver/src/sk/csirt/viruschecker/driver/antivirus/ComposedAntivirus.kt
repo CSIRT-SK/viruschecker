@@ -44,7 +44,8 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
                                     AntivirusReportResult(
                                         antivirusName = antivirusName,
                                         status = ScanStatusResult.NOT_AVAILABLE,
-                                        malwareDescription = "Scan failed."
+                                        malwareDescription = "Scan failed.",
+                                        virusDatabaseVersion = ""
                                     )
                                 )
                             )

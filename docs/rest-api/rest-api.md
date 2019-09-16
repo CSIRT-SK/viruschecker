@@ -57,6 +57,19 @@ Upload virus file and returns scan report.
 
 Type: *multipart/form-data*
 
+Example: 
+```
+Content-Type: multipart/form-data; boundary=---------------------------9051914041544843365972754266
+Content-Length: ...
+
+-----------------------------9051914041544843365972754266
+Content-Disposition: form-data; name="externalDrivers"
+
+false   #(Note: this value determined if the external services like VirusTotal will be used)
+-----------------------------9051914041544843365972754266
+Content-Disposition: form-data; name="file"; filename="eicar.exe"
+```
+
 #### Response body schema
 
 * **200 OK**

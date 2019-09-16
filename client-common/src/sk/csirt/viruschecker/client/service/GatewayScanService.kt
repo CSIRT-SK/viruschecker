@@ -27,7 +27,7 @@ class GatewayScanService(
     private val logger = KotlinLogging.logger { }
 
     suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
-        client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.scanFile}") {
+        client.post<FileHashScanResponse>("$gatewayUrl${GatewayRoutes.multiScanFile}") {
             this.body = MultiPartFormDataContent(
                 listOf(
                     PartData.FileItem(

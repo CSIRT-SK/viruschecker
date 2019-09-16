@@ -1,59 +1,51 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
-import java.io.File
-import java.nio.charset.Charset
 
 class Kaspersky(
     scanCommand: RunProgramCommand
-//        updateCommand: RunProgramCommand
 ) : CommandLineAntivirus(scanCommand) {
 
     private val logger = KotlinLogging.logger { }
 
     override val antivirusName: String = AntivirusType.KASPERSKY.antivirusName
 
-    override suspend fun parseReportFile(
-        reportFile: File,
+    override suspend fun parseReport(
+        report: List<String>,
         params: FileScanParameters
     ): Report {
-        val reports = withContext(Dispatchers.IO) {
-            FileUtils.readLines(
-                reportFile,
-                Charset.defaultCharset()
-            )
-        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+        val reports = report
             .asSequence()
             .filterNot { it.startsWith(";") }
             .filter { params.fileToScan.name in it }
             .map { line ->
                 line.split("\t").let {
                     Report(
-                        when (it[2].trim()) {
+                        status = when (it[2].trim()) {
                             "ok" -> ScanStatusResult.OK
                             "detected" -> ScanStatusResult.INFECTED
                             else -> ScanStatusResult.NOT_AVAILABLE
                         },
-                        if (it.size > 3) it[3].trim() else "OK"
+                        malwareDescription = if (it.size > 3) it[3].trim() else "OK",
+                        virusDatabaseVersion = ""
                     )
                 }
             }
         val status = reports.maxBy { it.status }?.status ?: return Report(
             status = ScanStatusResult.NOT_AVAILABLE,
-            malwareDescription = ""
+            malwareDescription = "",
+            virusDatabaseVersion = ""
         )
 
         return reports.filter { it.status == status }
-            .reduce { acc, report ->
+            .reduce { acc, reportLine ->
                 acc.copy(
-                    status = status,
-                    malwareDescription = "${acc.malwareDescription}, ${report.malwareDescription}"
+                    malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
-            }
+            }.copy(
+                virusDatabaseVersion = report.first().substring("AV bases release date: ".length)
+            )
     }
 
 }

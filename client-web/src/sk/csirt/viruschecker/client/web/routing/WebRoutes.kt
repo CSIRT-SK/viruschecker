@@ -14,6 +14,11 @@ object WebRoutes {
     @Location(scanFile)
     class ScanFile
 
+    const val shareFile = "/shareFile"
+    @KtorExperimentalLocationsAPI
+    @Location(shareFile)
+    class ShareFile
+
     const val index = "/"
     @KtorExperimentalLocationsAPI
     @Location(index)

@@ -22,7 +22,8 @@ class PersistentScanReportService(
                 AntivirusReportEntity(
                     antivirus = it.antivirus,
                     status = it.status.name,
-                    malwareDescription = it.malwareDescription
+                    malwareDescription = it.malwareDescription,
+                    virusDatabaseVersion = it.virusDatabaseVersion
                 )
             }
         ).also { reportRepository.save(it) }
@@ -34,7 +35,8 @@ class PersistentScanReportService(
                 AntivirusReportResponse(
                     antivirus = it.antivirus,
                     malwareDescription = it.malwareDescription,
-                    status = ScanStatusResponse.valueOf(it.status)
+                    status = ScanStatusResponse.valueOf(it.status),
+                    virusDatabaseVersion = it.virusDatabaseVersion
                 )
             }
             FileHashScanResponse(

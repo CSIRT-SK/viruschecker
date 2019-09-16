@@ -1,7 +1,10 @@
 package sk.csirt.viruschecker.driver.utils
 
+import mu.KotlinLogging
 import java.nio.file.Files
 import java.nio.file.Paths
+
+private val logger = KotlinLogging.logger {}
 
 fun parseParameter(
     commandList: MutableList<String>,
@@ -23,3 +26,33 @@ fun createDirectoryIfNotExists(directoryName: String){
         Files.createDirectory(directoryPath)
     }
 }
+
+/**
+ * Works only on Windows.
+ */
+fun readHKLMRegistryKey(path: String, key: String): String =
+    ProcessBuilder(
+        "reg",
+        "query",
+        path,
+        "/v",
+        key
+    ).start()
+        .inputStream
+        .bufferedReader()
+        .useLines { it.toList() }
+        .also { logger.debug { "Registry $path\\$key loaded value is: $it" } }
+        .firstOrNull { key in it }
+        ?.split(" ")
+        ?.last()
+        ?: ""
+//        .use { reader ->
+//            val output = reader.readLine()
+//            logger.debug { "Registry $path\\$key loaded value is: $output" }
+//            if(output == null || output.isBlank()){
+//                ""
+//            }else {
+//                output.split("\t").last()
+//            }
+//        }
+//    WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, path, key)

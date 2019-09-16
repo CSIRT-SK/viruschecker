@@ -15,5 +15,6 @@ data class ScanReportEntity(
 data class AntivirusReportEntity(
     val antivirus: String,
     val status: String,
-    val malwareDescription: String
+    val malwareDescription: String,
+    val virusDatabaseVersion: String
 ): Serializable

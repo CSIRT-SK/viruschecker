@@ -13,7 +13,8 @@ interface ExternalAntivirus : Antivirus {
                         AntivirusReportResult(
                             antivirusName = antivirusName,
                             status = ScanStatusResult.SCAN_REFUSED,
-                            malwareDescription = "The caller did not want to use this external service."
+                            malwareDescription = "The caller did not want to use this external service.",
+                            virusDatabaseVersion = ""
                         )
                     )
                 )

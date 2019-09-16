@@ -39,7 +39,8 @@ val gatewayDependencyInjectionModule = module {
                     AntivirusReportEntity(
                         antivirus = "Antivirus-$it",
                         status = "INFECTED",
-                        malwareDescription = "This is a super duper malware"
+                        malwareDescription = "This is a super duper malware",
+                        virusDatabaseVersion = "database-2019-09-09"
                     )
                 }
             ),

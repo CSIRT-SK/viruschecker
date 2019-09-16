@@ -99,7 +99,7 @@ In theory, you should be fine with such setup if you disable automatic scanners 
 
 We provide documentation for two ways of deploying driver programs - on Windows based virtual 
 machines or on Linux based virtual machines. 
-We assume that the VirtualBox is used as an virtualization platform.
+We assume that the VirtualBox is used as a virtualization platform.
 The first way allows you to reuse some spare licenses for Windows or antivirus solutions.
 The other way is usually less demanding on computer resources.
 
@@ -142,19 +142,15 @@ You may specify port other than `8080` with the `-port=` parameter, e.g.
 `java -jar driver-1.0.0-all.jar ESET COMODO -port=9595`.
 Please be aware, that ports `7979` and `8181` are default ports of the client programs.
 
-Drivers alg
-
 ### 2.1 Driver REST API
 
-One can communicate with the driver using its REST web API.
-You can use it directly or with the provided gateway or client applications.
-
+One can directly communicate with the driver directly using its REST web API.
 The API endpoints are documented [here](docs/rest-api/rest-api.md)
 
 ### 2.2 Extend driver
 
-If you want to support some new antivirus in driver or modify the existing configuration, this [guide](docs/driver/extensions.md)
-is the place to go.
+If you want to add support for a new antivirus or modify the existing configuration yourself, 
+this [guide](docs/driver/extensions.md) is the place to go.
 
 3 Deploy gateway
 ----------------
@@ -165,7 +161,7 @@ It receives data from the client and then sends it to all deployed drivers in pa
 Third party clients can either use the unified gateway API or upload files directly to the drivers.    
 
 Gateway can be theoretically deployed on any machine with Java 8 JRE installed.
-However, it was tested only on Ubuntu 18.04.
+However, it was tested on Ubuntu 18.04 only.
 
 The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 

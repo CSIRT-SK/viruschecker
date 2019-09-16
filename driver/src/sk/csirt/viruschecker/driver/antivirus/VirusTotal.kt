@@ -42,7 +42,8 @@ class VirusTotal(apiKey: String) : ExternalAntivirus {
                     AntivirusReportResult(
                         antivirusName = antivirusName,
                         malwareDescription = "${antivirusName} did not recognize this hash",
-                        status = ScanStatusResult.NOT_AVAILABLE
+                        status = ScanStatusResult.NOT_AVAILABLE,
+                        virusDatabaseVersion = ""
                     )
                 )
             )
@@ -57,13 +58,14 @@ class VirusTotal(apiKey: String) : ExternalAntivirus {
                         scanReport = ScanResult(
                             reports = it.scans.map { (antivirus, info) ->
                                 AntivirusReportResult(
-                                    antivirusName = "$antivirus (${antivirusName})",
+                                    antivirusName = "$antivirus ($antivirusName)",
                                     malwareDescription = info.result ?: "",
                                     status = when {
                                         info.result == null -> ScanStatusResult.NOT_AVAILABLE
                                         info.isDetected -> ScanStatusResult.INFECTED
                                         else -> ScanStatusResult.OK
-                                    }
+                                    },
+                                    virusDatabaseVersion = info.version
                                 )
                             }
                         )

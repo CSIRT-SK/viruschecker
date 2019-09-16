@@ -44,21 +44,47 @@ fun Route.showReport(reportService: GatewayReportService) {
                 }
             }
 
+//            br(); br()
+//
+//            div {
+//                id = "input-container"
+//                style = "width: 0px; height: 0px; overflow: hidden"
+//                fileInput {
+//                    id="share-file-input"
+//                }
+//            }
+
             br(); br()
             strong { +"Antivirus reports" }
             hr()
-            scanReport.results.forEach {
-                p {
-                    +"Antivirus: ${it.antivirus}"
-                    br()
-                    +"Description: ${it.malwareDescription}"
-                    pStatus(it.status)
+            scanReport.results.forEach { report ->
+                //                p {
+//                    +"Antivirus: ${report.antivirus}"
+//                    br()
+//                    +"Description: ${report.malwareDescription}"
+//                    pStatus(report.status)
+//                }
+                table(classes = "padding-table-columns") {
+                    tr {
+                        td {
+                            pStatus(report.status)
+                        }
+                        td {
+                            if(report.status == ScanStatusResponse.INFECTED){
+                                +"${report.antivirus}: ${report.malwareDescription}"
+                            }else{
+                                +report.antivirus
+                            }
+                        }
+                        td {
+                           +"database: ${report.virusDatabaseVersion}"
+                        }
+                    }
                 }
                 hr(classes = "lhr")
             }
         }
     }
-
 }
 
 @HtmlTagMarker

@@ -67,13 +67,16 @@ class DefaultDriverScanService(
                             AntivirusReportResponse(
                                 antivirus = "Unknown",
                                 malwareDescription = "Connection to $driverUrl was unsuccessful.",
-                                status = ScanStatusResponse.NOT_AVAILABLE
+                                status = ScanStatusResponse.NOT_AVAILABLE,
+                                virusDatabaseVersion = ""
                             )
                         )
                     )
                 )
             }.flatMap {
                 it.results
+            }.filterNot {
+                it.status == ScanStatusResponse.SCAN_REFUSED
             }.let {
                     FileHashScanResponse(
                         report = FileScanResponse(

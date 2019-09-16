@@ -4,10 +4,15 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
 object GatewayRoutes {
-    const val scanFile = "/multiScanFile"
+    const val multiScanFile = "/multiScanFile"
     @KtorExperimentalLocationsAPI
-    @Location(scanFile)
+    @Location(multiScanFile)
     class MultiScanFile
+
+    const val shareFile = "/shareFile"
+    @KtorExperimentalLocationsAPI
+    @Location(shareFile)
+    class ShareFile
 
     const val driversInfo = "/driversInfo"
     @KtorExperimentalLocationsAPI

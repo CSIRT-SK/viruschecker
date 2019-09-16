@@ -7,8 +7,8 @@ import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
+import io.ktor.locations.locations
 import io.ktor.locations.post
-import io.ktor.locations.url
 import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
@@ -36,7 +36,8 @@ fun Route.scanFile(scanService: GatewayScanService) {
             +"Scan can take up to ${parsedArgs.socketTimeout.seconds} seconds."
             br(); br()
             form(
-                call.url(WebRoutes.ScanFile()),
+//                call.url(WebRoutes.ScanFile()),
+                locations.href(WebRoutes.ScanFile()),
                 classes = "pure-form-stacked",
                 encType = FormEncType.multipartFormData,
                 method = FormMethod.post
@@ -112,8 +113,8 @@ fun Route.scanFile(scanService: GatewayScanService) {
                         )
                     )
                 }
-            call.respondRedirect(call.url(WebRoutes.ScanReport(scanResult.sha256)), false)
+//            call.respondRedirect(call.url(WebRoutes.ScanReport(scanResult.sha256)), false)
+            call.respondRedirect(locations.href(WebRoutes.ScanReport(scanResult.sha256)), false)
         }
-//        responseLambda(call)
     }
 }

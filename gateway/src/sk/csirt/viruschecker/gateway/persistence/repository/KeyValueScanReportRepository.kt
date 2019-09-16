@@ -7,6 +7,10 @@ class KeyValueScanReportRepository(
     private val storage: ConcurrentMap<CharSequence, ScanReportEntity>
 ) : ScanReportRepository {
 
+    override suspend fun findAll(): Iterable<ScanReportEntity> {
+       return storage.values
+    }
+
     override suspend fun save(item: ScanReportEntity): ScanReportEntity {
         storage[item.sha256] = item
         return item

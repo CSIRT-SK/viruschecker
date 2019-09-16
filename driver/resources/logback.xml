@@ -24,7 +24,7 @@
         </encoder>
     </appender>
 
-    <root level="info">N
+    <root level="debug">N
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

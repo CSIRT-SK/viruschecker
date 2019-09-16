@@ -1,6 +1,5 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -8,9 +7,7 @@ import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.Constants
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
 import java.nio.file.Paths
 import java.util.*
 
@@ -46,20 +43,10 @@ abstract class CommandLineAntivirus(
 
     override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
         logger.info("Scanning file with this parameters: $params")
-        val reportFile = Paths.get(
-            Constants.scanReportsDir,
-            "report-${params.fileToScan.nameWithoutExtension}-${UUID.randomUUID()}.txt"
-        ).toFile()
-        val output = runAntivirusToScan(params, reportFile)
+        val output = runAntivirusToScan(params)
         // Some antiviruses (Avast) cannot write results properly when invoked from another process.
-        // This will manually write their STDOUT to the file
-        writeOutputToFileIfNotExists(reportFile, output)
-        retrieveReport(reportFile, params).also {
+        retrieveReport(output, params).also {
             logger.info("Retrieved report: $it")
-        }.also {
-            launch(IO) {
-                reportFile.delete()
-            }
         }
     }
 
@@ -73,36 +60,44 @@ abstract class CommandLineAntivirus(
         FileUtils.writeLines(reportFile, scanOutput)
     }
 
-    private suspend fun runAntivirusToScan(params: FileScanParameters, reportFile: File)
-            : AntivirusOutput = runAntivirus(scanCommand.parse(params.fileToScan, reportFile))
+    private suspend fun runAntivirusToScan(params: FileScanParameters)
+            : AntivirusOutput {
+        // Some antiviruses (Avast) cannot write results properly to stdout when invoked from another process.
+        // Therefore we will use the auxiliary report file. This will cause the AV write its output to both the file and stdout.
+        val reportFile = Paths.get(
+            Constants.scanReportsDir,
+            "report-${params.fileToScan.nameWithoutExtension}-${UUID.randomUUID()}.txt"
+        ).toFile()
+        return runAntivirus(scanCommand.parse(params.fileToScan, reportFile)).also {
+            if (reportFile.exists()) {
+                coroutineScope {
+                    launch(IO) { reportFile.delete() }
+                }
+            }
+        }
+    }
 
     protected suspend fun runAntivirus(command: List<String>): AntivirusOutput {
-        val processBuilder = ProcessBuilder()
-        processBuilder.command(command)
         logger.debug("Waiting for antivirusName. Command to run: $scanCommand")
-        val output = withContext(Dispatchers.IO) {
-            val process = processBuilder.start()
-            val processReader = BufferedReader(InputStreamReader(process.inputStream))
-            val output = mutableListOf<String>()
-            var line: String? = processReader.readLine()
-            var i = 1
-            while (line != null) {
-                logger.debug("Output line [$i] from antivirusName: $line")
-                output += line
-                line = processReader.readLine()
-                i++
-            }
-            output
+        val report = withContext(IO) {
+            ProcessBuilder(command)
+                .start()
+                .inputStream
+                .bufferedReader()
+                .useLines {
+                    it.toList()
+                }
         }
         logger.debug("Antivirus task completed. Command successfully executed: $scanCommand")
-        return output
+        logger.debug("Output from $antivirusName: $report")
+        return report
     }
 
     private suspend fun retrieveReport(
-        reportFile: File,
+        report: List<String>,
         params: FileScanParameters
     ): FileScanResult {
-        val (status, description) = parseReportFile(reportFile, params)
+        val (status, description, virusDatabase) = parseReport(report, params)
         return FileScanResult(
             filename = params.originalFileName,
             scanReport = ScanResult(
@@ -111,18 +106,23 @@ abstract class CommandLineAntivirus(
                     AntivirusReportResult(
                         status = status,
                         malwareDescription = description,
-                        antivirusName = antivirusName
+                        antivirusName = antivirusName,
+                        virusDatabaseVersion = virusDatabase
                     )
                 )
             )
         )
     }
 
-    protected abstract suspend fun parseReportFile(
-        reportFile: File,
+    protected abstract suspend fun parseReport(
+        report: List<String>,
         params: FileScanParameters
     ): Report
 
-    protected data class Report(val status: ScanStatusResult, val malwareDescription: String)
+    protected data class Report(
+        val status: ScanStatusResult,
+        val malwareDescription: String,
+        val virusDatabaseVersion: String
+    )
 
 }

@@ -181,3 +181,8 @@ h3 {
     color: #333; /* old IE */
     background-color: #333; /* Modern Browsers */
 }
+
+.padding-table-columns td
+{
+    padding:0 20px 0 0; /* Only right padding*/
+}

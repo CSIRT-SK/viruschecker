@@ -30,7 +30,8 @@ data class FileScanResponse(
 data class AntivirusReportResponse(
     val antivirus: String,
     val status: ScanStatusResponse,
-    val malwareDescription: String
+    val malwareDescription: String,
+    val virusDatabaseVersion: String
 )
 
 /**

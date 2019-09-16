@@ -5,7 +5,10 @@ import io.ktor.http.CacheControl
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.routing.Routing
-import kotlinx.html.*
+import kotlinx.html.br
+import kotlinx.html.h2
+import kotlinx.html.h3
+import kotlinx.html.p
 import sk.csirt.viruschecker.client.service.GatewayInfoService
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
 
@@ -23,8 +26,6 @@ fun Routing.index(antivirusDriverInfoService: GatewayInfoService) {
             info.forEach {
                 p{
                     +"Antivirus: ${it.info.antivirus}"
-                    br()
-                    +"Address: ${it.url}"
                     br()
                     +"Driver version: ${it.info.driverVersion}"
                 }

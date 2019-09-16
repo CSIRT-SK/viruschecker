@@ -1,12 +1,7 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
-import java.io.File
-import java.nio.charset.Charset
 
 class Avast(
     scanCommand: RunProgramCommand
@@ -16,27 +11,24 @@ class Avast(
 
     override val antivirusName: String = AntivirusType.AVAST.antivirusName
 
-    override suspend fun parseReportFile(
-        reportFile: File,
+    override suspend fun parseReport(
+        report: List<String>,
         params: FileScanParameters
     ): Report =
-        withContext(Dispatchers.IO) {
-            FileUtils.readLines(
-                reportFile,
-                Charset.defaultCharset()
-            )
-        }.also { logger.debug { "From ${reportFile.name} loaded report: $it" } }
+            report
             .takeIf { it.isNotEmpty() }
-            ?.first()
-            ?.let { line ->
-                line.split("\t")[1].let {
+            ?.let { it.first() to it.first { "# Virus database" in it } }
+            ?.let { (scanLine, databaseLine) ->
+                scanLine.split("\t")[1].let {
                     Report(
-                        when {
+                        status = when {
                             "OK" in it -> ScanStatusResult.OK
                             else -> ScanStatusResult.INFECTED
                         },
-                        it
+                        malwareDescription = it,
+                        virusDatabaseVersion =
+                            databaseLine.split(":")[1]
                     )
                 }
-            } ?: Report(ScanStatusResult.NOT_AVAILABLE, "")
+            } ?: Report(ScanStatusResult.NOT_AVAILABLE, "", "")
 }
