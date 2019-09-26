@@ -10,24 +10,22 @@ import io.ktor.http.content.PartData
 import kotlinx.io.streams.asInput
 import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import java.io.File
 import java.io.FileInputStream
 
-data class ScanParameters(
-    val fileToScan: File,
-    val originalFilename: String,
-    val useExternalDrivers: Boolean
+data class ShareParameters(
+    val file: File,
+    val originalFilename: String
 )
 
-class GatewayScanService(
+class GatewayShareService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {
     private val logger = KotlinLogging.logger { }
 
-    suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
-        client.post("$gatewayUrl${GatewayRoutes.multiScanFile}") {
+    suspend fun shareFile(params: ShareParameters): String =
+        client.post("$gatewayUrl${GatewayRoutes.shareFile}") {
             this.body = MultiPartFormDataContent(
                 listOf(
                     PartData.FileItem(
@@ -39,12 +37,7 @@ class GatewayScanService(
                                 ).toString()
                         },
                         dispose = { },
-                        provider = { FileInputStream(params.fileToScan).asInput() }
-                    ),
-                    PartData.FormItem(
-                        value = params.useExternalDrivers.toString(),
-                        dispose = { },
-                        partHeaders = Headers.Empty
+                        provider = { FileInputStream(params.file).asInput() }
                     )
                 )
             )

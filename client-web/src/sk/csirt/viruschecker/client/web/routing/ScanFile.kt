@@ -61,13 +61,8 @@ fun Route.scanFile(scanService: GatewayScanService) {
     }
 
 
-    /**
-     * Registers a POST route for [Upload] that actually read the bits sent from the client and creates a new video
-     * using the [database] and the [uploadDir].
-     */
     post<WebRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
-//        var title = ""
         var scanParameters = ScanParameters(
             fileToScan = File(""),
             originalFilename = "",
@@ -113,7 +108,6 @@ fun Route.scanFile(scanService: GatewayScanService) {
                         )
                     )
                 }
-//            call.respondRedirect(call.url(WebRoutes.ScanReport(scanResult.sha256)), false)
             call.respondRedirect(locations.href(WebRoutes.ScanReport(scanResult.sha256)), false)
         }
     }

@@ -14,6 +14,7 @@ import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.routing.service.ShareParameters
 import sk.csirt.viruschecker.gateway.routing.service.ShareService
+import sk.csirt.viruschecker.gateway.routing.utils.toTempFile
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import java.io.File
 

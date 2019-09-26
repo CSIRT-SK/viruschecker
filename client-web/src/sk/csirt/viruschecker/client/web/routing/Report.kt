@@ -6,8 +6,7 @@ import io.ktor.locations.get
 import io.ktor.routing.Route
 import kotlinx.html.*
 import sk.csirt.viruschecker.client.service.GatewayReportService
-import sk.csirt.viruschecker.client.web.template.pAlert
-import sk.csirt.viruschecker.client.web.template.pOk
+import sk.csirt.viruschecker.client.web.template.pStatus
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
 import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 import java.time.LocalDateTime
@@ -16,16 +15,13 @@ import java.time.ZoneId
 @KtorExperimentalLocationsAPI
 fun Route.showReport(reportService: GatewayReportService) {
     get<WebRoutes.ScanReport> { params ->
-        val (sha256, md5, sha1, scanReport) =
-            reportService.findReportBySha256(params.sha256)
+        val (sha256, md5, sha1, scanReport) = reportService.findReportBySha256(params.sha256)
         call.respondDefaultHtml {
             h2 { +"Scan report for ${scanReport.filename}" }
 
             +scanReport.date
                 .let { LocalDateTime.ofInstant(it, ZoneId.systemDefault()) }
                 .let { "Time: ${it.toLocalDate()}, ${it.toLocalTime()}" }
-//            br()
-//
             p {
                 strong { +"Scan result: " }
                 pStatus(scanReport.status)
@@ -44,26 +40,10 @@ fun Route.showReport(reportService: GatewayReportService) {
                 }
             }
 
-//            br(); br()
-//
-//            div {
-//                id = "input-container"
-//                style = "width: 0px; height: 0px; overflow: hidden"
-//                fileInput {
-//                    id="share-file-input"
-//                }
-//            }
-
             br(); br()
             strong { +"Antivirus reports" }
             hr()
             scanReport.results.forEach { report ->
-                //                p {
-//                    +"Antivirus: ${report.antivirus}"
-//                    br()
-//                    +"Description: ${report.malwareDescription}"
-//                    pStatus(report.status)
-//                }
                 table(classes = "padding-table-columns") {
                     tr {
                         td {
@@ -87,17 +67,3 @@ fun Route.showReport(reportService: GatewayReportService) {
     }
 }
 
-@HtmlTagMarker
-private fun FlowContent.pStatus(status: ScanStatusResponse) {
-    when (status) {
-        ScanStatusResponse.OK -> pOk {
-            +"OK"
-        }
-        ScanStatusResponse.INFECTED -> pAlert {
-            +"INFECTED"
-        }
-        else -> p {
-            +"NOT AVAILABLE"
-        }
-    }
-}

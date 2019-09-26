@@ -13,6 +13,7 @@ import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
+import sk.csirt.viruschecker.gateway.routing.utils.toTempFile
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import java.io.File
 import java.time.Instant

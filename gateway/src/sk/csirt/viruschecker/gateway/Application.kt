@@ -22,11 +22,9 @@ import sk.csirt.viruschecker.gateway.config.CommandLineArguments
 import sk.csirt.viruschecker.gateway.config.checkedDriverUrls
 import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
 import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
-import sk.csirt.viruschecker.gateway.routing.driversInfo
-import sk.csirt.viruschecker.gateway.routing.findByHash
-import sk.csirt.viruschecker.gateway.routing.index
-import sk.csirt.viruschecker.gateway.routing.multiScanFile
+import sk.csirt.viruschecker.gateway.routing.*
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
+import sk.csirt.viruschecker.gateway.routing.service.ShareService
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
 
 private val logger = KotlinLogging.logger {  }
@@ -74,12 +72,15 @@ fun Application.module() {
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<PersistentScanReportService>()
     val checkedUrls by inject<List<UrlDriverInfoResponse>>(checkedDriverUrls)
+    val shareService by inject<ShareService>()
 
     routing {
         index()
         driversInfo(checkedUrls)
         multiScanFile(scanService)
         findByHash(scanReportService)
+        shareFile(shareService)
+        findAll(scanReportService)
     }
 
 

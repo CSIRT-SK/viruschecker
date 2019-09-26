@@ -18,7 +18,7 @@ fun Route.findByHash(
 ) {
     get<GatewayRoutes.ScanReport> { params ->
         val hash = params.sha256
-        logger.info { "Retrieving report for sha256 $hash." }
+        logger.info { "Requested report for sha256 $hash." }
         val scanReport = scanReportService.findBySha256(hash)
 
         if (scanReport == null) {

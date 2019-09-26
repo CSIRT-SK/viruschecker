@@ -70,6 +70,8 @@ Open terminal in this directory and
 2 Deploy antivirus driver program
 ---------------------------------
 
+The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
+
 The driver provides a unified REST API to simplify communication with supported antivirus solutions.
 As of this moment the supported antivirus software includes
 - Avast
@@ -78,10 +80,10 @@ As of this moment the supported antivirus software includes
 - Kaspersky
 - Windows defender
 
-In addition to this, the driver also supports VirusTotal online virus database.
-However, only SHA-256 hashes are uploaded to VirusTotal.
+In addition to those self hosted services, the driver also supports querying VirusTotal online virus
+ database by SHA-256 hashes computed automatically from the scanned file.
+Note that the driver uploads only hash of the file to VirusTotal.
 
-The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
 
 In the following subsections we provide a step-by-step instructions for successful deployment.
 
@@ -119,7 +121,7 @@ currently unsupported antivirus you may visit this [guide](docs/driver/extension
 ### 2.1 Run the driver program
 
 The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
-We will assume that this executable file was copied to `~/virus-checker` or `C:\virus-checker` folder on the virtual 
+We will assume that this executable file was copied to `~/virus-checker` (on Linux) or `C:\virus-checker` (on Windows) folder on the virtual 
 machine.
  
 * On the virtual machine, open terminal in the folder with the driver executable.   
@@ -140,30 +142,31 @@ More info about the web API can be found in the following subsection.
 
 You may specify port other than `8080` with the `-port=` parameter, e.g. 
 `java -jar driver-1.0.0-all.jar ESET COMODO -port=9595`.
-Please be aware, that ports `7979` and `8181` are default ports of the client programs.
+Please be aware, that ports `7979` and `8181` are reserved by default for other modules of the 
+VirusChecker.
 
 ### 2.1 Driver REST API
 
 One can directly communicate with the driver directly using its REST web API.
-The API endpoints are documented [here](docs/rest-api/rest-api.md)
+The API endpoints are documented [here](docs/rest-api/rest-api.md).
 
 ### 2.2 Extend driver
 
-If you want to add support for a new antivirus or modify the existing configuration yourself, 
+If you want to configure the driver or even add support for a new antivirus by yourself, 
 this [guide](docs/driver/extensions.md) is the place to go.
 
 3 Deploy gateway
 ----------------
+
+The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 
 The purpose of the gateway is to simplify the implementation of client applications.
 It receives data from the client and then sends it to all deployed drivers in parallel.
 
 Third party clients can either use the unified gateway API or upload files directly to the drivers.    
 
-Gateway can be theoretically deployed on any machine with Java 8 JRE installed.
+Gateway can be theoretically deployed on any machine with JRE 1.8.
 However, it was tested on Ubuntu 18.04 only.
-
-The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 
 Create a new text file and put the full urls of running driver programs, one url per line.
 For example, if you have three running drivers on (virtual) machines with IPv4 addresses 
@@ -185,12 +188,17 @@ to `http://127.0.0.1:8080/`.
 The driver should respond with JSON containing some basic info about itself.
 More info about the web API can be found in the following subsection.
 
-Remember to open port 8080 for TCP if you wish to connect to the gateway from outside. 
+Remember to open port 8080 for TCP if you wish to connect to the gateway from other computers in 
+network. 
 
 ###### Note
 
 Default port of the gateway is 8080 which is also used by driver program by default.
-If you wish to deploy the driver on the same system
+If you wish to deploy both the driver and the gateway on the same system, you should change the 
+port of at least one component.
+
+It is, therefore, highly recommended to run the gateway on different virtual/physical machine than 
+the driver.
 
    
 4 Deploy client cli application

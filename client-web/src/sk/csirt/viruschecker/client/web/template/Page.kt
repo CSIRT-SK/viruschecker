@@ -30,9 +30,6 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
             styleLink("https://yui-s.yahooapis.com/pure/0.6.0/pure-min.css")
             styleLink("https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-min.css")
             styleLink(locations.href(WebRoutes.MainCss()))
-//            styleLink(url(WebRoutes.MainCss()) {
-//                protocol = URLProtocol.createOrDefault(request.origin.scheme)
-//            })
         }
         body {
             div("pure-g") {
@@ -52,6 +49,10 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
                                 li("nav-item") {
                                         a(classes = "pure-button",
                                             href = locations.href(WebRoutes.ScanFile())) { +"Scanner" }
+                                }
+                                li("nav-item") {
+                                    a(classes = "pure-button",
+                                        href = locations.href(WebRoutes.AllScanReports())) { +"All reports" }
                                 }
                             }
                         }

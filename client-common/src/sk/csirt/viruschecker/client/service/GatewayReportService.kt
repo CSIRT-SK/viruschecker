@@ -20,5 +20,11 @@ class GatewayReportService(
             logger.debug { "Retrieved report for hash $sha256: $it" }
         }
 
+    suspend fun findAllReports(): List<FileHashScanResponse> =
+        client.get<List<FileHashScanResponse>>(
+            "$gatewayUrl${GatewayRoutes.allScanReports}"
+        ).also {
+            logger.info { "Retrieved all reports" }
+        }
 
 }

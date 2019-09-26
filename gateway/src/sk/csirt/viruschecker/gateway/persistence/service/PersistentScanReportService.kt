@@ -3,10 +3,8 @@ package sk.csirt.viruschecker.gateway.persistence.service
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
-import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
+import sk.csirt.viruschecker.gateway.persistence.service.converter.toFileHashScanResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.FileScanResponse
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 
 class PersistentScanReportService(
     private val reportRepository: ScanReportRepository
@@ -30,24 +28,12 @@ class PersistentScanReportService(
     }
 
     override suspend fun findBySha256(hash: String): FileHashScanResponse? =
-        reportRepository.findBySha256(hash)?.let {
-            val reports = it.reports.map {
-                AntivirusReportResponse(
-                    antivirus = it.antivirus,
-                    malwareDescription = it.malwareDescription,
-                    status = ScanStatusResponse.valueOf(it.status),
-                    virusDatabaseVersion = it.virusDatabaseVersion
-                )
-            }
-            FileHashScanResponse(
-                sha256 = it.sha256,
-                md5 = it.md5,
-                sha1 = it.sha1,
-                report = FileScanResponse(
-                    date = it.date,
-                    filename = it.filename,
-                    results = reports
-                )
-            )
+        reportRepository.findBySha256(hash)?.toFileHashScanResponse()
+
+    override suspend fun findAll(): List<FileHashScanResponse> {
+        return reportRepository.findAll().map {
+            it.toFileHashScanResponse()
         }
+    }
+
 }

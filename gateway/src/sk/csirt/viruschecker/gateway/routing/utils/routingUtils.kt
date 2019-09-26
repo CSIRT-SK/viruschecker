@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.gateway.routing
+package sk.csirt.viruschecker.gateway.routing.utils
 
 import io.ktor.http.content.PartData
 import io.ktor.util.KtorExperimentalAPI
