@@ -195,21 +195,23 @@ network.
 
 ###### Note
 
-Default port of the gateway is 8080 which is also used by the driver program by default.
+The default port of the gateway is 8080 which is also used by the driver program.
 If you wish to deploy both the driver and the gateway on the same system/VM, you should change the 
-listening port of at least one one of them.
+listening port of at least one of them.
 
-It is, therefore, highly recommended to run the gateway on different VM (or directly on host) than 
-the driver.
+Therefore, it is highly recommended that you run the gateway on a different VM (or directly on the 
+host) than the driver.
 
 4 Deploy client web application
 -------------------------------
 
-This client provides simple web based interface to send files to the gateway and show retrieved reports.
+This client provides simple web based interface to send files to the gateway and displaying 
+retrieved reports.
 
 The location of the compiled JRE executable is `client-web/build/libs/client-web-[VERSION]-all.jar`.
 
-Assuming Java is in the *Path* and the gateway is running on the same machine, run terminal in this directory.
+Assuming Java is in the *Path* and the gateway is running on the same machine, run terminal in this 
+directory.
 
 Type `java -jar client-web-[VERSION]-all.jar http://localhost:8080` and press enter.
 By default, the web application will run on port `7979`.
