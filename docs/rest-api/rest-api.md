@@ -1,13 +1,16 @@
-Driver REST API
-===============
+REST API
+========
 
-This subsection describes the API endpoints along with the corresponding requests and responses.
+This section describes the API endpoints along with the corresponding requests and responses.
 
 In request/response body schemas below, all data types are implicitly **not null**. 
 Nullable values are explicitly denoted with `?` symbol. 
 For example, data type `String` is guaranteed not to be of value `null`, however it still may 
 contain empty value denoted by `""`.
 On the other hand, data type `String?` may contain `null` value.
+
+Driver REST API
+===============
 
 Driver info
 -----------
@@ -148,16 +151,6 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
 
 Gateway REST API
 ================
-
-One can communicate with the driver using its REST web API.
-You can use it directly or with the provided gateway or client applications.
-
-The API endpoints are documented [here](docs/rest-api/rest-api.md)
-
-This subsection describes the API endpoints along with the corresponding requests and responses.
-
-As mentioned in subsection 2.5, we distinguish between nullable and non-nullable attributes in 
-request/response body schemas where 
 
 Gateway info
 ------------

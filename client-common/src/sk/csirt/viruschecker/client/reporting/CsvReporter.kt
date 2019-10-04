@@ -10,17 +10,6 @@ import java.time.ZoneId
 
 class CsvReporter(private val file: File) : Reporter {
     override fun saveReport(result: FileHashScanResponse) {
-        data class ReportLine(
-            val file: String,
-            val date: LocalDateTime,
-            val antivirus: String,
-            val status: String,
-            val malwareDescription: String,
-            val sha256: String,
-            val sha1: String,
-            val md5: String
-        )
-
         FileWriter(file).use { fileWriter ->
             CSVPrinter(
                 fileWriter, CSVFormat.DEFAULT.withHeader(

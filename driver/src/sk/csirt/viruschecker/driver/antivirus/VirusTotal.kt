@@ -41,7 +41,7 @@ class VirusTotal(apiKey: String) : ExternalAntivirus {
                 reports = listOf(
                     AntivirusReportResult(
                         antivirusName = antivirusName,
-                        malwareDescription = "${antivirusName} did not recognize this hash",
+                        malwareDescription = "$antivirusName did not recognize this hash",
                         status = ScanStatusResult.NOT_AVAILABLE,
                         virusDatabaseVersion = ""
                     )
@@ -52,26 +52,23 @@ class VirusTotal(apiKey: String) : ExternalAntivirus {
         return when {
             scanInformation == null -> emptyReport
             "Scan finished" in scanInformation.verboseMessage ->
-                scanInformation.let {
-                    FileScanResult(
-                        filename = params.originalFileName,
-                        scanReport = ScanResult(
-                            reports = it.scans.map { (antivirus, info) ->
-                                AntivirusReportResult(
-                                    antivirusName = "$antivirus ($antivirusName)",
-                                    malwareDescription = info.result ?: "",
-                                    status = when {
-                                        info.result == null -> ScanStatusResult.NOT_AVAILABLE
-                                        info.isDetected -> ScanStatusResult.INFECTED
-                                        else -> ScanStatusResult.OK
-                                    },
-                                    virusDatabaseVersion = info.version
-                                )
-                            }
-                        )
+                FileScanResult(
+                    filename = params.originalFileName,
+                    scanReport = ScanResult(
+                        reports = scanInformation.scans.map { (antivirus, info) ->
+                            AntivirusReportResult(
+                                antivirusName = "$antivirus ($antivirusName)",
+                                malwareDescription = info.result ?: "",
+                                status = when {
+                                    info.result == null -> ScanStatusResult.NOT_AVAILABLE
+                                    info.isDetected -> ScanStatusResult.INFECTED
+                                    else -> ScanStatusResult.OK
+                                },
+                                virusDatabaseVersion = info.version
+                            )
+                        }
                     )
-
-                }
+                )
             else -> emptyReport
         }
     }

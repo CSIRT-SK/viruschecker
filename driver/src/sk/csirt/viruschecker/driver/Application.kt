@@ -25,8 +25,6 @@ import sk.csirt.viruschecker.driver.config.driverDependencyInjectionModule
 import sk.csirt.viruschecker.driver.routing.index
 import sk.csirt.viruschecker.driver.routing.scanFile
 
-private val logger = KotlinLogging.logger { }
-
 lateinit var parsedArgs: CommandLineArguments
 private val viruscheckerDriverProperties = DriverPropertiesFactory.loadOrCreateDefault()
 

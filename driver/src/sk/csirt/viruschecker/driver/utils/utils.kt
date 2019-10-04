@@ -46,13 +46,3 @@ fun readHKLMRegistryKey(path: String, key: String): String =
         ?.split(" ")
         ?.last()
         ?: ""
-//        .use { reader ->
-//            val output = reader.readLine()
-//            logger.debug { "Registry $path\\$key loaded value is: $output" }
-//            if(output == null || output.isBlank()){
-//                ""
-//            }else {
-//                output.split("\t").last()
-//            }
-//        }
-//    WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, path, key)

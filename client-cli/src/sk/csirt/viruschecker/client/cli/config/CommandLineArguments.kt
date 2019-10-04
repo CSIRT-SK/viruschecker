@@ -16,7 +16,7 @@ class CommandLineArguments(parser: ArgParser) {
         help = "File to scan. Does not support directories (only archived)."
     ) { File(this) }
 
-    val socketTimeout by parser.storing(
+    val socketTimeout: Duration by parser.storing(
         "-t", "--timeout",
         help = "Optional: Sets socket timeout in milliseconds. Default value is " +
                 "${defaultTimeout.toMillis()}."
@@ -28,7 +28,7 @@ class CommandLineArguments(parser: ArgParser) {
     )
     val outputFile by parser.storing(
         "-o", "--out",
-        help = "Outpuy file to store report. Csv format is supported if the filename ends" +
+        help = "Output file to store report. Csv format is supported if the filename ends" +
                 " with appropriate postfix."
     ) { File(this) }.default<File?>(null)
 }

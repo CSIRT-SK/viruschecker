@@ -69,8 +69,6 @@ fun Route.scanFile(scanService: GatewayScanService) {
             useExternalDrivers = false
         )
 
-        val fileId = UUID.randomUUID().toString()
-
         multipart.forEachPart { part ->
             when (part) {
                 is PartData.FormItem -> {
@@ -81,7 +79,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
                 is PartData.FileItem -> {
                     val file = File(
                         tempDirectory,
-                        "$fileId-${part.originalFileName}"
+                        "${UUID.randomUUID()}-${part.originalFileName}"
                     )
 
                     part.streamProvider()

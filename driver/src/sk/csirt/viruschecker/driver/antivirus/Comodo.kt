@@ -22,4 +22,4 @@ class Comodo(scanCommand: RunProgramCommand) : CommandLineAntivirus(scanCommand)
                     else -> Report(ScanStatusResult.NOT_AVAILABLE, "", "Not available ATM")
                 }
             }
-    }
+}

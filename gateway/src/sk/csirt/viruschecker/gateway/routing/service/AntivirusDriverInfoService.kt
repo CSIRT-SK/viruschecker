@@ -2,7 +2,6 @@ package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.DriverInfoResponse
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
@@ -12,9 +11,7 @@ class DriverInfoService(
     client: HttpClient
 ) : AntivirusDriverService(driverUrls, client) {
 
-    private val logger = KotlinLogging.logger { }
-
-        suspend fun info(): List<UrlDriverInfoResponse> =
+    suspend fun info(): List<UrlDriverInfoResponse> =
         multiDriverRequest { driverUrl, client ->
             val info = client.get<DriverInfoResponse>("$driverUrl${DriverRoutes.index}")
             UrlDriverInfoResponse(

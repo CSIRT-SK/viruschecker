@@ -36,9 +36,6 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
                 div("sidebar pure-u-1 pure-u-md-1-4") {
                     div("header") {
                         div("brand-title") { +title }
-//                        div("brand-tagline") {
-//                            +"Virus Checker"
-//                        }
 
                         nav("nav") {
                             ul("nav-list") {

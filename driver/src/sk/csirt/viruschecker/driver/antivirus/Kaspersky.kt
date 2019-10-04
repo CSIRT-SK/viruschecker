@@ -1,13 +1,10 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.AntivirusType
 
 class Kaspersky(
     scanCommand: RunProgramCommand
 ) : CommandLineAntivirus(scanCommand) {
-
-    private val logger = KotlinLogging.logger { }
 
     override val antivirusName: String = AntivirusType.KASPERSKY.antivirusName
 

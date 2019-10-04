@@ -33,8 +33,6 @@ import sk.csirt.viruschecker.client.web.routing.showReport
 import sk.csirt.viruschecker.client.web.template.styles
 import sk.csirt.viruschecker.config.filterArgsForArgParser
 
-private val logger = KotlinLogging.logger { }
-
 lateinit var parsedArgs: CommandLineArguments
 
 fun main(args: Array<String>) = mainBody {

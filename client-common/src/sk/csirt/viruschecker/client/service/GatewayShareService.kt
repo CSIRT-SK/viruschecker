@@ -8,7 +8,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.PartData
 import kotlinx.io.streams.asInput
-import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import java.io.File
 import java.io.FileInputStream
@@ -22,8 +21,6 @@ class GatewayShareService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {
-    private val logger = KotlinLogging.logger { }
-
     suspend fun shareFile(params: ShareParameters): String =
         client.post("$gatewayUrl${GatewayRoutes.shareFile}") {
             this.body = MultiPartFormDataContent(

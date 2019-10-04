@@ -2,7 +2,7 @@ package sk.csirt.viruschecker.driver.config
 
 import sk.csirt.viruschecker.driver.antivirus.RunProgramCommand
 
-internal val defaultPropertiesUnix = """
+internal const val defaultPropertiesUnix = """
 # Comodo
 # ==============================================================================
 

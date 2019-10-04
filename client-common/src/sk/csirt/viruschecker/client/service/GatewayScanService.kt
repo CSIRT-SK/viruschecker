@@ -8,7 +8,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.PartData
 import kotlinx.io.streams.asInput
-import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import java.io.File
@@ -24,8 +23,6 @@ class GatewayScanService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {
-    private val logger = KotlinLogging.logger { }
-
     suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
         client.post("$gatewayUrl${GatewayRoutes.multiScanFile}") {
             this.body = MultiPartFormDataContent(

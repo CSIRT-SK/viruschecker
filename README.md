@@ -91,8 +91,6 @@ In addition to those self hosted services, the driver also supports querying Vir
  database with SHA-256 hashes computed automatically from the scanned file.
 Note that the driver uploads only hash of the file to VirusTotal and never the file itself.
 
-[//]: # "In the following subsections we provide a step-by-step instructions for successful deployment."
-
 ### 2.1 Prepare a virtual machine
 
 The recommended setup for the whole Virus Checker system is to have all AVs and the drivers 

@@ -545,27 +545,27 @@ We need to create a template for command used to execute Kaspersky antivirus.
 One can see that the template we need already exists, see lines
 
 ```properties
-...
+...=
 
 # Kaspersky
 # ==============================================================================
 
 ${Properties.kaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
 
-...
+...=
 ```
 
 Our new template will look almost the same
 
 ```properties
-...
+...=
 
 # MyKaspersky
 # ==============================================================================
 
 ${Properties.myKaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
 
-...
+...=
 ```
 
 Now the content of the file should be
@@ -681,7 +681,7 @@ Now we will explain the meaning of each part of this file.
   class MyKaspersky(
        // 
       scanCommand: RunProgramCommand 
-  ) : CommandLineAntivirus(scanCommand) { 
+  ) : CommandLineAntivirus(scanCommand) 
   ```
 
 * We declare the name of this antivirus parser. This what we added to `AntivirusType.kt`.

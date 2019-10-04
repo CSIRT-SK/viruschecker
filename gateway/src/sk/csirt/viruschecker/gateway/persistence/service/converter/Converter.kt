@@ -1,6 +1,5 @@
 package sk.csirt.viruschecker.gateway.persistence.service.converter
 
-import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
@@ -27,20 +26,3 @@ internal fun ScanReportEntity.toFileHashScanResponse(): FileHashScanResponse {
         )
     )
 }
-
-internal fun FileHashScanResponse.toScanReportEntity() =
-    ScanReportEntity(
-        date = this.report.date,
-        filename = this.report.filename,
-        sha256 = this.sha256,
-        md5 = this.md5,
-        sha1 = this.sha1,
-        reports = this.report.results.map {
-            AntivirusReportEntity(
-                antivirus = it.antivirus,
-                status = it.status.name,
-                malwareDescription = it.malwareDescription,
-                virusDatabaseVersion = it.virusDatabaseVersion
-            )
-        }
-    )

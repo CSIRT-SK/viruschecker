@@ -32,10 +32,9 @@ interface PropertiesFactory {
     private fun loadProperties(propertiesFile: File): Map<String, Any> =
         FileUtils.readLines(propertiesFile, Charset.defaultCharset())
             .cleanCommentsAndEmptyLines()
-            .associate {
-                it.split(limit = 2, delimiters = *arrayOf("=", "= ", " = ")).let {
-                    it[0] to
-                            (it[1].toDoubleOrNull() ?: it[1].toIntOrNull() ?: it[1])
+            .associate { propertyLine ->
+                propertyLine.split(limit = 2, delimiters = *arrayOf("=", "= ", " = ")).let {
+                    it[0] to (it[1].toDoubleOrNull() ?: it[1].toIntOrNull() ?: it[1])
                 }
             }
 }

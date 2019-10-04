@@ -1,6 +1,5 @@
 package sk.csirt.viruschecker.gateway
 
-
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.ktor.application.Application
@@ -13,7 +12,6 @@ import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
-import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -26,8 +24,6 @@ import sk.csirt.viruschecker.gateway.routing.*
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.ShareService
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
-
-private val logger = KotlinLogging.logger {  }
 
 lateinit var parsedArgs: CommandLineArguments
 

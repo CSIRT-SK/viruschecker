@@ -22,7 +22,7 @@ object WebRoutes {
     const val index = "/"
     @KtorExperimentalLocationsAPI
     @Location(index)
-    class Index()
+    class Index
 
     const val scanReport = "/scanReport/{sha256}"
     @KtorExperimentalLocationsAPI

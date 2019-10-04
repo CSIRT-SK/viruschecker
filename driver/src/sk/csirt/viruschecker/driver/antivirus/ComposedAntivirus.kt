@@ -6,22 +6,6 @@ import kotlinx.coroutines.supervisorScope
 
 class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antivirus {
 
-//    override val isInternal: Boolean = run {
-//        val (internal, external) = antiviruses.partition { it.isInternal }
-//
-//        if (internal.isEmpty() && external.isNotEmpty()) {
-//            false
-//        } else if (internal.isNotEmpty() && external.isEmpty()) {
-//            true
-//        } else {
-//            throw AntivirusCompositionException(
-//                "These antiviruses ${antiviruses.map { it.antivirusName }} are not mutually " +
-//                        "compatible. Cannot mix ${internal.map { it.antivirusName }} with " +
-//                        "${external.map { it.antivirusName }}"
-//            )
-//        }
-//    }
-
     override val antivirusName: String = antiviruses.joinToString(", ") { it.antivirusName }
 
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {

@@ -9,10 +9,6 @@ deactivated.
 1 Create virtual machines
 -------------------------
 
-[//]: # "At first, we will install and configure a single VM.
-This VM will serve as base VM for cloning, where each clone VM will be separately fitted with 
-single antivirus software and our driver executable." 
-
 These steps describe how to setup Windows 7 VM in VirtualBox.
 
 ### 1.1 Set up virtual machine

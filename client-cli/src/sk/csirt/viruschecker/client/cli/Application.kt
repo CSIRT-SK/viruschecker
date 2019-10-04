@@ -17,8 +17,6 @@ import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import kotlin.system.exitProcess
 
-private val logger = KotlinLogging.logger { }
-
 lateinit var parsedArgs: CommandLineArguments
 
 fun main(args: Array<String>) = mainBody {

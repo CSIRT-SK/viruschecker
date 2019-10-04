@@ -17,6 +17,9 @@ import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
 import java.util.*
 
+/**
+ * Work in progress. Upload file to VirusTotal.
+ */
 @KtorExperimentalLocationsAPI
 fun Route.shareFile(shareService: GatewayShareService) {
 
@@ -27,14 +30,12 @@ fun Route.shareFile(shareService: GatewayShareService) {
             originalFilename = ""
         )
 
-        val fileId = UUID.randomUUID().toString()
-
         multipart.forEachPart { part ->
             when (part) {
                 is PartData.FileItem -> {
                     val file = File(
                         tempDirectory,
-                        "$fileId-${part.originalFileName}"
+                        "${UUID.randomUUID()}-${part.originalFileName}"
                     )
 
                     part.streamProvider()

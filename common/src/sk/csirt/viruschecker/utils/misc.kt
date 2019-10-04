@@ -1,13 +1,12 @@
 package sk.csirt.viruschecker.utils
 
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.io.InputStream
 import java.io.OutputStream
 
-val tempDirectory = System.getProperty("java.io.tmpdir")
+val tempDirectory: String = System.getProperty("java.io.tmpdir")
 
 suspend fun InputStream.copyToSuspend(
     out: OutputStream,
@@ -31,8 +30,6 @@ suspend fun InputStream.copyToSuspend(
         bytesCopied
     }
 }
-
-suspend fun <T> Iterable<Deferred<T>>.await() = map { it.await() }
 
 fun Iterable<String>.cleanCommentsAndEmptyLines() =
     asSequence()

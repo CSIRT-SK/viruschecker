@@ -5,7 +5,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
-import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.config.Constants
 import java.io.File
 import java.nio.file.Paths
@@ -48,16 +47,6 @@ abstract class CommandLineAntivirus(
         retrieveReport(output, params).also {
             logger.info("Retrieved report: $it")
         }
-    }
-
-    private fun writeOutputToFileIfNotExists(
-        reportFile: File,
-        scanOutput: List<String>
-    ) {
-        if (reportFile.exists()) return
-
-        reportFile.createNewFile()
-        FileUtils.writeLines(reportFile, scanOutput)
     }
 
     private suspend fun runAntivirusToScan(params: FileScanParameters)

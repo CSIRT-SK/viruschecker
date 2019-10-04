@@ -34,8 +34,8 @@ class DefaultDriverScanService(
             val (fileToScan, originalFileName) = scanParams
             logger.info { "Computing hashes for $fileToScan" }
             val sha256Deferred = async { fileToScan.sha256() }
-            val sha1Deffered = async { fileToScan.sha1() }
-            val md5Deffered = async { fileToScan.md5() }
+            val sha1Deferred = async { fileToScan.sha1() }
+            val md5Deferred = async { fileToScan.md5() }
 
             multiDriverRequest { driverUrl, client ->
                 client.post<FileScanResponse>("$driverUrl${DriverRoutes.scanFile}") {
@@ -77,15 +77,15 @@ class DefaultDriverScanService(
                 it.results
             }.filterNot {
                 it.status == ScanStatusResponse.SCAN_REFUSED
-            }.let {
+            }.let { antivirusResponses ->
                     FileHashScanResponse(
                         report = FileScanResponse(
                             date = Instant.now(),
                             filename = originalFileName,
-                            results = it.sortedBy { it.antivirus }
+                            results = antivirusResponses.sortedBy { it.antivirus }
                         ),
-                        md5 = md5Deffered.await().value,
-                        sha1 = sha1Deffered.await().value,
+                        md5 = md5Deferred.await().value,
+                        sha1 = sha1Deferred.await().value,
                         sha256 = sha256Deferred.await().value
                     )
                 }
