@@ -1,17 +1,17 @@
 Deploy driver program on Windows based virtual machines 
 =======================================================
 
-We will use the Windows based VMs, more specifically the Windows 7 VMs.
+We will use the Windows based VM, more specifically the Windows 7 VMs.
 Windows 8.1 is, however, more future proof as it has longer support.
-Right now we do not recommend Windows 10 because of its forced updates that cannot be completely 
+Right now we do not recommend to use Windows 10 because of its forced updates that cannot be completely 
 deactivated.
 
 1 Create virtual machines
 -------------------------
 
-At first, we will install and configure a single VM.
+[//]: # "At first, we will install and configure a single VM.
 This VM will serve as base VM for cloning, where each clone VM will be separately fitted with 
-single antivirus software and our driver executable. 
+single antivirus software and our driver executable." 
 
 These steps describe how to setup Windows 7 VM in VirtualBox.
 
@@ -21,9 +21,11 @@ These steps describe how to setup Windows 7 VM in VirtualBox.
 
 * Create a new machine.
 
-* Type some name, e.g. "VC-Base".
+* Type some name, e.g. **VC-Windows**.
 
-* In the *Memory size* dialog, type 1536 MB. Remember that later we will run at least four such machines. 
+* Make sure to create a virtual hard drive when asked to (should be the default option). 
+
+* In the *Memory size* dialog, type at least 4096 MB. 
 
 * In the following dialogs, just leave the recommended options.
 
@@ -32,17 +34,22 @@ networking or location of the installation media.
 
 * Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select *Settings*.
 
-* Navigate to the *Network* tab and switch the *Attached to* option from *NAT* to *Bridged 
-Adapter*. 
-
+* Navigate to the *Network* tab.
+    * Make sure the *Enable Network Adapter* is checked.
+    * Expand the *Advanced* options and press the *Port Forwarding* button.
+    * Click on the green `+` icon at the top right corner of the newly opened window.
+    * A port forwarding rule should be created. Now we need to configure it.
+        * Double click on **Rule 1** under the *Name* tab and and rename it, perhaps, to **Driver rule**.
+        * Analogously change the **0** under the *Host Port* to **8081**.
+        * Finally change the **0** under the *Guest Port* to **8080** and press *OK*.
+        
 * Navigate to the *Storage* tab. 
     * In the *Storage Devices* pane click on the CD icon labeled as *Empty*. 
     * In the right-hand side *Attributes* pane click on the similar looking CD icon located to the 
     right of the *Optical Drive* label and select the *Choose the Virtual Optical Disk file* 
     option.  
-    * Open your Windows iso file and close the *Settings* window by clicking on the *Ok* button.
+    * Open your Windows iso file and close the *Settings* window by clicking on the *OK* button.
     
-
 ### 1.2 Install Windows on the virtual machine
 
 * Start the newly created VM and install the operating system.
@@ -58,8 +65,7 @@ installation process.
     * After restarting the virtual machine, click on *Devices* top menu item and set *Shared 
     Clipboard* and *Drag and Drop* settings to *Host To Guest*. 
     
-
-* (Optional) For the sake of saving some computer resources, it may be helpful to use the Windows 
+* (Optional) For the sake of saving some VM resources, it may be helpful to use the Windows 
 Classic or Basic theme. 
 
 #### 1.2.1 Setup firewall
@@ -79,12 +85,12 @@ Firewall with Advanced Security" and open it.
     *These IP addresses* options.
     * In the large text field bellow write your **host** IP address and press the *Next >*.
     
-* When you reach the *Name* pane, type the "VBOX" in the first text field and press the *Finnish*
+* When you reach the *Name* pane, type the **VBOX** in the first text field and press the *Finnish*
  button.
  
 #### 1.2.2 Install Java and copy the driver
 
-The driver application requires Java 8 or newer.
+The driver application requires JRE 1.8 or newer.
 The free and open source Java distributions like AdoptOpenJDK are fully sufficient.
 
 Copy the driver executable *jar* file from  **host** located at 
@@ -94,12 +100,11 @@ If the Guest Additions are working properly then you may just drag & drop the fi
 system's file manager to the virtual machine.
 Place the *jar* file to some reasonable and easy-to-find location, perhaps `C:\virus-checker`. 
 
-#### 1.2.3 Take a snapshot
+#### 1.2.3 (Optional) Take a snapshot
 
-Now the virtual machine should be prepared to install antivirus software and it's corresponding 
-driver application.
+Now the virtual machine should be prepared to install the supported AVs.
 
-Now in the virtual machine topside panel select *Machine* and press *Take snapshot*. 
+In the virtual machine topside panel select *Machine* and press *Take snapshot*. 
 This will create a backup of the virtual machine in the exactly same state as it is now.
 After the snapshot is complete, you may shut down the virtual machine classically using 
 *Start*->*Shut down*.
@@ -107,34 +112,14 @@ After the snapshot is complete, you may shut down the virtual machine classicall
 2 Install and configure antivirus
 ---------------------------------
 
-Driver program supports the aforementioned antivirus solutions.
-If you have performed the steps in the previous section, then it is highly to clone the 
-virtual machine and install each antivirus on different clone.
-
-In theory, you can install all antiviruses on the same operating system since the automatic scans 
-will be disabled.
-
-#### 2.0.1 Clone the machine
-
-In VirtualBox, the virtual machine can be cloned by right-clicking the machine and selecting the 
-appropriate option.
-Name the clone reasonably, e.g. "VC-Eset" or "VC-Kaspersky" according to the antivirus that will 
-be installed on that particular cloned virtual machine. 
-Also make sure that the *Reinitialize the MAC address of all network cards* option is **enabled**.
-
-As the driver program will not use the realtime protection provided by the antivirus and it may 
-be even harmful for proper functionality of the driver. 
-Thus it is highly recommended to disable all realtime protection features except the virus database 
-updates.
-
-The following sub-subsections comprise the recommended steps to install and configure each of the
- supported antivirus solutions. 
+Driver program currently supports the aforementioned AVs on Windows: Avast, Eset, Kaspersky, Microsoft.
 
 ### 2.1 Avast (paid)
 
 You need the *Avast Pro Antivirus* or *Avast Interner Security*.
 
-This guide assumes the installation of Avast Interner Security, however the other case is similar.
+This guide assumes the installation of Avast Interner Security, however the other case is basically 
+identical.
 
 Optional: After launching the installer, click on *Customize* button and disable all components 
 except the *File Shield*.
@@ -189,13 +174,11 @@ In my case the path is `C:\Program Files\AVAST Software\Avast`.
     
     ```C:\Program Files\AVAST Software\Avast;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
-* A reboot of the virtual machine is now recommended. 
-
 ### 2.2 Eset (paid)
 
 Install any of the Eset antivirus software, i.e. *Eset Nod32*, *Eset Internet Security*, ... .
 This guide assumes the installation of Eset Internet Security, however, in the case of other Eset
- products the steps are basically the same.
+ products the steps are basically identical.
 
 #### 2.2.1 Configuration
 
@@ -245,13 +228,11 @@ In my case the path is `C:\Program Files\ESET\ESET Security`.
     
     ```C:\Program Files\ESET\ESET Security;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
-* A reboot of the virtual machine is now recommended. 
-
 ### 2.3 Kaspersky (free)
 
 Install the Kaspersky Free Antivirus, now called the *Kaspersky Security Cloud*. 
-If you have the paid version, you can use it as well, but for our purposes the free version is 
-sufficient.
+You may also use the paid version, but for our purposes the paid version does not bring any 
+benefits.
 
 #### 2.3.1 Configuration
 
@@ -278,7 +259,7 @@ features to disable includes:
 
 Kaspersky provides the command line utility called *avp.com* that may be used to scan the 
 selected file or directory for malware and to store human readable reports to specified file.
-It can be also used to perform manual virus database updates.
+It can also update the virus database.
 
 By default, our driver application assumes that the *avp.com* program is available in the *Path* 
 system variable. To do this, follow these steps:
@@ -300,11 +281,9 @@ the *Edit...* button below.
     
     ```C:\Program Files (x86)\Kaspersky Lab\Kaspersky Security Cloud 20.0;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
     
-* A reboot of the virtual machine is now recommended. 
-
 ### 2.4 Windows Defender/Microsoft Security Essentials (free)
 
-Windows 8, 8,1 and 10 contains quite capable antivirus called Windows Defender.
+Windows 8, 8,1 and 10 contains a quite capable antivirus called Windows Defender.
 
 If you have already installed the other antivirus software, the defender will be disabled.
 On Windows 10 you can o turn it on again by clicking on *Start* -> *Settings* -> *Update & Security*
@@ -332,7 +311,6 @@ If this is also your case, than disable Windows Update once again.
 
 ##### B) Windows Defender (Windows 10)
 
-This paragraph is intended for Windows Defender in Windows 10.
 Windows 8 version of defender has different UI, however the idea is similar - to disable all 
 automatic protection features except virus database updates.
   
@@ -370,7 +348,8 @@ the *Edit...* button below.
 
 ##### A) Microsoft Security Essentials (Windows 7)
 
-* Add the installation path of the Microsoft Security Essentials to the beginning of *Variable value* text. 
+* Add the installation path of the Microsoft Security Essentials to the beginning of 
+*Variable value* text. 
 In my case the path is `C:\Program Files\Microsoft Security Client`.
   
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
@@ -387,5 +366,4 @@ In my case the path is `C:\Program Files\Microsoft Security Client`.
     If you also installed the AdoptOpenJDK 8, the *Variable value* should now look like this. 
     
     ```C:\Program Files\Microsoft Security Client;C:\Program Files\AdoptOpenJDK\jre-8.0.212.04-hotspot\bin;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\```
-    
-* A reboot of the virtual machine is now recommended.
+

@@ -1,15 +1,11 @@
 Deploy driver program on Linux based virtual machines 
 =====================================================
 
-We will use the Linux based VMs, more specifically the Ubuntu 18.04 VMs.
+We will use the Linux based VM, more specifically the Ubuntu 18.04 VM.
 Any modern linux distribution is, however, equally suitable.
 
 1 Create virtual machines
 -------------------------
-
-At first, we will install and configure a single VM.
-This VM will serve as base VM for cloning, where each clone VM will be separately fitted with 
-single antivirus software and our driver executable. 
 
 These steps describe how to setup Ubuntu 18.04 VM in VirtualBox.
 
@@ -19,9 +15,9 @@ These steps describe how to setup Ubuntu 18.04 VM in VirtualBox.
 
 * Create a new machine.
 
-* Type some name, e.g. "VCL-Base".
+* Type some name, e.g. **VC-Linux**.
 
-* In the *Memory size* dialog, type 1024 MB. 
+* In the *Memory size* dialog, type 2048 MB. 
 
 * In the following dialogs, just leave the recommended options.
 
@@ -29,6 +25,15 @@ The virtual machine is now created, however, we need to specify a few additional
 networking or location of the installation media.
 
 * Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select *Settings*.
+
+* Navigate to the *Network* tab.
+    * Make sure the *Enable Network Adapter* is checked.
+    * Expand the *Advanced* options and press the *Port Forwarding* button.
+    * Click on the green `+` icon at the top right corner of the newly opened window.
+    * A port forwarding rule should be created. Now we need to configure it.
+        * Double click on **Rule 1** under the *Name* tab and and rename it, perhaps, to **Driver rule**.
+        * Analogously change the **0** under the *Host Port* to **8082**.
+        * Finally change the **0** under the *Guest Port* to **8080** and press *OK*.
 
 * Navigate to the *Network* tab and switch the *Attached to* option from *NAT* to *Bridged 
 Adapter*. 
@@ -70,7 +75,7 @@ The above command will open port 8080 which is a default port of the driver prog
  
 #### 1.2.2 Install Java and copy the driver
 
-The driver application requires Java 8 or newer.
+The driver application requires JRE 8 or newer.
 The free and open source Java distributions like OpenJDK are fully sufficient.
 
 ```bash
@@ -85,7 +90,7 @@ system's file manager to the virtual machine.
 Place the *jar* file to some reasonable and easy-to-find location, perhaps `~/virus-checker` where 
 `~` denotes your home directory. 
 
-#### 1.2.3 Take a snapshot
+#### 1.2.3 (Optional)  Take a snapshot
 
 Now the virtual machine should be prepared to install antivirus software and it's corresponding 
 driver application.
@@ -98,25 +103,7 @@ After the snapshot is complete, you may shut down the virtual machine classicall
 2 Install and configure antivirus
 ---------------------------------
 
-Driver program supports the aforementioned antivirus solutions.
-If you have performed the steps in the previous section, then it is highly recommended to clone the 
-virtual machine and install each antivirus on different clone.
-
-#### 2.0.1 Clone the machine
-
-In VirtualBox, the virtual machine can be cloned by right-clicking the machine and selecting the 
-appropriate option.
-Name the clone reasonably, e.g. "VC-Eset" or "VC-Kaspersky" according to the antivirus that will 
-be installed on that particular cloned virtual machine. 
-Also make sure that the *Reinitialize the MAC address of all network cards* option is **enabled**.
-
-As the driver program will not use the realtime protection provided by the antivirus and it may 
-be even harmful for proper functionality of the driver. 
-Thus it is highly recommended to disable all realtime protection features except the virus database 
-updates.
-
-The following sub-subsections comprise the recommended steps to install and configure each of the
- supported antivirus solutions. 
+Driver program currently supports the aforementioned AVs on Windows: Comodo.
 
 ### 2.1 Comodo
 

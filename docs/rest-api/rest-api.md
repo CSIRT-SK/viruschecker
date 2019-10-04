@@ -379,3 +379,23 @@ Currently only searching by SHA-256 hashes is supported
 * **204 No Content**
     
     If scan report is not found.
+    
+    
+Retrieve all scan reports
+-------------------------
+
+### GET  `/allScanReports`
+
+Get stored scan report of a file.
+
+**Path parameters** 
+
+None
+
+#### Response body schema 
+
+* **200 OK** 
+
+    ```List<FileHashScanResponse>```    
+    
+    *FileHashScanResponse* schema is identical with POST /multiScanFile
