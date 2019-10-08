@@ -210,6 +210,9 @@ listening port of at least one of them.
 Therefore, it is highly recommended that you run the gateway on the host or on the dedicated VM 
 with bridged network adapter.
 Do not forget to open port **8080** on the machine/VM running the gateway for machines that are 
+intended to use its REST API.
+
+Also, if you wish to run the gateway on a dedicated VM with bridged network adapter and Do not forget to open port **7979** on the machine/VM running the gateway for machines that are 
 intended to use its REST API.  
 
 ### 3.1 Gateway REST API
