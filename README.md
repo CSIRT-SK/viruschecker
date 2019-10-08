@@ -1,17 +1,17 @@
 Virus Checker
 =============
 
-This repository contains an offline based virus checker application stack, similar to VirusTotal.
+This repository contains a standalone virus checker application stack similar to VirusTotal.
 
 It contains several executable modules:
 
-- **driver** program provides REST API to communicate with some antivirus software installed 
-on the same machine or with the external services.
-- **gateway** serves to upload files to several *driver* instances in parallel. 
-- **client-cli** is a simple console REST client to upload files to gateway and export the reports to `csv` files.  
-- **client-web** is a simple graphical web frontend with the same purpose as **client-cli**.
+- **driver** program provides a REST API for communication with the supported antivirus solutions.
+- **gateway** serves to upload files to several drivers in parallel. 
+- **client-cli** is a simple console REST client for uploading files to the gateway and exporting 
+reports to CSV files.  
+- **client-web** is a simple graphical web frontend with the similar purpose as **client-cli**.
 
-There are also some helper modules that contains shared dependencies or classes.
+There are also some helper modules that contain common dependencies or classes:
 
 - **common**
 - **cli-common**
@@ -19,11 +19,9 @@ There are also some helper modules that contains shared dependencies or classes.
 The architecture of this software solution is visualized below.
 
 ```dtd
-                               :---> driver (e.g. Avast)
-client-cli ---:                :---> driver (e.g. Eset, Microsoft, ...)
-              :---> gateway ---:
-client-web ---:                :      ...
-                               :---> driver (e.g. Kaspersky)
+client-cli ---:               :--- driver (Avast, Eset, Kaspersky, Microsoft)
+              :--- gateway ---:
+client-web ---:               :--- driver (Comodo, VirusTotal)                               
 ```
 
 Before diving further we denote the following terms:
@@ -36,34 +34,34 @@ Before diving further we denote the following terms:
 Installation
 ============
 
-First of all, currently we do not provide an one-click/one-command installer.
-Also this software does not include a ready-to-use VM/Cs with deployed AVs.
+First of all, we do not currently provide a one-click installer.
+Also, this software does not include ready-to-use VM/Cs with deployed AVs.
 
 These steps describe how to build and deploy this program from scratch.
 They can be summarized in the following steps.
 
 1. Compile the source code
-2. Deploy antivirus driver programs
-   - Create a VM with supported antivirus programs.
-   - Install and configure each antivirus - mainly disable the automatic protections.
-   - Run the driver program.
-3. Deploy gateway application.
-4. Deploy web client application.
-5. (Optional) Run console client application.
+2. Deploy the driver/s
+   - Create a VMs with supported antivirus programs.
+   - Install and configure each antivirus - i.e. disable the automatic protections.
+   - Run the driver.
+3. Deploy gateway.
+4. Deploy web client.
+5. (Optional) Run console client.
 
 The following subsections thoroughly describe each of the five steps. 
 
 1 Compiling the source code
 ---------------------------
 
-To build this software a JDK 1.8 or newer is required (OpenJDK is sufficient).
+Building this software requires JDK 1.8 or later (OpenJDK is sufficient).
 
-Open terminal in the project directory and
-- on Windows machine run
+Open a terminal in the project directory and
+- on a Windows machine run
     ```bash 	
     gradlew.bat clean build shadowJar
     ```
-- on Linux machine run
+- on a Linux machine run
     ```bash 	
     ./gradlew clean build shadowJar
     ```
@@ -73,13 +71,12 @@ Open terminal in the project directory and
 
 The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
 
-Running driver performs these tasks in the following order:
-1. Receive a file.
-2. Invoke the AV command line tools to scan the file.
+A running driver performs these tasks in the following order:
+1. Receive a file from the gateway.
+2. Invoke the AV command line tool to scan the received file.
 3. Read and process the scan reports.
 4. Send back the scan result.
   
-The driver provides a unified REST API to simplify communication with supported antivirus solutions.
 As of this moment the supported antivirus software includes
 - Avast
 - Comodo
@@ -87,18 +84,18 @@ As of this moment the supported antivirus software includes
 - Kaspersky
 - Windows defender
 
-In addition to those self hosted services, the driver also supports querying VirusTotal online virus
- database with SHA-256 hashes computed automatically from the scanned file.
-Note that the driver uploads only hash of the file to VirusTotal and never the file itself.
+In addition to these AVs, the driver also supports querying VirusTotal online virus 
+database with SHA-256 hashes computed automatically from the scanned file.
+Please note that the driver uploads only hash of the file to VirusTotal, not the file itself.
 
 ### 2.1 Prepare a virtual machine
 
-The recommended setup for the whole Virus Checker system is to have all AVs and the drivers 
-installed on one or more AV with forwarded port 8080 to the host.
+The recommended setup for the entire VirusChecker is to have all AVs and their driver 
+installed on one or more VMs with their local port 8080 forwarded to the host.
 
-We provide documentation for two ways of deploying driver programs - on Windows based virtual 
+We provide documentation for two ways to deploy the drivers - on Windows based virtual 
 machines or on Linux based virtual machines.
-We assume that the VirtualBox is used as a virtualization platform.
+We assume that VirtualBox is used as a virtualization platform.
 
 * Create a [Windows virtual machine using VirtualBox](docs/driver/drivers-on-windows.md)
 
@@ -108,68 +105,80 @@ We assume that the VirtualBox is used as a virtualization platform.
 
 * Enable VirusTotal hash database [guide](docs/driver/driver-virustotal.md)
 
-As of this moment, the commercial antivirus programs are supported only on Windows, while the free 
+###### Note
+
+Currently, commercial AVs are supported only on Windows, and the free 
 one(s) are supported only on Linux.
-If you want to run some commercial antivirus like Eset on Linux or implement your own driver for a 
-currently unsupported antivirus you may visit this [guide](docs/driver/extensions.md).
+If you want to run some commercial AV, for example Eset, on Linux or implement your own driver for a 
+currently unsupported AV you may visit this [guide](docs/driver/extensions.md).
 
 ### 2.2 Run the deployed driver
 
 The location of the compiled Java executable is `driver/build/libs/driver-[VERSION]-all.jar`.
-Copy that file to `~/virus-checker` (on Linux) or 
-`C:\virus-checker` (on Windows) folder on the VM.
+Copy this file to some reasonable place on the VM, for example `~/virus-checker` (on Linux VM) or 
+`C:\virus-checker` (on Windows VM).
+
+If the guest VM add-ons work properly, you may simply drag & drop the file from your 
+system's file manager to the VM.
  
-* On the VM, open terminal in the folder with the driver executable.   
+* On the VM, open a terminal in the folder with the driver executable.   
 
 * Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUSES]` and press enter.
-    * `[NAME-OF-PROGRAM]` is the name of the driver program.
+    * `[NAME-OF-PROGRAM]` is the name of the driver JAR file.
     * `[ANTIVIRUSES]` must be one or more of the following: 
     `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`. (TODO: auto-detection of the installed
-     antivirus)
+     antiviruses)
 
 * Examples:
-    * `java -jar driver-1.0.0-all.jar KASPERSKY` if you have only Kaspersky Antivirus installed on 
-    this virtual machine.
+    * `java -jar driver-1.0.0-all.jar KASPERSKY` if you only have Kaspersky Antivirus installed on 
+    the VM.
     * `java -jar driver-1.0.0-all.jar ESET KASPESRY VIRUS_TOTAL` if you have both Eset and Kaspersky
-     installed on this virtual machine and also want to use the VirusTotal service.
+     installed on the VM and also want to use the VirusTotal service.
 
-To test the successful launch of the driver program open the web browser on the guest and go to 
+If Windows firewall popup window asks for permission, then allow it at least for private networks.
+ 
+To verify the successful launch of the driver program, open a web browser on the VM and visit 
 `http://127.0.0.1:8080/`.
 The driver should respond with JSON containing some basic info about itself.
-More info about the web API can be found in the following subsection.
 
-If the network adapter of your running VMs have been attached to a NAT with forwarded guest port 
-8080, then you can visit `http://127.0.0.1:<insert-forwarded-port>/` on the host as well.   
+If the network adapter of your running VMs had been attached to a NAT with a guest port 
+**8080** forwarded to host's **8081**, then you may visit `http://127.0.0.1:8081/` on the host with 
+the same respond.   
 
 ###### Different port
-You may specify the listening port other than **8080** with the `-port=` parameter, e.g. 
-`java -jar driver-1.0.0-all.jar ESET COMODO -port=9595` will set the listening port to **9595**.
+
+You can specify the listening port other than **8080** using the `-port=` parameter, e.g. 
+`java -jar driver-1.0.0-all.jar AVAST ESET -port=9595` will set the listening port to **9595**.
 Please be aware, that ports **7978** and **7979** are reserved by default for other modules of the 
 VirusChecker. 
-Also you need to re-set port forwarding for the new port instead of **8080**. 
+You will also need to reset port forwarding for the new port instead of **8080**.
 
 ### 2.3 Driver REST API
 
-One can directly communicate with the driver directly using its REST web API.
+If you are a developer and want to use the driver programmatically, you can 
+explore its REST web API.
 The API endpoints are documented [here](docs/rest-api/rest-api.md).
+
+For most users, however, this API is not important.
 
 ### 2.4 Extend driver
 
-If you want to configure the driver or even add support for a new antivirus by yourself, 
-this [guide](docs/driver/extensions.md) is the place to go.
+If you and want to configure the driver our you are a developer wanting to add support for 
+a new antivirus by yourself, this [guide](docs/driver/extensions.md) is the place to go.
 
 3 Deploy gateway
 ----------------
 
+The purpose of the gateway is to simplify the implementation of client applications.
+It receives data from the client and then sends it to all deployed drivers in parallel and then
+store all scan reports in its embedded database.
+Third party clients can either use the unified gateway API or upload files directly to the drivers.
+
 The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 
-The purpose of the gateway is to simplify the implementation of client applications.
-It receives data from the client and then sends it to all deployed drivers in parallel.
-
-Third party clients can either use the unified gateway API or upload files directly to the drivers.    
-
-Gateway can be theoretically deployed on any machine with JRE 1.8.
-However, it was tested on Ubuntu 18.04 only.
+Gateway can be run from host or from the its own VM as well.
+Theoretically it can be deployed on any machine with JRE 1.8, however, it was tested only on 
+Ubuntu 18.04.
 
 Create a new text file and put the full urls of running driver programs, one url per line.
 For example, if you have two running drivers on VMs with their listening port **8080** forwarded to 
@@ -185,13 +194,12 @@ Assuming Java is in the *Path*, run terminal in this directory.
 
 Type `java -jar gateway-[VERSION]-all.jar driverUrls.txt` and press enter.
     
-To test the successful launch of the driver program open the web browser and go 
+To verify the successful launch of the gateway, open a web browser and go 
 to `http://127.0.0.1:8080/`.
 The gateway should respond with JSON containing some basic info about itself.
-More info about the web API can be found in the following subsection.
 
 Remember to open port 8080 for TCP if you wish to connect to the gateway from other computers in 
-network. 
+network.
 
 ###### Note
 
@@ -199,8 +207,15 @@ The default port of the gateway is 8080 which is also used by the driver program
 If you wish to deploy both the driver and the gateway on the same system/VM, you should change the 
 listening port of at least one of them.
 
-Therefore, it is highly recommended that you run the gateway on a different VM (or directly on the 
-host) than the driver.
+Therefore, it is highly recommended that you run the gateway on the host or on the dedicated VM 
+with bridged network adapter.
+Do not forget to open port **8080** on the machine/VM running the gateway for machines that are 
+intended to use its REST API.  
+
+### 3.1 Gateway REST API
+
+If you are a developer and want to use the gateway programmatically, you can 
+explore its REST web API [here](docs/rest-api/rest-api.md).
 
 4 Deploy client web application
 -------------------------------
@@ -219,6 +234,11 @@ By default, the web application will run on port `7979`.
 Open the web browser and go to `http://localhost:7979/`.
 If the application started successfully you should see a graphical web interface.
 
+###### Note
+
+It is OK to run the client web application on same machine/VM as the gateway.
+Do not forget to open port **7979** on the machine/VM running the gateway for machines that are 
+intended to use its REST API.  
    
 5 Deploy client cli application
 -------------------------------
@@ -260,3 +280,11 @@ Assume we want to scan the file named `eicar.exe` that you placed in the same di
 running gateway is, for example `http://192.168.1.110`.
 Also we want to save the report as `scanReport.csv`.
 We can achieve this by running `java -jar client-cli-[VERSION]-all.jar http://192.168.1.110 eicar.exe --out scanReport.csv`.
+
+6 SSL support
+-------------
+
+VirusChecker does not currently use SSL for the driver and gateway, although both clients programs
+ support SSL and accept self-signed SSL certificates by default. 
+Therefore if you wish to enable SSL for the gateway then you are free to use some reverse proxy like 
+Nginx.

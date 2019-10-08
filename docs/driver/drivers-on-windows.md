@@ -3,49 +3,58 @@ Deploy driver program on Windows based virtual machines
 
 We will use the Windows based VM, more specifically the Windows 7 VMs.
 Windows 8.1 is, however, more future proof as it has longer support.
-Right now we do not recommend to use Windows 10 because of its forced updates that cannot be completely 
-deactivated.
+Right now, we do not recommend using Windows 10 because of its forced updates that cannot be 
+completely deactivated.
 
 1 Create virtual machines
 -------------------------
 
-These steps describe how to setup Windows 7 VM in VirtualBox.
+These steps describe how to setup Windows 7 VM in VirtualBox, but they are practically identical
+also for newer systems with some parts of the OS having slightly different names. 
 
 ### 1.1 Set up virtual machine
 
 * Install some recent version of VirtualBox.
 
-* Create a new machine.
+* Create a new VM.
 
 * Type some name, e.g. **VC-Windows**.
 
 * Make sure to create a virtual hard drive when asked to (should be the default option). 
 
-* In the *Memory size* dialog, type at least 4096 MB. 
+* In the *Memory size* dialog, type at least 4096 MB if you want to use all supported AVs. 
 
 * In the following dialogs, just leave the recommended options.
 
 The virtual machine is now created, however, we need to specify a few additional options like 
 networking or location of the installation media.
 
-* Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select *Settings*.
+* Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select 
+*Settings*.
 
-* Navigate to the *Network* tab.
-    * Make sure the *Enable Network Adapter* is checked.
-    * Expand the *Advanced* options and press the *Port Forwarding* button.
-    * Click on the green `+` icon at the top right corner of the newly opened window.
-    * A port forwarding rule should be created. Now we need to configure it.
-        * Double click on **Rule 1** under the *Name* tab and and rename it, perhaps, to **Driver rule**.
-        * Analogously change the **0** under the *Host Port* to **8081**.
-        * Finally change the **0** under the *Guest Port* to **8080** and press *OK*.
-        
+* Navigate to the *System* tab.
+    * Select the *Processor* sub-tab.
+    * Make sure the VM has allocated at least 4 processors.
+     More is usually better but do not go beyond "green" part of the slider.
+
 * Navigate to the *Storage* tab. 
     * In the *Storage Devices* pane click on the CD icon labeled as *Empty*. 
     * In the right-hand side *Attributes* pane click on the similar looking CD icon located to the 
     right of the *Optical Drive* label and select the *Choose the Virtual Optical Disk file* 
     option.  
     * Open your Windows iso file and close the *Settings* window by clicking on the *OK* button.
-    
+          
+
+* Navigate to the *Network* tab.
+    * Make sure the *Enable Network Adapter* is checked.
+    * Expand the *Advanced* options and press the *Port Forwarding* button.
+    * Click on the green `+` icon at the top right corner of the newly opened window.
+    * A port forwarding rule should be created. Now we need to configure it.
+        * Double click on **Rule 1** under the *Name* tab and and rename it, perhaps, to 
+        **Driver rule**.
+        * Analogously change the **0** under the *Host Port* to **8081**.
+        * Finally change the **0** under the *Guest Port* to **8080** and press *OK*.
+        
 ### 1.2 Install Windows on the virtual machine
 
 * Start the newly created VM and install the operating system.
@@ -54,9 +63,9 @@ networking or location of the installation media.
 installation process.
 
 * Install the *Guest Additions*. 
-    * On the topside of the running virtual machine window, click on *Devices* menu and press the 
+    * At the top of the running virtual machine window, click on the *Devices* menu and press the 
     *Insert Guest Additions CD Image*.
-    * Open the virtual CD Drive, available in *Computer* as a *D:* drive
+    * Open the virtual CD Drive, available in *Computer*/*This PC* as a *D:* drive
     * Run the *VBoxWindowsAdditions.exe* and follow the installation steps.
     * After restarting the virtual machine, click on *Devices* top menu item and set *Shared 
     Clipboard* and *Drag and Drop* settings to *Host To Guest*. 
@@ -64,37 +73,11 @@ installation process.
 * (Optional) For the sake of saving some VM resources, it may be helpful to use the Windows 
 Classic or Basic theme. 
 
-#### 1.2.1 Setup firewall
 
-Now we need to modify the firewall settings to allow the future deployed *driver* executable to 
-communicate with the host operating system. 
-
-* On the virtual machine, press the *Start* button, search the program called "Windows 
-Firewall with Advanced Security" and open it.
-
-* In the left-hand side pane choose the *Inbound Rules* option. 
-
-* In the right-hand side panel choose the *New rule* option.
-
-* Choose *Custom* checkbox and press the *Next >* button until you reach the *Scope* pane.
-    * Navigate to the *Which remote IP addresses does this rule apply to?* label and choose the 
-    *These IP addresses* options.
-    * In the large text field bellow write your **host** IP address and press the *Next >*.
-    
-* When you reach the *Name* pane, type the **VBOX** in the first text field and press the *Finnish*
- button.
- 
-#### 1.2.2 Install Java and copy the driver
+#### 1.2.2 Install Java
 
 The driver application requires JRE 1.8 or newer.
 The free and open source Java distributions like AdoptOpenJDK are fully sufficient.
-
-Copy the driver executable *jar* file from  **host** located at 
-`.../driver/build/libs/driver-[VERSION]-all.jar`
-to the virtual machine. 
-If the Guest Additions are working properly then you may just drag & drop the file from your 
-system's file manager to the virtual machine.
-Place the *jar* file to some reasonable and easy-to-find location, perhaps `C:\virus-checker`. 
 
 #### 1.2.3 (Optional) Take a snapshot
 
@@ -102,22 +85,21 @@ Now the virtual machine should be prepared to install the supported AVs.
 
 In the virtual machine topside panel select *Machine* and press *Take snapshot*. 
 This will create a backup of the virtual machine in the exactly same state as it is now.
-After the snapshot is complete, you may shut down the virtual machine classically using 
-*Start*->*Shut down*.
 
 2 Install and configure antivirus
 ---------------------------------
 
-Driver program currently supports the aforementioned AVs on Windows: Avast, Eset, Kaspersky, Microsoft.
+Driver program currently supports the aforementioned AVs on Windows: Avast, Eset, Kaspersky, 
+Microsoft (Security Essentials or Defender).
 
 ### 2.1 Avast (paid)
 
-You need the *Avast Pro Antivirus* or *Avast Interner Security*.
+You need the *Avast Pro Antivirus* or *Avast Internet Security*.
 
-This guide assumes the installation of Avast Interner Security, however the other case is basically 
+This guide assumes the installation of Avast Internet Security, however the other case is basically 
 identical.
 
-Optional: After launching the installer, click on *Customize* button and disable all components 
+Optional: After launching the installer, click on the *Customize* button and disable all components 
 except the *File Shield*.
 
 #### 2.1.1 Configuration
@@ -153,8 +135,8 @@ selected file for malware and to store human readable reports to specified file.
 By default, our driver application assumes that the *ashCmd.exe* program is available in the *Path* 
 system variable. To do this, follow these steps:
 
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
+* Press *Start*, search "Computer" (on Win 7) or "This PC" (on Win 10), right click on the found 
+program with the same name and select *Properties* 
 
 * On the left-hand side open the *Advanced system settings*.
 
@@ -207,8 +189,8 @@ selected file for malware and to store human readable reports to specified file.
 By default, our driver application assumes that the *ecls.exe* program is available in the *Path* 
 system variable. To do this, follow these steps:
 
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
+* Press *Start*, search "Computer" (on Win 7) or "This PC" (on Win 10), right click on the found 
+program with the same name and select *Properties* 
 
 * On the left-hand side open the *Advanced system settings*.
 
@@ -260,8 +242,8 @@ It can also update the virus database.
 By default, our driver application assumes that the *avp.com* program is available in the *Path* 
 system variable. To do this, follow these steps:
 
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
+* Press *Start*, search "Computer" (on Win 7) or "This PC" (on Win 10), right click on the found 
+program with the same name and select *Properties* 
 
 * On the left-hand side open the *Advanced system settings*.
 
@@ -318,9 +300,7 @@ Disable the following features:
 
 * In the *Virus & threat protection* tab, turn off the *Tamper protection*. 
 
-* In the *App & browser control* tab, turn off the *Tamper protection*. 
-
-* In the *Real-time protection* tab, select *Off* option for each setting.
+* In the *App & browser control* tabs, select *Off* option for each setting. 
 
 (TODO) Disable telemetry
 
@@ -332,8 +312,8 @@ selected file for malware.
 By default, our driver application assumes that the *MpCmdRun.exe* program is available in the *Path* 
 system variable. To do this, follow these steps:
 
-* Press *Start*, search "Computer", right click on the found program with the same name and select 
-*Properties* 
+* Press *Start*, search "Computer" (on Win 7) or "This PC" (on Win 10), right click on the found 
+program with the same name and select *Properties* 
 
 * On the left-hand side open the *Advanced system settings*.
 
