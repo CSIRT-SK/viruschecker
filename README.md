@@ -201,7 +201,7 @@ The gateway should respond with JSON containing some basic info about itself.
 Remember to open port 8080 for TCP if you wish to connect to the gateway from other computers in 
 network.
 
-###### Note
+###### 3.1 Deploying on the dedicated VM
 
 The default port of the gateway is 8080 which is also used by the driver program.
 If you wish to deploy both the driver and the gateway on the same system/VM, you should change the 
@@ -279,8 +279,8 @@ positional arguments:
 
 ###### Example
 
-Assume we want to scan the file named `eicar.exe` that you placed in the same directory as the client executable, the url of 
-running gateway is, for example `http://192.168.1.110`.
+Assume we want to scan the file named `eicar.exe` that you placed in the same directory as the 
+client executable, the url of running gateway is, for example `http://192.168.1.110`.
 Also we want to save the report as `scanReport.csv`.
 We can achieve this by running `java -jar client-cli-[VERSION]-all.jar http://192.168.1.110 eicar.exe --out scanReport.csv`.
 
