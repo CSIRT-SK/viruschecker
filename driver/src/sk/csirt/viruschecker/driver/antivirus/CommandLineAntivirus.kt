@@ -6,38 +6,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.Constants
-import java.io.File
 import java.nio.file.Paths
 import java.util.*
 
 typealias AntivirusOutput = List<String>
 
-data class RunProgramCommand(
-    val command: String
-) {
-
-    fun parse(
-        fileToScan: File? = null,
-        fileToReport: File? = null
-    ) = command.split(" ").map {
-        when {
-            SCAN_FILE in it ->
-                it.replace(SCAN_FILE, fileToScan?.canonicalPath ?: "")
-            REPORT_FILE in it ->
-                it.replace(REPORT_FILE, fileToReport?.canonicalPath ?: "")
-            else -> it
-        }
-    }
-
-    companion object Placeholder {
-        const val SCAN_FILE = "[SCAN-FILE]"
-        const val REPORT_FILE = "[REPORT-FILE]"
-    }
-}
-
 abstract class CommandLineAntivirus(
     private val scanCommand: RunProgramCommand
-) : Antivirus {
+) : Antivirus, AutoDetectable {
     private val logger = KotlinLogging.logger { }
 
     override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
@@ -49,10 +25,23 @@ abstract class CommandLineAntivirus(
         }
     }
 
+    override suspend fun isInstalled(): Boolean {
+        val antivirusTestRunResult = runCatching {
+            runAntivirus(listOf(scanCommand.parse().first()))
+        }.getOrElse { return false }
+            .joinToString(" ")
+        return listOf(
+            "is not recognized",
+            "No such file or directory"
+        ).any { it in antivirusTestRunResult }
+            .not()
+    }
+
     private suspend fun runAntivirusToScan(params: FileScanParameters)
             : AntivirusOutput {
-        // Some antiviruses (Avast) cannot write results properly to stdout when invoked from another process.
-        // Therefore we will use the auxiliary report file. This will cause the AV write its output to both the file and stdout.
+        // Some antiviruses (Avast) cannot write results properly to stdout when invoked from
+        // another process. Therefore we will use the auxiliary report file. This will cause the AV
+        // write its output to both the file and stdout.
         val reportFile = Paths.get(
             Constants.scanReportsDir,
             "report-${params.fileToScan.nameWithoutExtension}-${UUID.randomUUID()}.txt"
@@ -60,14 +49,14 @@ abstract class CommandLineAntivirus(
         return runAntivirus(scanCommand.parse(params.fileToScan, reportFile)).also {
             if (reportFile.exists()) {
                 coroutineScope {
-                    launch(IO) { reportFile.delete() }
+                    launch(IO) { runCatching { reportFile.delete() } }
                 }
             }
         }
     }
 
-    protected suspend fun runAntivirus(command: List<String>): AntivirusOutput {
-        logger.debug("Waiting for antivirusName. Command to run: $scanCommand")
+    private suspend fun runAntivirus(command: List<String>): AntivirusOutput {
+        logger.debug("Waiting for $antivirusName. Command to run: $scanCommand")
         val report = withContext(IO) {
             ProcessBuilder(command)
                 .start()

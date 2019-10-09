@@ -1,5 +1,6 @@
 package sk.csirt.viruschecker.driver.config
 
+import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import sk.csirt.viruschecker.driver.antivirus.*
@@ -37,6 +38,19 @@ val driverDependencyInjectionModule = module {
 
     single<Antivirus>(defaultAntivirusQualifier) {
         val antivirusTypesToLoad = parsedArgs.antivirusTypes
+        if (antivirusTypesToLoad.isEmpty()) {
+            logger.info { "No antivirus specified. Attempting to auto-detect" }
+            runBlocking {
+                AntivirusType.values()
+                    .map{
+                        get<Antivirus>(it)
+                    }.filter {
+                        (it as? AutoDetectable)?.isInstalled() ?: false
+                    }
+            }.also {
+                logger.info{ "Auto-detected ${it.size} antiviruses: $it" }
+            }
+        }
         if (antivirusTypesToLoad.size == 1) {
             get(antivirusTypesToLoad[0])
         } else {
