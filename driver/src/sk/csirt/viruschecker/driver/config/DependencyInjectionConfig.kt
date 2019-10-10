@@ -38,26 +38,36 @@ val driverDependencyInjectionModule = module {
 
     single<Antivirus>(defaultAntivirusQualifier) {
         val antivirusTypesToLoad = parsedArgs.antivirusTypes
-        if (antivirusTypesToLoad.isEmpty()) {
-            logger.info { "No antivirus specified. Attempting to auto-detect" }
-            runBlocking {
+        val autodetect = parsedArgs.autodetectAntiviruses
+
+        fun autoLoadAntiviruses(): List<Antivirus> {
+            logger.debug { "Auto-detection enabled." }
+            return runBlocking {
                 AntivirusType.values()
-                    .map{
-                        get<Antivirus>(it)
-                    }.filter {
+                    .mapNotNull {
+                        runCatching { get<Antivirus>(it) }.getOrNull()
+                    }
+                    .filter {
                         (it as? AutoDetectable)?.isInstalled() ?: false
                     }
             }.also {
-                logger.info{ "Auto-detected ${it.size} antiviruses: $it" }
+                logger.debug { "Auto-detected ${it.size} antivirus drivers: $it" }
             }
         }
-        if (antivirusTypesToLoad.size == 1) {
-            get(antivirusTypesToLoad[0])
-        } else {
-            ComposedAntivirus(
-                antiviruses = antivirusTypesToLoad.map { get<Antivirus>(it) }
-            )
+
+        val antiviruses = mutableListOf<Antivirus>()
+        if (autodetect) {
+            antiviruses += autoLoadAntiviruses()
         }
+        if (antivirusTypesToLoad.isNotEmpty()) {
+            antiviruses += antivirusTypesToLoad.map { get<Antivirus>(it) }
+        }
+
+        ComposedAntivirus(
+            antiviruses = antiviruses.distinctBy { it.antivirusName }.also {
+                logger.info { "Total loaded antivirus drivers ${it.size}: $it" }
+            }
+        )
     }
 
 }

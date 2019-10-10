@@ -1,6 +1,7 @@
 package sk.csirt.viruschecker.driver.config
 
 import sk.csirt.viruschecker.driver.antivirus.RunProgramCommand
+import sk.csirt.viruschecker.driver.config.DriverPropertiesFactory.missingApiKeyPlaceHolder
 
 internal const val defaultPropertiesWindows = """
 # Avast
@@ -26,5 +27,5 @@ ${Properties.microsoft}=MpCmdRun.exe -Scan -ScanType 3 -File ${RunProgramCommand
 # VirusTotal
 # ==============================================================================
 
-${Properties.virusTotal}=<insert-your-api-key>
+${Properties.virusTotal}=$missingApiKeyPlaceHolder
 """

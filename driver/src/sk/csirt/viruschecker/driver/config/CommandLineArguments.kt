@@ -9,8 +9,14 @@ class CommandLineArguments(parser: ArgParser) {
                 AntivirusType.values().joinToString(separator = ", ") {
                     it.name
                 },
-        sizeRange = 1..AntivirusType.values().size
+        sizeRange = 0..AntivirusType.values().size
     ){
         AntivirusType.valueOf(this)
     }
+
+    val autodetectAntiviruses by parser.flagging(
+        "-a", "--auto-detect", "--auto",
+        help = "Enable auto detection of installed AVs. AVs with command line scanners must be in " +
+                "the Path."
+    )
 }

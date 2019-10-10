@@ -127,8 +127,9 @@ system's file manager to the VM.
 * Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUSES]` and press enter.
     * `[NAME-OF-PROGRAM]` is the name of the driver JAR file.
     * `[ANTIVIRUSES]` must be one or more of the following: 
-    `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`. (TODO: auto-detection of the installed
-     antiviruses)
+    `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`.
+    * Optionally you may use `-a` option to auto-detect all installed AVs.
+     This includes VirusTotal if there is an API key specified in `viruschecker-driver.properties`. 
 
 * Examples:
     * `java -jar driver-1.0.0-all.jar KASPERSKY` if you only have Kaspersky Antivirus installed on 

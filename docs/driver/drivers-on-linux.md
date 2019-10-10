@@ -63,16 +63,6 @@ Adapter*.
     * After restarting the virtual machine, click on *Devices* top menu item and set *Shared 
     Clipboard* and *Drag and Drop* settings to *Host To Guest*. 
 
-#### 1.2.1 Setup firewall
-
-Now we need to modify the firewall settings to allow the future deployed *driver* executable to 
-communicate with the host operating system. 
-
-```bash
-sudo ufv allow from <place-host-ip-here> to any port 8080 proto tcp
-```
-The above command will open port 8080 which is a default port of the driver program's REST API.
- 
 #### 1.2.2 Install Java and copy the driver
 
 The driver application requires JRE 8 or newer.

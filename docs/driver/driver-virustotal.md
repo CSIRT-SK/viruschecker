@@ -34,5 +34,9 @@ This mode is OS agnostic and can be run as
 ```bash
 java -jar <name-of-driver> VIRUS_TOTAL
 ```
+Using the `-a` argument instead will now load the VirusTotal alongside all detected AVs on the 
+machine.
+```bash
+java -jar <name-of-driver> -a
+```
 Also remember to open the port in the firewall.
-Firewall configurations for both [Windows](/docs/driver/drivers-on-windows.md) and [Linux](/docs/driver/drivers-on-linux.md) are described in section *1.2.1 Setup firewall*.

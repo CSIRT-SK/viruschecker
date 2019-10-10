@@ -6,9 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.AntivirusType
+import sk.csirt.viruschecker.driver.config.DriverPropertiesFactory
 import sk.csirt.viruschecker.hash.sha256
 
-class VirusTotal(apiKey: String) : ExternalAntivirus {
+class VirusTotal(apiKey: String) : ExternalAntivirus, AutoDetectable {
     private val logger = KotlinLogging.logger { }
 
     init {
@@ -72,4 +73,8 @@ class VirusTotal(apiKey: String) : ExternalAntivirus {
             else -> emptyReport
         }
     }
+
+    override suspend fun isInstalled(): Boolean =
+        VirusTotalConfig.getConfigInstance().virusTotalAPIKey != DriverPropertiesFactory.missingApiKeyPlaceHolder
+                && VirusTotalConfig.getConfigInstance().virusTotalAPIKey.isNotBlank()
 }

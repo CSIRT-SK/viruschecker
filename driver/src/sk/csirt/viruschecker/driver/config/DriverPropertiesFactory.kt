@@ -16,6 +16,8 @@ object DriverPropertiesFactory : PropertiesFactory {
 
     override val propertiesName = "viruschecker-driver.properties"
 
+    const val missingApiKeyPlaceHolder = "<insert-your-api-key>"
+
     override val defaultProperties by lazy {
         if (SystemUtils.IS_OS_WINDOWS) defaultPropertiesWindows
         else defaultPropertiesUnix
