@@ -128,7 +128,8 @@ system's file manager to the VM.
     * `[NAME-OF-PROGRAM]` is the name of the driver JAR file.
     * `[ANTIVIRUSES]` must be one or more of the following: 
     `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`.
-    * Optionally you may use `-a` option to auto-detect all installed AVs.
+    * Optionally you may use `-a` option to auto-detect all installed AVs that have their command 
+    line scanners in the *Path* variable.
      This includes VirusTotal if there is an API key specified in `viruschecker-driver.properties`. 
 
 * Examples:
@@ -136,7 +137,8 @@ system's file manager to the VM.
     the VM.
     * `java -jar driver-1.0.0-all.jar ESET KASPESRY VIRUS_TOTAL` if you have both Eset and Kaspersky
      installed on the VM and also want to use the VirusTotal service.
-
+    * `java -jar driver-1.0.0-all.jar -a` if you want load all AVs in *Path* and/or enable 
+    VirusTotal if there is an API key specified in `viruschecker-driver.properties`. 
 If Windows firewall popup window asks for permission, then allow it at least for private networks.
  
 To verify the successful launch of the driver program, open a web browser on the VM and visit 
