@@ -30,6 +30,7 @@ Before diving further we denote the following terms:
 - JRE = Java Runtime Environment
 - VM = Virtual Machine
 - VM/C = Virtual Machine or Container
+- host = The native OS on your machine
 
 Installation
 ============
@@ -169,51 +170,68 @@ a new antivirus by yourself, this [guide](docs/driver/extensions.md) is the plac
 3 Deploy gateway
 ----------------
 
+
 The purpose of the gateway is to simplify the implementation of client applications.
 It receives data from the client and then sends it to all deployed drivers in parallel and then
 store all scan reports in its embedded database.
 Third party clients can either use the unified gateway API or upload files directly to the drivers.
 
-The location of the compiled JRE executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
+The location of the compiled JAR executable is `gateway/build/libs/gateway-[VERSION]-all.jar`.
 
 Gateway can be run from host or from the its own VM as well.
 Theoretically it can be deployed on any machine with JRE 1.8, however, it was tested only on 
 Ubuntu 18.04.
 
-Create a new text file and put the full urls of running driver programs, one url per line.
+We will assume that the gateway will be deployed on a dedicated VM.
+
+* Create a (linked) clone of some VM running the driver or install a new one. 
+(It is ample to you use the Linux virtual machine.)
+
+* Set the network adapter in the VM settings to *Bridged*.
+
+* Allow host ports that are forwarded from the driver's VM to be opened for IP address of the 
+gateway's VM. 
 For example, if you have two running drivers on VMs with their listening port **8080** forwarded to 
-host's ports **8081** and **8082**, the file should look like below.
-```dtd
-http://localhost:8081
-http://localhost:8082
-```
+host's ports **8081** and **8082** and your host is Linux you may use the command bellow with 
+superuser privileges 
+    ```bash
+    ufw allow proto tcp from <insert-gateway-VM-IP> to any port 8081,8082
+    ```
+  On a Windows host follow these steps.
+    * Press the *Start* button, search the program called *Windows Firewall with Advanced Security* 
+    and open it.
+    * In the left-hand side pane choose the *Inbound Rules* option. 
+    * In the right-hand side panel choose the *New rule* option.
+    * Choose *Custom* checkbox and press the *Next >* button until you reach the *Scope* pane.
+        * Navigate to the *Which remote IP addresses does this rule apply to?* label and choose the 
+        *These IP addresses* options.
+        * In the large text field bellow write IP address of the gateway VM and press the *Next >*.
+    * When you reach the *Name* pane, type the **Gateway** in the first text field and press the *Finnish*
+     button.
 
-Save the file as, for example, `driverUrls.txt`.
+* Copy the gateway JAR executable to the VM.
 
-Assuming Java is in the *Path*, run terminal in this directory.
+* In the folder with the copied JAR executable, create a new text file and put the full urls of the 
+running drivers. 
+For example, if you have two running drivers on VMs with their listening port **8080** forwarded to 
+the host ports **8081** and **8082**, the file should look like below.
+    ```dtd
+    http://<insert-host-IP>:8081
+    http://<insert-host-IP>:8082
+    ```
 
-Type `java -jar gateway-[VERSION]-all.jar driverUrls.txt` and press enter.
+* Save the file as, for example, `driverUrls.txt`.
+
+* Assuming Java is in the *Path*, run terminal in this directory.
+
+* Type `java -jar gateway-[VERSION]-all.jar driverUrls.txt` and press enter.
     
-To verify the successful launch of the gateway, open a web browser and go 
+To verify the successful launch of the gateway, open a web browser in a VM and go 
 to `http://127.0.0.1:8080/`.
 The gateway should respond with JSON containing some basic info about itself.
 
-Remember to open port 8080 for TCP if you wish to connect to the gateway from other computers in 
-network.
-
-###### 3.1 Deploying on the dedicated VM
-
-The default port of the gateway is 8080 which is also used by the driver program.
-If you wish to deploy both the driver and the gateway on the same system/VM, you should change the 
-listening port of at least one of them.
-
-Therefore, it is highly recommended that you run the gateway on the host or on the dedicated VM 
-with bridged network adapter.
-Do not forget to open port **8080** on the machine/VM running the gateway for machines that are 
-intended to use its REST API.
-
-Also, if you wish to run the gateway on a dedicated VM with bridged network adapter and Do not forget to open port **7979** on the machine/VM running the gateway for machines that are 
-intended to use its REST API.  
+Remember to open port 8080 for TCP on the VM if you wish to connect to the gateway from other 
+computers on the network.
 
 ### 3.1 Gateway REST API
 
@@ -227,8 +245,9 @@ This client provides simple web based interface to send files to the gateway and
 retrieved reports.
 
 The location of the compiled JRE executable is `client-web/build/libs/client-web-[VERSION]-all.jar`.
+Copy it to the VM with deployed gateway, but create a new folder for it. 
 
-Assuming Java is in the *Path* and the gateway is running on the same machine, run terminal in this 
+Assuming Java is in the *Path* on the VM and the gateway is running on the same machine, run terminal in this 
 directory.
 
 Type `java -jar client-web-[VERSION]-all.jar http://localhost:8080` and press enter.
@@ -237,11 +256,8 @@ By default, the web application will run on port `7979`.
 Open the web browser and go to `http://localhost:7979/`.
 If the application started successfully you should see a graphical web interface.
 
-###### Note
-
-It is OK to run the client web application on same machine/VM as the gateway.
-Do not forget to open port **7979** on the machine/VM running the gateway for machines that are 
-intended to use its REST API.  
+Do not forget to open port **7979** on the machine/VM running the client for machines that are 
+intended to use its graphical interface.  
    
 5 Deploy client cli application
 -------------------------------
