@@ -9,10 +9,10 @@ class Kaspersky(
     override val antivirusName: String = AntivirusType.KASPERSKY.antivirusName
 
     override suspend fun parseReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): Report {
-        val reports = report
+        val reports = rawReport
             .asSequence()
             .filterNot { it.startsWith(";") }
             .filter { params.fileToScan.name in it }
@@ -41,7 +41,7 @@ class Kaspersky(
                     malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
             }.copy(
-                virusDatabaseVersion = report.first().substring("AV bases release date: ".length)
+                virusDatabaseVersion = rawReport.first().substring("AV bases release date: ".length)
             )
     }
 

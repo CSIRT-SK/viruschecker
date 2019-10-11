@@ -9,13 +9,13 @@ data class RunProgramCommand(
     fun parse(
         fileToScan: File? = null,
         fileToReport: File? = null
-    ): List<String> = command.split(" ").map {
+    ): List<String> = command.split(" ").map { word ->
         when {
-            SCAN_FILE in it ->
-                it.replace(SCAN_FILE, fileToScan?.canonicalPath ?: "")
-            REPORT_FILE in it ->
-                it.replace(REPORT_FILE, fileToReport?.canonicalPath ?: "")
-            else -> it
+            SCAN_FILE in word ->
+                word.replace(SCAN_FILE, fileToScan?.canonicalPath ?: "")
+            REPORT_FILE in word ->
+                word.replace(REPORT_FILE, fileToReport?.canonicalPath ?: "")
+            else -> word
         }
     }
 

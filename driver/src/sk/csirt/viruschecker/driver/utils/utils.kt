@@ -30,7 +30,7 @@ fun createDirectoryIfNotExists(directoryName: String){
 /**
  * Works only on Windows.
  */
-fun readHKLMRegistryKey(path: String, key: String): String =
+fun readRegistryKey(path: String, key: String): String =
     ProcessBuilder(
         "reg",
         "query",

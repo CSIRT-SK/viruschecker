@@ -72,10 +72,10 @@ abstract class CommandLineAntivirus(
     }
 
     private suspend fun retrieveReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): FileScanResult {
-        val (status, description, virusDatabase) = parseReport(report, params)
+        val (status, description, virusDatabase) = parseReport(rawReport, params)
         return FileScanResult(
             filename = params.originalFileName,
             scanReport = ScanResult(
@@ -93,7 +93,7 @@ abstract class CommandLineAntivirus(
     }
 
     protected abstract suspend fun parseReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): Report
 

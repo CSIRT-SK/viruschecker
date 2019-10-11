@@ -6,7 +6,7 @@
 
 a {
     text-decoration: none;
-    color: rgb(61, 146, 201);
+    color: rgb(40, 105, 141);
 }
 a:hover,
 a:focus {
@@ -34,7 +34,7 @@ h3 {
 }
 
 .sidebar {
-    background: rgb(61, 70, 93);
+    background: rgb(41, 71, 122);
     color: #fff;
 }
 

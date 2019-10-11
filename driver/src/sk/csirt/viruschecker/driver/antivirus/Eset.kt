@@ -12,10 +12,10 @@ class Eset(
     override val antivirusName: String = AntivirusType.ESET.antivirusName
 
     override suspend fun parseReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): Report {
-        val reports = report
+        val reports = rawReport
             .asSequence()
             .filter { it.startsWith("name=") }
             .filter { params.fileToScan.name in it }
@@ -48,7 +48,7 @@ class Eset(
                     malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
             }.copy(
-                virusDatabaseVersion = report.first {
+                virusDatabaseVersion = rawReport.first {
                     "Module scanner" in it
                 }.split(",")[1].substring(" version ".length)
             )

@@ -9,12 +9,12 @@ class Avast(
     override val antivirusName: String = AntivirusType.AVAST.antivirusName
 
     override suspend fun parseReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): Report =
-        report
+        rawReport
             .takeIf { it.isNotEmpty() }
-            ?.let{ report.first() to report.first { "# Virus database" in it } }
+            ?.let{ rawReport.first() to rawReport.first { "# Virus database" in it } }
             ?.let { (scanLine, databaseLine) ->
                 scanLine.split("\t")[1].let {
                     Report(

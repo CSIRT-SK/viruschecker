@@ -7,10 +7,10 @@ class Comodo(scanCommand: RunProgramCommand) : CommandLineAntivirus(scanCommand)
     override val antivirusName: String = AntivirusType.COMODO.antivirusName
 
     override suspend fun parseReport(
-        report: List<String>,
+        rawReport: List<String>,
         params: FileScanParameters
     ): Report =
-        report[1]
+        rawReport[1]
             .split("--->")[1]
             .trim()
             .let {
