@@ -46,6 +46,8 @@ subprojects {
         compile "com.xenomachina:kotlin-argparser:$argparser_version"
         compile "io.github.microutils:kotlin-logging:$koltin_logger_version"
         compile "commons-io:commons-io:$apache_commons_io_version"
+
+        testImplementation "io.mockk:mockk:$mockk_version"
     }
 
     compileKotlin {
