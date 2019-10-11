@@ -16,11 +16,11 @@ abstract class CommandLineAntivirus(
 ) : Antivirus, AutoDetectable {
     private val logger = KotlinLogging.logger { }
 
-    override suspend fun scanFile(params: FileScanParameters): FileScanResult = coroutineScope {
+    override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         logger.info("Scanning file with this parameters: $params")
         val output = runAntivirusToScan(params)
         // Some antiviruses (Avast) cannot write results properly when invoked from another process.
-        retrieveReport(output, params).also {
+        return retrieveReport(output, params).also {
             logger.info("Retrieved report: $it")
         }
     }

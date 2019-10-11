@@ -1,6 +1,5 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 
@@ -10,14 +9,14 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
 
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val reports = supervisorScope {
-            antiviruses.map {
-                async(Dispatchers.IO) {
-                    it.scanFile(params)
-                } to it.antivirusName
+            antiviruses.map { antivirus ->
+                async {
+                    antivirus.scanFile(params)
+                } to antivirus.antivirusName
             }.map { (deferredScanResult, antivirusName) ->
                 runCatching { deferredScanResult.await() }
-                    .getOrElse {
-                        logger.error(it){
+                    .getOrElse { throwable ->
+                        logger.error(throwable){
                             "Scan failed. Returning status NOT AVAILABLE for antivirus $antivirusName."
                         }
                         FileScanResult(
