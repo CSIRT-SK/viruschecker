@@ -1,5 +1,6 @@
 package sk.csirt.viruschecker.driver.config
 
+import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
 import sk.csirt.viruschecker.config.PropertiesFactory
 
@@ -14,13 +15,30 @@ object Properties {
 
 object DriverPropertiesFactory : PropertiesFactory {
 
+    private val logger = KotlinLogging.logger{ }
+
     override val propertiesName = "viruschecker-driver.properties"
 
+    // Do not change the value of this variable! Insert your key into [defaultPropertiesUnix] or
+    // [defaultPropertiesWindows].
     const val missingApiKeyPlaceHolder = "<insert-your-api-key>"
 
     override val defaultProperties by lazy {
-        if (SystemUtils.IS_OS_WINDOWS) defaultPropertiesWindows
-        else defaultPropertiesUnix
+        when {
+            SystemUtils.IS_OS_WINDOWS -> {
+                logger.debug("Operating system Windows detected.")
+                defaultPropertiesWindows
+            }
+            SystemUtils.IS_OS_UNIX -> {
+                logger.debug("Operating system Linux detected.")
+                defaultPropertiesUnix
+            }
+            else -> {
+                logger.warn("Operating system is not officially supported. Generating empty " +
+                        "$propertiesName file.")
+                ""
+            }
+        }
     }
 
 }

@@ -66,6 +66,12 @@ Open a terminal in the project directory and
     ```bash 	
     ./gradlew clean build shadowJar
     ```
+
+###### Note
+
+On Linux, the build command may result in *Permission denied* error.
+In this case grant executable permission to the `gradlew` (Debian based distros may use 
+`sudo chmod 775 gradlew`) and re-run the build command.
     
 2 Deploy antivirus driver program
 ---------------------------------
