@@ -30,7 +30,7 @@ Before diving further we denote the following terms:
 - JRE = Java Runtime Environment
 - VM = Virtual Machine
 - VM/C = Virtual Machine or Container
-- host = The native OS on your machine
+- host = The native OS of your machine
 
 Installation
 ============
@@ -130,21 +130,21 @@ system's file manager to the VM.
  
 * On the VM, open a terminal in the folder with the driver executable.   
 
-* Type `java -jar [NAME-OF-PROGRAM] [ANTIVIRUSES]` and press enter.
-    * `[NAME-OF-PROGRAM]` is the name of the driver JAR file.
+* Type `java -jar driver-[VERSION]-all.jar [ANTIVIRUSES]` and press enter.
     * `[ANTIVIRUSES]` must be one or more of the following: 
     `AVAST, COMODO, ESET, KASPERSKY, MICROSOFT, VIRUS_TOTAL`.
-    * Optionally you may use `-a` option to auto-detect all installed AVs that have their command 
-    line scanners in the *Path* variable.
+    * Instead of `[ANTIVIRUSES]` you may use the `-a` option to auto-detect all installed AVs that 
+    have their command line scanners in the *Path* variable.
      This includes VirusTotal if there is an API key specified in `viruschecker-driver.properties`. 
 
 * Examples:
-    * `java -jar driver-1.0.0-all.jar KASPERSKY` if you only have Kaspersky Antivirus installed on 
+    * `java -jar driver-1.0.0-all.jar -a` if you want load all AVs in *Path* and enable
+    VirusTotal if there is an API key specified in `viruschecker-driver.properties`.
+    * `java -jar driver-1.0.0-all.jar KASPERSKY` if you only want the Kaspersky Antivirus installed on 
     the VM.
     * `java -jar driver-1.0.0-all.jar ESET KASPESRY VIRUS_TOTAL` if you have both Eset and Kaspersky
      installed on the VM and also want to use the VirusTotal service.
-    * `java -jar driver-1.0.0-all.jar -a` if you want load all AVs in *Path* and/or enable 
-    VirusTotal if there is an API key specified in `viruschecker-driver.properties`. 
+     
 If Windows firewall popup window asks for permission, then allow it at least for private networks.
  
 To verify the successful launch of the driver program, open a web browser on the VM and visit 
@@ -211,7 +211,7 @@ The location of the compiled JRE executable is `client-web/build/libs/client-web
 If the gateway has been deployed on a VM, copy the client JAR to the same VM, but create a new 
 folder for it. 
 
-Assuming Java is in the *Path* and the gateway was deployed on the same machine/VM, run terminal in 
+Assuming the gateway was deployed on the same machine/VM, run terminal in 
 folder with client JAR.
 
 Type `java -jar client-web-[VERSION]-all.jar http://localhost:8080` and press enter.
@@ -239,8 +239,7 @@ Currently it supports text and `csv` formats.
 
 The location of the compiled JRE executable is `client-cli/build/libs/client-cli-[VERSION]-all.jar`.
 
-Assuming Java is in the *Path*, run terminal in this directory.
-
+Run terminal in this directory.
 Type `java -jar client-cli-[VERSION]-all.jar -h` and press enter.
 Successful launch should print this help
 ```bash
