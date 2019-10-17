@@ -15,7 +15,7 @@ also for newer systems with some parts of the OS having slightly different names
 ### 1.1 Set up virtual machine
 
 For production purposes it is recommended to create a VM from scratch.
-For development or testing, however, one can also download a pre-installed VM directly from 
+For development or testing, however, one can instead download a pre-installed VM directly from 
 [Microsoft](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) with 90 day evaluation 
 license. 
 
