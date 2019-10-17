@@ -1,7 +1,5 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
@@ -20,7 +18,7 @@ class Microsoft(
         rawReport: List<String>,
         params: FileScanParameters
     ): Report = coroutineScope {
-        val virusDatabaseVersionDeferred = async(IO) {
+        val virusDatabaseVersion = let {
             val registryKey = if (SystemUtils.IS_OS_WINDOWS_7)
                 "HKLM\\SOFTWARE\\Microsoft\\Microsoft Antimalware\\Signature Updates"
             else
@@ -40,15 +38,19 @@ class Microsoft(
         logger.debug { "Found $infectedCountString threats." }
         val infectedCount = infectedCountString?.toIntOrNull() ?: 0
 
-        val virusDatabaseVersion = virusDatabaseVersionDeferred.await()
-
         // return from coroutine
         when {
             infectedCountString == null -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")
             infectedCount == 0 -> Report(ScanStatusResult.OK, "OK", virusDatabaseVersion)
             infectedCount >= 1 -> {
-                val description = rawReport.first { it.startsWith("Threat") }.split(": ")[1]
-                Report(ScanStatusResult.INFECTED, description, virusDatabaseVersion)
+                val description = rawReport
+                    .first { it.startsWith("Threat") }
+                    .split(": ")[1]
+                Report(
+                    ScanStatusResult.INFECTED,
+                    description,
+                    virusDatabaseVersion
+                )
             }
             else -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")
         }
