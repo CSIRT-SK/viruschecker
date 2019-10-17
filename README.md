@@ -38,8 +38,7 @@ Installation
 First of all, we do not currently provide a one-click installer.
 Also, this software does not include ready-to-use VM/Cs with deployed AVs.
 
-These steps describe how to build and deploy this program from scratch.
-They can be summarized in the following steps.
+These steps describe how to build and deploy this program from scratch
 
 1. Compile the source code
 2. Deploy the driver/s
