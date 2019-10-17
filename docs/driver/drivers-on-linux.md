@@ -127,21 +127,6 @@ Open the Comodo window and click on the *Antivirus* tab at the top side of the w
 
 * In the *Scanner Settings* disable the *Real-Time Scanning* option.
 
-
-* In the *Protection* tab permanently disable the *Core shields*, *Ransomware Shield*, 
-*Firewall* and *Real site* features. 
-
-* In the *Privacy* tab, disable the *Sensitive Data Shield*.
-
-* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
-
-* In the *Licensing* window click on the green symbol `x` located to the right of 
-*License key* label.
-
-* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
-
-* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
-
 #### 2.1.2 Command line utility
 
 Comodo provides the command line utility called *cmdscan* that may be used to scan the 
