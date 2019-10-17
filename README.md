@@ -68,9 +68,9 @@ Open a terminal in the project directory and
 
 ###### Note
 
-On Linux, the build command may result in *Permission denied* error.
-In this case grant executable permission to the `gradlew` (Debian based distros may use 
-`sudo chmod 775 gradlew`) and re-run the build command.
+On Linux, running the *gradlew* may result in *Permission denied* error.
+In this case grant executable permission to the *gradlew* (Debian and Ubuntu based distros may use 
+`sudo chmod 775 gradlew`) and re-run *gradlew*.
     
 2 Deploy antivirus driver program
 ---------------------------------
