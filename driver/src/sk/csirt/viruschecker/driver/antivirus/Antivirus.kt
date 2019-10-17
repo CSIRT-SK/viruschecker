@@ -1,6 +1,6 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
@@ -16,7 +16,7 @@ interface Antivirus {
     suspend fun scanFileAndClean(params: FileScanParameters)
             : FileScanResult = supervisorScope {
         val result = scanFile(params)
-        launch(Dispatchers.IO) {
+        launch(IO) {
             params.fileToScan.delete()
         }
         result

@@ -1,7 +1,6 @@
 package sk.csirt.viruschecker.gateway.routing.service
 
 import com.kanishka.virustotalv2.VirustotalPublicV2Impl
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
@@ -18,7 +17,7 @@ class ShareService {
     suspend fun shareFile(shareParameters: ShareParameters) = coroutineScope {
         val virusTotalRef = VirustotalPublicV2Impl()
         logger.info { "Sending file ${shareParameters.file} to VirusTotal" }
-        launch(Dispatchers.IO) {
+        launch {
             runCatching {
                 virusTotalRef.scanFile(shareParameters.file)
             }.onSuccess {
