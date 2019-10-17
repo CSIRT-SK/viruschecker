@@ -99,20 +99,23 @@ Driver program currently supports the aforementioned AVs on Windows: Comodo.
 
 To install *Comodo Antivirus* open terminal and execute the following commands.
 
-* Install the *libssl* library.
+* Install the *libssl0.9.8* library.
     ```bash
-    sudo apt install libssl
+    wget archive.ubuntu.com/ubuntu/pool/universe/o/openssl098/libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb	
+
+    sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb
+
+    sudo apt-get install -f
     ```
-* Download the installation package
-    ```bash
-    wget http://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
-    ```
+
 * Install the antivirus
     ```bash
-    sudo gdebi -n cav-linux_x64.deb
-    ``` 
-* Run the post installation script
-    ```bash
+    wget http://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
+
+    sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb
+
+    sudo apt-get install -f
+
     sudo /opt/COMODO/post_setup.sh
     ``` 
   
