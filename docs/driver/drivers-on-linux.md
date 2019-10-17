@@ -132,6 +132,5 @@ Open the Comodo window and click on the *Antivirus* tab at the top side of the w
 Comodo provides the command line utility called *cmdscan* that may be used to scan the 
 selected file for malware.
 It should be located at `/opt/COMODO`.
-The driver is preconfigured to this location and therefore no additional settings should be 
-necessary. 
+The driver is preconfigured to this location and therefore no additional settings are required. 
 
