@@ -208,10 +208,11 @@ This client provides simple web based interface to send files to the gateway and
 retrieved reports.
 
 The location of the compiled JRE executable is `client-web/build/libs/client-web-[VERSION]-all.jar`.
-Copy it to the VM with deployed gateway, but create a new folder for it. 
+If the gateway has been deployed on a VM, copy the client JAR to the same VM, but create a new 
+folder for it. 
 
-Assuming Java is in the *Path* on the VM and the gateway is running on the same machine, run terminal in this 
-directory.
+Assuming Java is in the *Path* and the gateway was deployed on the same machine/VM, run terminal in 
+folder with client JAR.
 
 Type `java -jar client-web-[VERSION]-all.jar http://localhost:8080` and press enter.
 By default, the web application will run on port `7979`.
@@ -219,9 +220,16 @@ By default, the web application will run on port `7979`.
 Open the web browser and go to `http://localhost:7979/`.
 If the application started successfully you should see a graphical web interface.
 
-Do not forget to open port **7979** on the machine/VM running the client for machines that are 
-intended to use its graphical interface.  
-   
+Do not forget to open port **7979** on the machine/VM running the client if you want to make it's 
+graphical interface accessible from other computers.
+
+###### Note
+
+[Eicar test files](http://2016.eicar.org/85-0-Download.html) are a great way to test the 
+functionality of VirusChecker.
+Just try to scan one of them using VirusChecker's web interface.
+All antiviruses should report it as a malware. 
+  
 5 Deploy client cli application
 -------------------------------
 
