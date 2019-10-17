@@ -1,6 +1,6 @@
 package sk.csirt.viruschecker.hash
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
@@ -17,7 +17,7 @@ sealed class HashAlgorithm(
         hash(file.inputStream().buffered())
 
     suspend fun hash(inputStream: InputStream): HashHolder {
-        val digest = withContext(Dispatchers.IO) {
+        val digest = withContext(IO) {
             val digest = MessageDigest.getInstance(algorithm)
             inputStream.use { inputStream ->
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)

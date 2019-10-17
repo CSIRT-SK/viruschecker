@@ -5,9 +5,6 @@ Driver application can be run in a special mode available via `VIRUS_TOTAL` comm
 Instead of scanning the uploaded file via it's REST API, it will calculate the SHA-256 hash of the 
 file and check it against the VirusTotal online database.
 
-1 Place the api key
--------------------
-
 The VirusTotal API requires API key to be set. 
 You can obtain the free api key [here](https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key).
 Be noted that the free api key is limited to 4 requests per minute.
@@ -18,6 +15,7 @@ If you do not have this file, then just run the driver program without any argum
 ```bash
 java -jar <name-of-driver>
 ```
+and shut it down with `Ctrl+C` (or just close the terminal).
 
 The driver will automatically create the aforementioned file.
 Open the file with any text editor that is better than *Notepad*.
@@ -27,16 +25,3 @@ virustotal.apikey=<insert-your-api-key>
 ``` 
 replace the `<insert-your-api-key>` with your api key.
 
-2 Run the driver program
-------------------------
-
-This mode is OS agnostic and can be run as
-```bash
-java -jar <name-of-driver> VIRUS_TOTAL
-```
-Using the `-a` argument instead will now load the VirusTotal alongside all detected AVs on the 
-machine.
-```bash
-java -jar <name-of-driver> -a
-```
-Also remember to open the port in the firewall.

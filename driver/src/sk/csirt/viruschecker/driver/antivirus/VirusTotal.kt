@@ -2,7 +2,7 @@ package sk.csirt.viruschecker.driver.antivirus
 
 import com.kanishka.virustotalv2.VirusTotalConfig
 import com.kanishka.virustotalv2.VirustotalPublicV2Impl
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.AntivirusType
@@ -23,7 +23,7 @@ class VirusTotal(apiKey: String) : ExternalAntivirus, AutoDetectable {
         val fileToScan = params.fileToScan
         val sha256 = fileToScan.sha256().value
         val scanInformation =
-            runCatching { withContext(Dispatchers.IO) { virusTotalRef.getScanReport(sha256) } }
+            runCatching { withContext(IO) { virusTotalRef.getScanReport(sha256) } }
                 .onFailure {
                     logger.error {
                         "VirusTotal error for file ${fileToScan.canonicalPath}. " +
