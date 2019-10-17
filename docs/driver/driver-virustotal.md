@@ -15,6 +15,7 @@ If you do not have this file, then just run the driver program without any argum
 ```bash
 java -jar <name-of-driver>
 ```
+and shut it down with `Ctrl+C` (or just close the terminal).
 
 The driver will automatically create the aforementioned file.
 Open the file with any text editor that is better than *Notepad*.
