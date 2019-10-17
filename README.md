@@ -19,7 +19,7 @@ There are also some helper modules that contain common dependencies or classes:
 The architecture of this software solution is visualized below.
 
 ```dtd
-client-cli ---:               :--- driver (Avast, Eset, Kaspersky, Microsoft)
+client-cli ---:               :--- driver (Avast, Eset, Kaspersky, Microsoft, VirusTotal)
               :--- gateway ---:
 client-web ---:               :--- driver (Comodo, VirusTotal)                               
 ```
