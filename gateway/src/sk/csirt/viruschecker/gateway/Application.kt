@@ -76,7 +76,7 @@ fun Application.module() {
         multiScanFile(scanService)
         findByHash(scanReportService)
         shareFile(shareService)
-        findAll(scanReportService)
+        findBy(scanReportService)
     }
 
 

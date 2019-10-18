@@ -166,7 +166,7 @@ You will also need to reset port forwarding for the new port instead of **8080**
 
 If you are a developer and want to use the driver programmatically, you can 
 explore its REST web API.
-The API endpoints are documented [here](docs/rest-api/rest-api.md).
+The API endpoints are documented [here](docs/driver/rest-api.md).
 
 For most users, however, this API is not important.
 
@@ -198,7 +198,7 @@ We provide documentation for two ways to deploy the gateway - on host OS or on L
 ### 3.1 Gateway REST API
 
 If you are a developer and want to use the gateway programmatically, you can 
-explore its REST web API [here](docs/rest-api/rest-api.md).
+explore its REST web API [here](docs/gateway/rest-api.md).
 
 4 Deploy client web application
 -------------------------------

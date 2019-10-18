@@ -17,7 +17,6 @@ import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.routing
-import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -28,8 +27,8 @@ import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
 import sk.csirt.viruschecker.client.web.routing.index
 import sk.csirt.viruschecker.client.web.routing.scanFile
-import sk.csirt.viruschecker.client.web.routing.showAllReports
 import sk.csirt.viruschecker.client.web.routing.showReport
+import sk.csirt.viruschecker.client.web.routing.showReportsBy
 import sk.csirt.viruschecker.client.web.template.styles
 import sk.csirt.viruschecker.config.filterArgsForArgParser
 
@@ -110,7 +109,7 @@ fun Application.module() {
         styles()
         scanFile(scanService)
         showReport(scanReportService)
-        showAllReports(scanReportService)
+        showReportsBy(scanReportService)
     }
 }
 

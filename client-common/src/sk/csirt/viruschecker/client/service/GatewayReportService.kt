@@ -27,4 +27,18 @@ class GatewayReportService(
             logger.info { "Retrieved all reports" }
         }
 
+    suspend fun findReportBy(searchWords: String): List<FileHashScanResponse> {
+        logger.info{ "Original search words: $searchWords" }
+        val searchWordsParsed = searchWords
+            .replace(", ", ",")
+            .replace(" ", ",")
+        return client.get<List<FileHashScanResponse>>(
+            "$gatewayUrl${GatewayRoutes.scanReportsBy.replace("{searchWords}", searchWordsParsed)}"
+        ).also {
+            logger.info { "Retrieved ${it.size} reports for search words \"$searchWordsParsed\"" }
+            logger.debug { "Retrieved ${it.size} reports for search word \"$searchWordsParsed\": $it" }
+        }
+    }
+
+
 }

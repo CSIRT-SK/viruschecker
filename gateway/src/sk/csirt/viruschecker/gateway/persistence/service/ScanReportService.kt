@@ -6,5 +6,6 @@ interface ScanReportService {
     suspend fun save(response: FileHashScanResponse)
     suspend fun findBySha256(hash: String): FileHashScanResponse?
     suspend fun findAll(): List<FileHashScanResponse>
+    suspend fun findBy(searchWords: Iterable<String>): List<FileHashScanResponse>
 }
 
