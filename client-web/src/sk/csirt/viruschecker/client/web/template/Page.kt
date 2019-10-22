@@ -56,7 +56,7 @@ suspend fun ApplicationCall.respondDefaultHtml(
                                 li("nav-item") {
                                     a(
                                         classes = "pure-button",
-                                        href = locations.href(WebRoutes.ScanReportsBy("Type search words..."))
+                                        href = locations.href(WebRoutes.ScanReportsBy(""))
                                     ) { +"Search reports" }
                                 }
                             }

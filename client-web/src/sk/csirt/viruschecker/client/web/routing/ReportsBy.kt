@@ -12,7 +12,7 @@ import sk.csirt.viruschecker.client.web.template.respondMultipleReportsHtml
 fun Route.showReportsBy(reportService: GatewayReportService) {
     get<WebRoutes.ScanReportsBy> { params ->
         val scanReports = if(params.search.isBlank())
-            reportService.findAllReports()
+            emptyList()
         else
             reportService.findReportBy(params.search)
 
@@ -32,7 +32,7 @@ fun Route.showReportsBy(reportService: GatewayReportService) {
                 }
                 br()
                 submitInput(classes = "pure-button pure-button-primary") { value = "Search" }
-                br(); br()
+                br(); br(); br()
             }
         }
     }
