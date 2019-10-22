@@ -111,6 +111,9 @@ In general, adding the support for a new AV comprises the following steps:
 
 * Install the new AV. It is recommended to always do this on a VM.
 
+* Disable all automatic features and protections(scanners, firewalls,...) of the AV except automatic
+updates of the virus definitions database. 
+
 * Find out the name and location of the command line scan utility provided by the antivirus.
 
 * Scan some file and save the report somewhere. It will serve you as template for implementing the 
@@ -768,7 +771,7 @@ val driverDependencyInjectionModule = module {
 }
 ```
 
-### 2.4 Run the antivirus
+### 2.4 Run the driver
 
 If all previous steps are completed, then you should be able to run the antivirus with the new 
 reimplemented Kaspersky plugin as
