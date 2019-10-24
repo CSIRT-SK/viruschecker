@@ -1,20 +1,19 @@
-Modify driver program
-=====================
+Modify the driver program
+=========================
 
-There are two types of modification that are described in this guide.
+There are two types of modification described in this guide.
  
-* Modification of commands that are used to launch antivirus scanner 
-* Adding support for another antivirus
+* Modification of commands used to launch antivirus scanner. 
+* Adding support for another antivirus.
 
 
 1 Modification of commands to launch antivirus scanner
 ------------------------------------------------------
 
-If you run the driver program for the first time, a file named `viruschecker-driver.properties` will
-be generated.
+Running the driver for the first time will generate a file named `viruschecker-driver.properties`.
 Content of the file depends on the operating system.
 
-For example, for driver version `0.18.0` on Windows the content will look like this
+For example, on Windows the content will look like this
 
 ```properties
 # Avast
@@ -59,14 +58,10 @@ Most properties in the above examples represents commands that are called when t
 some file to scan. Notice the two wildcards `[SCAN-FILE]` and `[REPORT-FILE]` representing the file 
 to scan and the file to store scan report, respectively. 
 
-Every property that represents the command to run the antivirus scanner must contain the 
-`[SCAN-FILE]` wildcard. In the case of commands without the `[REPORT-FILE]` wildcard it is
+Every property that represents the command to run the AV must contain the 
+`[SCAN-FILE]` wildcard. 
+In the case of commands without the `[REPORT-FILE]` wildcard it is
 assumed that the scan report will be printed to the standard output.
-
-Antivirus programs may therefore store the scan report to file specified during scan 
-(e.g. antivirus commands with `[REPORT-FILE]` wildcard in `viruschecker-driver.properties`) or just 
-print the report to the terminal. The driver program is agnostic to this and supports both methods 
-of retrieving the reports.
 
 ### 1.1 I want some antivirus supported only on OS A to be supported on OS B 
 
@@ -76,15 +71,15 @@ now supported. The opposite is true for Comodo where we only support the Linux v
 If you wish to use, for example, the Linux version of Kaspersky, then just provide the correct form 
 of `kaspersky` property into the `viruschecker-driver.properties` that is automatically generated on 
 Linux and run the driver as usual, i.e. `java -jar <name-of-driver> KASPERSKY`.
-This should work as long as the both Windows and Linux version of the antivirus use the same scan 
-report formats.  
+This should work as long as the both Windows and Linux version of the antivirus use the same report 
+formats.  
 
 ### 1.2 VirusTotal API KEY
 
-The VirusTotal API requires API key to be set. 
+The VirusTotal API requires an API key to be set. 
 You can obtain the free api key [here](https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key).
 Be noted that the free api key is limited to 4 requests per minute.
-Otherwise you need to purchase the premium api key.
+Otherwise you may need to purchase the premium api key.
 
 Firstly you need to place your api key into `viruschecker-driver.properties`.
 If you do not have this file, then just run the driver program without any arguments like 
@@ -108,14 +103,16 @@ It is recommended, although not required, to use [*IntelliJ IDEA*](https://www.j
 to modify and compile the source codes. 
 The open source and free *Community Edition* is sufficient.
   
-This guide also assumes that the antivirus, for which you want to implement support, does support 
+This guide also assumes that the AV, for which you want to implement support, does support 
 the command line scanning of a single file.
 As of this moment, we deliberately support only such antivirus solutions.
 
-In general, adding the support for new antivirus comprises the following steps:
+In general, adding the support for a new AV comprises the following steps:
 
-* Install the antivirus for which you want to implement support. It is recommended to always do this
-on new virtual machine.
+* Install the new AV. It is recommended to always do this on a VM.
+
+* Disable all automatic features and protections(scanners, firewalls,...) of the AV except automatic
+updates of the virus definitions database. 
 
 * Find out the name and location of the command line scan utility provided by the antivirus.
 
@@ -134,12 +131,12 @@ These utilities will usually report the scan result in a simple text format.
 Adding support for another antivirus is, for the most part, parsing the scan report.
 
 Assume we want to reimplement the support for Kaspersky Antivirus on Windows.
-Installation and configuration of this antivirus is explained [here](/docs/driver/drivers-on-windows.md).
+Installation and configuration of this antivirus is already explained [here](/docs/driver/drivers-on-windows.md).
 
 ### 2.1 Learn about the antivirus
 
 Before we can start to implement something, we need to do some recon.
-Our task is now to learn the structure of the scan reports produced by Kaspersky command line 
+Our task is now to learn the structure of the scan reports produced by AV's command line 
 scanner.
  
 It is recommended to scan at least four different files and save the reports.
@@ -151,7 +148,7 @@ The four files should be
 (or download *eicar_com.zip*).
 
 Some antivirus programs, including Kaspersky, treat archive files as directories.
-Therefore the scan reports for archives needs to treated specially. 
+Therefore the scan reports for archives needs to be treated specially. 
  
 This antivirus provides the command line scan utility called *avp.com* located at `C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0`.
 To scan some file from the command line we can use this command
@@ -162,8 +159,8 @@ C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0\avp.com scan <some-fi
 
 ###### Note
 The `/i0` switch disables the automatic popup window asking for a user decision on how to treat the 
-infected file which may halt the driver because it cannot deal with a graphical components of the Kaspersky 
-antivirus. 
+infected file which may halt the driver because it cannot deal with a graphical components of the 
+Kaspersky antivirus. 
 Instead, the driver program itself deletes all scanned files.  
  
 #### 2.1.1 Scanning a healthy file
@@ -171,14 +168,14 @@ Instead, the driver program itself deletes all scanned files.
 Create a file called `healthy.txt` in `C:\virus-checker` and write something into it.
 Let us say we want to scan this file with Kaspersky command line scanner and save the report to 
 `healthy-report.txt` in the same directory. 
-This can be achieved with
+This can be achieved with command
 ```bash
 C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0\avp.com scan C:\virus-checker\healthy.txt /RA:C:\virus-checker\healthy-report.txt
 ```
 
 If you have placed the Kaspersky installation directory 
 `C:\Program Files (x86)\Kaspersky Lab\Kaspersky Free 19.0.0` into *Path* system variable, you may
-invoke the scanner using the shorter command.
+invoke the scanner using the shorter syntax.
 
 ```bash
 avp.com scan C:\virus-checker\healthy.txt /RA:C:\virus-checker\healthy-report.txt /i0
@@ -221,7 +218,7 @@ It's content should look similar to the text below.
 ;  ------------------
 ```
 
-Line `2019-06-28 09:37:03 C:\virus-checker\healthy-report.txt	ok` tells us, that this file does 
+Line `2019-06-28 09:37:03 C:\virus-checker\healthy-report.txt	ok` tells us that this file does 
 not contain any known malware.
 
 #### 2.1.2 Scanning an "infected" file
@@ -269,7 +266,7 @@ It's content should look similar to the text below.
 ;  ------------------
 ```
 
-Line `2019-06-28 09:50:18 C:\virus-checker\eicar.com 	detected	EICAR-Test-File` tells us, that 
+Line `2019-06-28 09:50:18 C:\virus-checker\eicar.com 	detected	EICAR-Test-File` tells us that 
 this file does contain a "threat" recognized as `EICAR-Test-File`.
  
 ```bash
@@ -414,7 +411,7 @@ This file summarizes all supported antivirus software including the VirusTotal w
 our purposes, can be considered an antivirus (which is not in real life of course).
 
 Although this file already include Kaspersky, we will "re-register" it again, this time as the
-*MyKaspersky*, therefore add the `MY_KASPERSKY("MyKaspersky"),` jsut below the `VIRUS_TOTAL("VirusTotal"),`.
+*MyKaspersky*, therefore add the `MY_KASPERSKY("MyKaspersky"),` just below the `VIRUS_TOTAL("VirusTotal"),`.
 
 The file should now look like this.
 
@@ -432,43 +429,13 @@ enum class AntivirusType(
     KASPERSKY("Kaspersky"),
     MICROSOFT("Microsoft"),
     VIRUS_TOTAL("VirusTotal"),
-    MY_KASPERSKY("MyKaspersky"),
+    MY_KASPERSKY("MyKaspersky"), // <<<<--------- THIS WAS ADDED <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 ```
 
 #### 2.2.2 Setup command line command
 
 Open `viruschecker/driver/src/sk/csirt/viruschecker/driver/config/DriverPropertiesFactory.kt` 
-Its content should look like
-
-```kotlin
-package sk.csirt.viruschecker.driver.config
-
-import org.apache.commons.lang3.SystemUtils
-import sk.csirt.viruschecker.config.PropertiesFactory
-
-object Properties {
-    const val avast = "avast"
-    const val eset = "eset"
-    const val kaspersky = "kaspersky"
-    const val microsoft = "microsoft"
-    const val comodo = "comodo"
-    const val virusTotal = "virustotal.apikey"
-}
-
-object DriverPropertiesFactory : PropertiesFactory {
-
-    override val propertiesName = "viruschecker-driver.properties"
-
-    override val defaultProperties by lazy {
-        if (SystemUtils.IS_OS_WINDOWS) defaultPropertiesWindows
-        else defaultPropertiesUnix
-    }
-
-}
-```
-
-Navigate to line `object Properties {` and below it place `const val myKaspersky = "my.kaspersky"`.
 
 Now the content of the file should be
 
@@ -479,7 +446,7 @@ import org.apache.commons.lang3.SystemUtils
 import sk.csirt.viruschecker.config.PropertiesFactory
 
 object Properties {
-    const val myKaspersky = "my.kaspersky"
+    const val myKaspersky = "my.kaspersky"  // <<<<--------- THIS WAS ADDED <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     const val avast = "avast"
     const val eset = "eset"
     const val kaspersky = "kaspersky"
@@ -506,69 +473,8 @@ Open `viruschecker/driver/src/sk/csirt/viruschecker/driver/config/WindowsDefault
 
 This files contains a template for generating `viruschecker-driver.properties` 
 
-Its content should be
-
-```kotlin
-package sk.csirt.viruschecker.driver.config
-
-import sk.csirt.viruschecker.driver.antivirus.RunProgramCommand
-
-internal val defaultPropertiesWindows = """
-# Avast
-# ==============================================================================
-
-${Properties.avast}=ashCmd.exe ${RunProgramCommand.SCAN_FILE} /_> ${RunProgramCommand.REPORT_FILE}
-
-# Eset
-# ==============================================================================
-
-${Properties.eset}=ecls.exe ${RunProgramCommand.SCAN_FILE} /log-file=${RunProgramCommand.REPORT_FILE} /log-all
-
-# Kaspersky
-# ==============================================================================
-
-${Properties.kaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
-
-# Microsoft
-# ==============================================================================
-
-${Properties.microsoft}=MpCmdRun.exe -Scan -ScanType 3 -File ${RunProgramCommand.SCAN_FILE} -DisableRemediation
-
-# VirusTotal
-# ==============================================================================
-
-${Properties.virusTotal}=<insert-your-api-key>
-"""
-```
-
 We need to create a template for command used to execute Kaspersky antivirus. 
-One can see that the template we need already exists, see lines
-
-```properties
-...=
-
-# Kaspersky
-# ==============================================================================
-
-${Properties.kaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
-
-...=
-```
-
-Our new template will look almost the same
-
-```properties
-...=
-
-# MyKaspersky
-# ==============================================================================
-
-${Properties.myKaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
-
-...=
-```
-
-Now the content of the file should be
+You need to modify the template as shown below
 
 ```kotlin
 package sk.csirt.viruschecker.driver.config
@@ -601,7 +507,7 @@ ${Properties.microsoft}=MpCmdRun.exe -Scan -ScanType 3 -File ${RunProgramCommand
 
 ${Properties.virusTotal}=<insert-your-api-key>
 
-# MyKaspersky
+# MyKaspersky  // <<<<--------- THIS WAS ADDED <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # ==============================================================================
 
 ${Properties.myKaspersky}=avp.com scan ${RunProgramCommand.SCAN_FILE} /RA:${RunProgramCommand.REPORT_FILE} /i0
@@ -679,18 +585,17 @@ Now we will explain the meaning of each part of this file.
   In the case of Kaspersky it is `avp.com scan [SCAN-FILE] /RA:[REPORT-FILE] /i0`.
   ```kotlin
   class MyKaspersky(
-       // 
       scanCommand: RunProgramCommand 
   ) : CommandLineAntivirus(scanCommand) 
   ```
 
-* We declare the name of this antivirus parser. This what we added to `AntivirusType.kt`.
+* Declares the name of this antivirus parser. This is what we added to `AntivirusType.kt`.
     ```kotlin
     override val antivirusName: String = AntivirusType.MY_KASPERSKY.antivirusName // 
     ```
   
 * Header part of the main parsing function. 
-  This function receives the two parameters: 
+  This function receives two parameters: 
   * `reportFile` represents the file containing the report generated after running the `scanCommand`
   * `params` represents the information about the scanned file, like its location and the original 
   name of the file that was uploaded by user via the web or cli client interface.
@@ -708,7 +613,7 @@ Now we will explain the meaning of each part of this file.
         Charset.defaultCharset()
     )
     ```
-* Exclude all lines beginning with `;` character and then returns only lines that contains name of 
+* Excludes all lines beginning with `;` character and then returns only lines that contains name of 
   the scanned file.
     ```kotlin
     val linesWithScannedFile = reportLines
@@ -716,7 +621,7 @@ Now we will explain the meaning of each part of this file.
         .filter { params.fileToScan.name in it }
     ```
 
-* Now we need to map all remaining relevant lines into `Report` structures that will be further
+* Map all remaining relevant lines into `Report` structures that will be further
  processed by another application logic.
   * For each line containing the name of the scanned file...
     ```kotlin
@@ -777,8 +682,8 @@ Now we will explain the meaning of each part of this file.
     `NOT_AVAILEBLE` is defined first, `OK` is defined second and `INFECTED` is defined third. 
     Thus, the `NOT_AVAILABLE` status is the "smallest" and the `INFECTED` status is the "largest".
     
-    As a subsequence of this we just need the `Result` with the "largest" `status`.
-    Therefore the parsing function will return 
+    As a subsequence of this we just need the `Report` with the "largest" `status`.
+    Therefore the parsing function will finally return  
     ```kotlin
     return scannedStatuses.maxBy { it.status }!!
     ```
@@ -787,67 +692,13 @@ We described a relatively simple parser for processing a scan report produced by
 command line scanning utility.
 This implementation is somewhat simplified version of the one provided in 
 `viruschecker/driver/src/sk/csirt/viruschecker/driver/antivirus/Kaspersky.kt`.
-It is also not able to report more than one malware in an archived files containing more infected 
-files.  
+###### This simplified implementation is not able to report more than one malware in an archive containing more infected files.  
 
 #### 2.2.4 Register parser to the dependency injection  
 
-We also need to register this parser to the dependency injection framework used.
+We also need to register this parser to the dependency injection framework.
 
 Open `viruschecker/driver/src/sk/csirt/viruschecker/driver/config/DependencyInjectionConfig.kt` 
-Its content should look like
-
-```kotlin
-package sk.csirt.viruschecker.driver.config
-
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
-import sk.csirt.viruschecker.driver.antivirus.*
-import sk.csirt.viruschecker.driver.parsedArgs
-
-internal val defaultAntivirusQualifier = named("antivirus")
-
-val driverDependencyInjectionModule = module {
-
-    single<Antivirus>(AntivirusType.AVAST) {
-        Avast(RunProgramCommand(getProperty(Properties.avast)))
-    }
-
-    single<Antivirus>(AntivirusType.ESET) {
-        Eset(RunProgramCommand(getProperty(Properties.eset)))
-    }
-
-    single<Antivirus>(AntivirusType.KASPERSKY) {
-        Kaspersky(RunProgramCommand(getProperty(Properties.kaspersky)))
-    }
-
-    single<Antivirus>(AntivirusType.MICROSOFT) {
-        Microsoft(RunProgramCommand(getProperty(Properties.microsoft)))
-    }
-
-    single<Antivirus>(AntivirusType.COMODO) {
-        Comodo(RunProgramCommand(getProperty(Properties.comodo)))
-    }
-
-    single<Antivirus>(AntivirusType.VIRUS_TOTAL) {
-        VirusTotal(getProperty(Properties.virusTotal))
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    single<Antivirus>(defaultAntivirusQualifier) {
-        val antivirusTypesToLoad = parsedArgs.antivirusTypes
-        if (antivirusTypesToLoad.size == 1) {
-            get(antivirusTypesToLoad[0])
-        } else {
-            ComposedAntivirus(
-                antiviruses = antivirusTypesToLoad.map { get<Antivirus>(it) }
-            )
-        }
-    }
-
-}
-```
 
 Add the following code 
 ```kotlin
@@ -900,7 +751,7 @@ val driverDependencyInjectionModule = module {
         VirusTotal(getProperty(Properties.virusTotal))
     }
 
-    single<Antivirus>(AntivirusType.MY_KASPERSKY) {
+    single<Antivirus>(AntivirusType.MY_KASPERSKY) { // <<<<--------- THIS WAS ADDED <<<<<<<<<<<<<<<<<<<<<<<<<<<
         MyKaspersky(RunProgramCommand(getProperty(Properties.myKaspersky)))
     }
 
@@ -920,17 +771,21 @@ val driverDependencyInjectionModule = module {
 }
 ```
 
-### 2.4 Run the antivirus
+### 2.4 Run the driver
 
 If all previous steps are completed, then you should be able to run the antivirus with the new 
 reimplemented Kaspersky plugin as
 ```bash
 java -jar <name-of-driver> MY_KASPERSKY
 ```
+or enable all recognizable AVs plugins with
+```bash
+java -jar <name-of-driver> -a
+```
 
 Analogously it is possible to add support for any antivirus that comes shipped with the command line
 scanning utility.
 
-TODO (Add support for manually updatable antiviruses) 
+TODO (Add support for manually updatable AVs) 
 
 

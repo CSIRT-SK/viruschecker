@@ -35,13 +35,23 @@ class Kaspersky(
             virusDatabaseVersion = ""
         )
 
+        val databaseVersion = rawReport.first().substring("AV bases release date: ".length)
+
+        if (status == ScanStatusResult.OK) {
+            return Report(
+                status = status,
+                malwareDescription = "OK",
+                virusDatabaseVersion = databaseVersion
+            )
+        }
+
         return reports.filter { it.status == status }
             .reduce { acc, reportLine ->
                 acc.copy(
                     malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
             }.copy(
-                virusDatabaseVersion = rawReport.first().substring("AV bases release date: ".length)
+                virusDatabaseVersion = databaseVersion
             )
     }
 

@@ -41,6 +41,18 @@ class Eset(
             malwareDescription = "",
             virusDatabaseVersion = ""
         )
+        val databaseVersion = rawReport.first {
+            "Module scanner" in it
+        }.split(",")[1]
+            .substring(" version ".length)
+
+        if (status == ScanStatusResult.OK) {
+            return Report(
+                status = status,
+                malwareDescription = "is OK",
+                virusDatabaseVersion = databaseVersion
+            )
+        }
 
         return reports.filter { it.status == status }
             .reduce { acc, reportLine ->
@@ -48,9 +60,7 @@ class Eset(
                     malwareDescription = "${acc.malwareDescription}, ${reportLine.malwareDescription}"
                 )
             }.copy(
-                virusDatabaseVersion = rawReport.first {
-                    "Module scanner" in it
-                }.split(",")[1].substring(" version ".length)
+                virusDatabaseVersion = databaseVersion
             )
     }
 }

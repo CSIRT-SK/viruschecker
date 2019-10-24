@@ -77,6 +77,7 @@ fun Application.module() {
         findByHash(scanReportService)
         shareFile(shareService)
         findBy(scanReportService)
+        findAll(scanReportService)
     }
 
 

@@ -59,11 +59,11 @@ Building this software requires JDK 1.8 or later (OpenJDK is sufficient).
 Open a terminal in the project directory and
 - on a Windows machine run
     ```bash 	
-    gradlew.bat clean build shadowJar
+    gradlew.bat clean shadowJar
     ```
 - on a Linux machine run
     ```bash 	
-    ./gradlew clean build shadowJar
+    ./gradlew clean shadowJar
     ```
 
 ###### Note
