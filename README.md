@@ -109,7 +109,7 @@ We assume that VirtualBox is used as a virtualization platform.
 
 * (TODO) Create a [Linux containers using Docker](docs/driver/drivers-on-docker.md)
 
-* Enable VirusTotal hash database [guide](docs/driver/driver-virustotal.md)
+* Enable the support for [VirusTotal hash database](docs/driver/driver-virustotal.md)
 
 ###### Note
 
@@ -151,8 +151,8 @@ To verify the successful launch of the driver program, open a web browser on the
 The driver should respond with JSON containing some basic info about itself.
 
 If the network adapter of your running VMs had been attached to a NAT with a guest port 
-**8080** forwarded to host's **8081**, then you may visit `http://127.0.0.1:8081/` on the host with 
-the same respond.   
+**8080** forwarded to host's **8081**, then you may visit `http://127.0.0.1:8081/` on the host to 
+get the same respond.   
 
 ###### Different port
 
@@ -199,6 +199,8 @@ We provide documentation for two ways to deploy the gateway - on host OS or on L
 
 If you are a developer and want to use the gateway programmatically, you can 
 explore its REST web API [here](docs/gateway/rest-api.md).
+
+For most users, however, this API is not important.
 
 4 Deploy client web application
 -------------------------------
