@@ -112,9 +112,7 @@ To install *Comodo Antivirus* open terminal and execute the following commands.
     ```bash
     wget http://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
 
-    sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb
-
-    sudo apt-get install -f
+    sudo gdebi -n cav-linux_x64.deb
 
     sudo /opt/COMODO/post_setup.sh
     ``` 
