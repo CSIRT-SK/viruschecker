@@ -22,7 +22,7 @@ class CachedDriverScanService(
             val resultChannel = scanService.scanFileChannel(scanParams)
             val saveChannel = produce<AntivirusReportResponse> {
                 for (antivirusResponse in resultChannel) {
-                    scanReportService.save(antivirusResponse)
+//                    scanReportService.save(antivirusResponse)
                     send(antivirusResponse)
                 }
             }
