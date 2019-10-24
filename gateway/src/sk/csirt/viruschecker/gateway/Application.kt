@@ -12,6 +12,7 @@ import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
+import io.ktor.websocket.WebSockets
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -64,6 +65,8 @@ fun Application.module() {
         modules(gatewayDependencyInjectionModule)
         fileProperties()
     }
+
+    install(WebSockets)
 
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<PersistentScanReportService>()

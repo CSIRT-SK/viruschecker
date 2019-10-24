@@ -10,6 +10,7 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.util.KtorExperimentalAPI
+import io.ktor.websocket.webSocket
 import mu.KotlinLogging
 import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
@@ -24,6 +25,48 @@ private val logger = KotlinLogging.logger { }
 @KtorExperimentalLocationsAPI
 fun Route.multiScanFile(scanService: FileScanService) {
     post<GatewayRoutes.MultiScanFile> {
+        val multipart = call.receiveMultipart()
+        logger.info("Receiving file")
+
+        var fileToScan: File? = null
+        var originalFilename = ""
+        var useExternalServices = false
+
+        multipart.forEachPart { part ->
+            when (part) {
+                is PartData.FormItem -> {
+                    useExternalServices = part.value.toBoolean()
+                }
+                is PartData.FileItem -> {
+                    fileToScan = part.toTempFile()
+                    originalFilename = part.originalFileName ?: "scan${Instant.now()}"
+                }
+            }
+            part.dispose()
+        }
+
+
+        logger.info {
+            "Received request to scan file $originalFilename using " +
+                    "${if (useExternalServices) "also" else "no"} external drivers."
+        }
+
+        if (fileToScan == null) {
+            call.respond(HttpStatusCode.BadRequest, "File was not received.")
+        }
+
+        scanService.scanFile(
+            ScanParameters(
+                fileToScan = fileToScan!!,
+                useExternalDrivers = useExternalServices,
+                originalFilename = originalFilename
+            )
+        ).also {
+            call.respond(it)
+        }
+    }
+
+    webSocket(GatewayRoutes.multiScanFileWebSocket) {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
 

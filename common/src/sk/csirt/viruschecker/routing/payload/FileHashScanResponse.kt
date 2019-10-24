@@ -1,6 +1,14 @@
 package sk.csirt.viruschecker.routing.payload
 
+import kotlinx.coroutines.channels.ReceiveChannel
 import java.time.Instant
+
+data class FileHashScanChannel(
+    val sha256: String,
+    val md5: String,
+    val sha1: String,
+    val report: FileScanChannel
+) : ReceiveChannel<AntivirusReportResponse> by report
 
 data class FileHashScanResponse(
     val sha256: String,
@@ -8,6 +16,12 @@ data class FileHashScanResponse(
     val sha1: String,
     val report: FileScanResponse
 )
+
+data class FileScanChannel(
+    val date: Instant,
+    val filename: String,
+    val results: ReceiveChannel<AntivirusReportResponse>
+) : ReceiveChannel<AntivirusReportResponse> by results
 
 data class FileScanResponse(
     val date: Instant,

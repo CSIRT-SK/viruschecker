@@ -4,6 +4,8 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
 object GatewayRoutes {
+    const val multiScanFileWebSocket = "/ws/multiScanFile"
+
     const val multiScanFile = "/multiScanFile"
 
     @KtorExperimentalLocationsAPI
