@@ -6,8 +6,8 @@ Windows 8.1 is, however, more future proof as it has longer support.
 Right now, we do not recommend using Windows 10 because of its forced updates that cannot be 
 completely deactivated.
 
-1 Create virtual machines
--------------------------
+1 Create virtual machine
+------------------------
 
 These steps describe how to setup Windows 7 VM in VirtualBox, but they are practically identical
 also for newer systems with some parts of the OS having slightly different names. 

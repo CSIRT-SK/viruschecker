@@ -4,8 +4,8 @@ Deploy driver program on Linux based virtual machines
 We will use the Linux based VM, more specifically the Ubuntu 18.04 VM.
 Any modern linux distribution is, however, equally suitable.
 
-1 Create virtual machines
--------------------------
+1 Create virtual machine
+------------------------
 
 These steps describe how to setup Ubuntu 18.04 VM in VirtualBox.
 
