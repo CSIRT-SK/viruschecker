@@ -16,3 +16,11 @@ internal fun PartData.FileItem.toTempFile(): File {
     FileUtils.copyInputStreamToFile(streamProvider(), tempFile)
     return tempFile
 }
+
+internal fun ByteArray.toTempFile(filename: String? = null): File {
+    val filename = filename ?: "file${UUID.randomUUID()}"
+    val tempFileName = "${UUID.randomUUID()}_$filename"
+    val tempFile = Paths.get(System.getProperty("java.io.tmpdir"), tempFileName).toFile()
+    tempFile.writeBytes(this)
+    return tempFile
+}

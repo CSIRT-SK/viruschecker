@@ -148,7 +148,7 @@ class DefaultDriverScanService(
                 md5 = md5Deferred.await().value,
                 sha1 = sha1Deferred.await().value,
                 sha256 = sha256Deferred.await().value,
-                report = FileScanChannel(
+                reportChannel = FileScanChannel(
                     date = Instant.now(),
                     filename = originalFileName,
                     results = receiveChannel

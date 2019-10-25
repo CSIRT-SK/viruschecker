@@ -39,15 +39,6 @@ subprojects {
         test.resources.srcDirs = ['testresources']
     }
 
-    dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        compile "io.ktor:ktor-locations:$ktor_version"
-        compile "ch.qos.logback:logback-classic:$logback_version"
-        compile "com.xenomachina:kotlin-argparser:$argparser_version"
-        compile "io.github.microutils:kotlin-logging:$koltin_logger_version"
-        compile "commons-io:commons-io:$apache_commons_io_version"
-    }
-
     compileKotlin {
         kotlinOptions {
 //            freeCompilerArgs = ["-XXLanguage:+InlineClasses"]

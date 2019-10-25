@@ -22,7 +22,7 @@ import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
 import sk.csirt.viruschecker.client.service.GatewayInfoService
 import sk.csirt.viruschecker.client.service.GatewayReportService
-import sk.csirt.viruschecker.client.service.GatewayScanService
+import sk.csirt.viruschecker.client.service.ClientScanService
 import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
 import sk.csirt.viruschecker.client.web.routing.index
@@ -100,7 +100,7 @@ fun Application.module() {
     }
 
 
-    val scanService by inject<GatewayScanService>()
+    val scanService by inject<ClientScanService>()
     val scanReportService by inject<GatewayReportService>()
     val antivirusDriverInfoService by inject<GatewayInfoService>()
 

@@ -39,7 +39,7 @@ abstract class AntivirusDriverService(
     suspend fun <T> multiDriverRequestChannel(
         block: suspend (driverUrl: String, client: HttpClient) -> T
     ): ReceiveChannel<MultiDriverResponse<Result<T>>> = coroutineScope {
-        produce {
+        produce<MultiDriverResponse<Result<T>>> {
             drivers.forEach { driverUrl ->
                 launch(IO) {
                     logger.info { "Requesting from $driverUrl" }

@@ -7,8 +7,8 @@ data class FileHashScanChannel(
     val sha256: String,
     val md5: String,
     val sha1: String,
-    val report: FileScanChannel
-) : ReceiveChannel<AntivirusReportResponse> by report
+    val reportChannel: FileScanChannel
+) : ReceiveChannel<AntivirusReportResponse> by reportChannel
 
 data class FileHashScanResponse(
     val sha256: String,
