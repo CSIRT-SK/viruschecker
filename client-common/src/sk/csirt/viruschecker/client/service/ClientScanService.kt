@@ -5,13 +5,14 @@ import io.ktor.client.features.websocket.ws
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
+import io.ktor.http.DEFAULT_PORT
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.content.PartData
 import kotlinx.io.streams.asInput
+import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
@@ -36,14 +37,14 @@ class ClientScanService(
     private val client: HttpClient,
     private val jsonConverter: JsonConverter
 ) {
-
+    private val logger = KotlinLogging.logger {}
     private val gatewayHost: String
     private val gatewayPort: Int
 
     init {
         val gatewayHostPort = gatewayUrl.split(":")
-        gatewayHost = gatewayHostPort[0]
-        gatewayPort = gatewayHostPort[1].toIntOrNull() ?: 0
+        gatewayHost = gatewayHostPort[1].substring(2)
+        gatewayPort = gatewayHostPort.getOrNull(2)?.toIntOrNull() ?: DEFAULT_PORT
     }
 
     suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
@@ -74,37 +75,51 @@ class ClientScanService(
         params: ScanParameters,
         onReceived: (AntivirusReportResponse) -> Unit
     ) {
+        logger.debug { "Initializing WebSocket connection to $gatewayUrl with params $params" }
         client.ws(
-            method = HttpMethod.Post,
+            // method = HttpMethod.Post,
             host = gatewayHost,
             port = gatewayPort,
             path = GatewayRoutes.multiScanFileWebSocket
         ) {
+            logger.info { "Established WebSocket connection to $gatewayUrl with params $params" }
             if (params.useExternalDrivers) {
+                logger.debug { "Sending WebSocket text frame 'useExternalDrivers: true'" }
                 send(Frame.Text("useExternalDrivers: true"))
             } else {
+                logger.debug { "Sending WebSocket text frame 'useExternalDrivers: false'" }
                 send(Frame.Text("useExternalDrivers: false"))
             }
+            logger.debug { "Sending WebSocket text frame 'params.originalFilename'" }
             send(Frame.Text(params.originalFilename))
+            logger.debug { "Sending WebSocket binary frame" }
             send(
                 Frame.Binary(
                     true,
                     params.fileToScan.readBytes()
                 )
             )
+//            outgoing.close()
+
 //            val md5 = (incoming.receive() as Frame.Text).readText()
 //            val sha1 = (incoming.receive() as Frame.Text).readText()
 //            val sha256 = (incoming.receive() as Frame.Text).readText()
 
             for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val antivirusResponse =
-                        jsonConverter.fromJson<AntivirusReportResponse>(
-                            frame.readText()
-                        )
-                    onReceived(antivirusResponse)
+                when (frame) {
+                    is Frame.Text -> {
+                        val message = frame.readText()
+                        logger.debug { "Receiving WebSocket text frame: $message" }
+                        val antivirusResponse =
+                            jsonConverter.fromJson<AntivirusReportResponse>(
+                                message
+                            )
+                        onReceived(antivirusResponse)
+                    }
+                    else -> logger.debug { "Receiving not supported WebSocket frame" }
                 }
             }
+            logger.info { "Finished WebSocket connection to $gatewayUrl with params $params" }
         }
     }
 

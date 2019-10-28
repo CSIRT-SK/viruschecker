@@ -20,8 +20,8 @@ data class FileHashScanResponse(
 data class FileScanChannel(
     val date: Instant,
     val filename: String,
-    val results: ReceiveChannel<AntivirusReportResponse>
-) : ReceiveChannel<AntivirusReportResponse> by results
+    val resultChannel: ReceiveChannel<AntivirusReportResponse>
+) : ReceiveChannel<AntivirusReportResponse> by resultChannel
 
 data class FileScanResponse(
     val date: Instant,

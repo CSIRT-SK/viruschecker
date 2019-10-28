@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import mu.KotlinLogging
 
-@ExperimentalCoroutinesApi
+
 abstract class AntivirusDriverService(
     private val drivers: List<String>,
     private val client: HttpClient
@@ -36,35 +36,28 @@ abstract class AntivirusDriverService(
         }
     }
 
-    suspend fun <T> multiDriverRequestChannel(
+    @ExperimentalCoroutinesApi
+    suspend fun <T> CoroutineScope.multiDriverRequestChannel(
         block: suspend (driverUrl: String, client: HttpClient) -> T
-    ): ReceiveChannel<MultiDriverResponse<Result<T>>> = coroutineScope {
-        produce<MultiDriverResponse<Result<T>>> {
-            drivers.forEach { driverUrl ->
-                launch(IO) {
-                    logger.info { "Requesting from $driverUrl" }
-                    val result = runCatching { block(driverUrl, client) }
-                        .onFailure {
-                            logger.error { "Failed http post to $driverUrl, cause is \n${it.stackTrace}" }
-                        }.onSuccess {
-                            logger.info { "Retrieved report from $driverUrl: $it" }
-                        }
-                    send(
-                        MultiDriverResponse(
-                            driverUrl,
-                            result
-                        )
-
+    ): ReceiveChannel<MultiDriverResponse<Result<T>>> = produce<MultiDriverResponse<Result<T>>> {
+        drivers.map { driverUrl ->
+            async(IO) {
+                logger.info { "Requesting from $driverUrl" }
+                val result = runCatching { block(driverUrl, client) }
+                    .onFailure {
+                        logger.error { "Failed http post to $driverUrl, cause is \n${it.stackTrace}" }
+                    }.onSuccess {
+                        logger.info { "Retrieved report from $driverUrl: $it" }
+                    }
+                send(
+                    MultiDriverResponse(
+                        driverUrl,
+                        result
                     )
-                }
+                )
             }
-        }
+        }.awaitAll()
     }
-
-    data class CountReceiveChannel<R>(
-        val count: Int,
-        val channel: ReceiveChannel<R>
-    ) : ReceiveChannel<R> by channel
 
     data class MultiDriverResponse<R>(
         val driverUrl: String,

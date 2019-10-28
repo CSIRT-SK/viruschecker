@@ -73,16 +73,16 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
     }
 
     webSocket(GatewayRoutes.multiScanFileWebSocket) {
-        logger.info("Receiving file")
-
-
+        logger.info { "WebSocket connection established" }
 
         val useExternalServices = (incoming.receiveOrNull() as? Frame.Text)
-            ?.readText()
+            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
             ?.takeIf { "useExternalDrivers: true" == it }
-            ?.let { true } ?: false
+            ?.let { true } ?: false.also { logger.debug { "Received WebSocket message: '$it'" } }
 
-        val originalFilename = (incoming.receiveOrNull() as? Frame.Text)?.readText() ?: ""
+        val originalFilename = (incoming.receiveOrNull() as? Frame.Text)
+            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
+            ?: "".also { logger.debug { "Received WebSocket message: '$it'" } }
 
         val fileToScan: File = (incoming.receive() as Frame.Binary)
             .readBytes()
@@ -103,9 +103,8 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
 //                }
 //            }
 //        }
-
         logger.info {
-            "Received request to scan file $originalFilename using " +
+            "Received WebSocket request to scan file $originalFilename using " +
                     "${if (useExternalServices) "also" else "no"} external drivers."
         }
 
@@ -134,9 +133,11 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
 //        send(Frame.Text(scanChannel.sha256))
 
         for (antivirusReport in scanChannel) {
-            send(Frame.Text(jsonConverter.toJson(antivirusReport)))
+            val message = Frame.Text(jsonConverter.toJson(antivirusReport))
+            logger.debug { "Sending via WebSocket: $message " }
+            send(message)
         }
-        close()
+       close()
     }
 }
 

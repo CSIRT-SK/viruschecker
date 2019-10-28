@@ -7,6 +7,7 @@ import io.ktor.http.ContentDisposition
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.PartData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.produce
@@ -92,8 +93,8 @@ class DefaultDriverScanService(
             }
         }
 
-    override suspend fun scanFileChannel(scanParams: ScanParameters): FileHashScanChannel =
-        coroutineScope {
+    override suspend fun CoroutineScope.scanFileChannel(scanParams: ScanParameters): FileHashScanChannel
+        {
             val (fileToScan, originalFileName) = scanParams
             logger.info { "Computing hashes for $fileToScan" }
             val sha256Deferred = async { fileToScan.sha256() }
@@ -139,19 +140,20 @@ class DefaultDriverScanService(
                             )
                         )
                     ).results.forEach {
+                        logger.debug { "Sending response via WebSocket: $it" }
                         send(it)
                     }
                 }
-
             }
-            FileHashScanChannel(
+
+            return FileHashScanChannel(
                 md5 = md5Deferred.await().value,
                 sha1 = sha1Deferred.await().value,
                 sha256 = sha256Deferred.await().value,
                 reportChannel = FileScanChannel(
                     date = Instant.now(),
                     filename = originalFileName,
-                    results = receiveChannel
+                    resultChannel = receiveChannel
                 )
             )
         }

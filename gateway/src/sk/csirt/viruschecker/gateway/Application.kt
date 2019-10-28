@@ -13,6 +13,7 @@ import io.ktor.request.path
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import io.ktor.websocket.WebSockets
+import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -24,10 +25,11 @@ import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportSer
 import sk.csirt.viruschecker.gateway.routing.*
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.ShareService
-import sk.csirt.viruschecker.utils.JsonConverter
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
+import sk.csirt.viruschecker.utils.JsonConverter
 
 lateinit var parsedArgs: CommandLineArguments
+val logger = KotlinLogging.logger{ }
 
 fun main(args: Array<String>) = mainBody {
     parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
