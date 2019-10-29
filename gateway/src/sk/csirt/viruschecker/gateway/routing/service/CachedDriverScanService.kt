@@ -27,7 +27,7 @@ class CachedDriverScanService(
 
     override suspend fun CoroutineScope.scanFileChannel(scanParams: ScanParameters)
             : FileHashScanChannel {
-        val scanFileChannel = scanService.run { scanFileChannel(scanParams) } // TU ZACAT TESTOVAT 
+        val scanFileChannel = scanService.run { scanFileChannel(scanParams) } // TU ZACAT TESTOVAT
         val saveReportChannel = produce<AntivirusReportResponse> {
             for (antivirusResponse in scanFileChannel) {
                 val currentScanResponse = scanReportService.findBySha256(scanFileChannel.sha256)

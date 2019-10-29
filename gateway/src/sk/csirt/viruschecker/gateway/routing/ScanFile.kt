@@ -119,14 +119,15 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
 //                )
 //            )
 //        }
-
-        val scanChannel = scanService.scanFileChannel(
-            ScanParameters(
-                fileToScan = fileToScan,
-                useExternalDrivers = useExternalServices,
-                originalFilename = originalFilename
+        val scanChannel = scanService.run {
+            scanFileChannel(
+                ScanParameters(
+                    fileToScan = fileToScan,
+                    useExternalDrivers = useExternalServices,
+                    originalFilename = originalFilename
+                )
             )
-        )
+        }
 
 //        send(Frame.Text(scanChannel.md5))
 //        send(Frame.Text(scanChannel.sha1))
@@ -137,7 +138,7 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
             logger.debug { "Sending via WebSocket: $message " }
             send(message)
         }
-       close()
+        close()
     }
 }
 

@@ -97,6 +97,9 @@ Driver program currently supports the aforementioned AVs on Windows: Comodo.
 
 ### 2.1 Comodo
 
+###### On Ubuntu 18.04, this AV needs older libssl library than the one shipped with the distribution. This may cause incompatibility with other AVs.
+ 
+
 To install *Comodo Antivirus* open terminal and execute the following commands.
 
 * Install the *libssl0.9.8* library.
@@ -131,4 +134,3 @@ Comodo provides the command line utility called *cmdscan* that may be used to sc
 selected file for malware.
 It should be located at `/opt/COMODO`.
 The driver is preconfigured to this location and therefore no additional settings are required. 
-
