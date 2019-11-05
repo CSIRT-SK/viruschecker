@@ -1,7 +1,9 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
 
 class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antivirus {
 
@@ -10,30 +12,12 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
     override suspend fun scanFile(params: FileScanParameters): FileScanResult {
         val reports = supervisorScope {
             antiviruses.map { antivirus ->
-                async {
+                async(IO) {
                     antivirus.scanFile(params)
                 } to antivirus.antivirusName
             }.map { (deferredScanResult, antivirusName) ->
                 runCatching { deferredScanResult.await() }
-                    .getOrElse { throwable ->
-                        logger.error(throwable){
-                            "Scan failed. Returning status NOT AVAILABLE for antivirus $antivirusName."
-                        }
-                        FileScanResult(
-                            filename = params.originalFileName,
-                            scanReport = ScanResult(
-                                status = ScanStatusResult.NOT_AVAILABLE,
-                                reports = listOf(
-                                    AntivirusReportResult(
-                                        antivirusName = antivirusName,
-                                        status = ScanStatusResult.NOT_AVAILABLE,
-                                        malwareDescription = "Scan failed.",
-                                        virusDatabaseVersion = ""
-                                    )
-                                )
-                            )
-                        )
-                    }
+                    .getOrDummy(params)
             }
         }.flatMap { it.scanReport.reports }
         return FileScanResult(
@@ -43,5 +27,38 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
             )
         )
     }
+
+    @ExperimentalCoroutinesApi
+    override suspend fun CoroutineScope.scanFileChannel(params: FileScanParameters)
+            : ReceiveChannel<FileScanResult> = produce {
+        antiviruses.map { antivirus ->
+            async(IO) {
+                val scanResult = runCatching { antivirus.scanFile(params) }
+                    .getOrDummy(params)
+                send(scanResult)
+            }
+        }.awaitAll()
+    }
+
+    private fun Result<FileScanResult>.getOrDummy(params: FileScanParameters): FileScanResult =
+        getOrElse { throwable ->
+            logger.error(throwable) {
+                "Scan failed. Returning status ${ScanStatusResult.NOT_AVAILABLE} for antivirus $antivirusName."
+            }
+            FileScanResult(
+                filename = params.originalFileName,
+                scanReport = ScanResult(
+                    status = ScanStatusResult.NOT_AVAILABLE,
+                    reports = listOf(
+                        AntivirusReportResult(
+                            antivirusName = antivirusName,
+                            status = ScanStatusResult.NOT_AVAILABLE,
+                            malwareDescription = "Scan failed.",
+                            virusDatabaseVersion = ""
+                        )
+                    )
+                )
+            )
+        }
 
 }

@@ -5,7 +5,6 @@ import io.ktor.client.features.websocket.ws
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
-import io.ktor.http.DEFAULT_PORT
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.cio.websocket.Frame
@@ -16,7 +15,8 @@ import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.utils.JsonConverter
+import sk.csirt.viruschecker.utils.HostPort
+import sk.csirt.viruschecker.utils.fromJson
 import java.io.File
 import java.io.FileInputStream
 
@@ -26,26 +26,12 @@ data class ScanParameters(
     val useExternalDrivers: Boolean
 )
 
-//data class ScanMetadataWebSocket(
-//    val md5: String,
-//    val sha1: String,
-//    val sha256: String
-//)
-
 class ClientScanService(
     private val gatewayUrl: String,
-    private val client: HttpClient,
-    private val jsonConverter: JsonConverter
+    private val client: HttpClient
 ) {
     private val logger = KotlinLogging.logger {}
-    private val gatewayHost: String
-    private val gatewayPort: Int
-
-    init {
-        val gatewayHostPort = gatewayUrl.split(":")
-        gatewayHost = gatewayHostPort[1].substring(2)
-        gatewayPort = gatewayHostPort.getOrNull(2)?.toIntOrNull() ?: DEFAULT_PORT
-    }
+    private val gatewayHostPort: HostPort = HostPort.fromUrlWithPort(gatewayUrl)
 
     suspend fun scanFile(params: ScanParameters): FileHashScanResponse =
         client.post("$gatewayUrl${GatewayRoutes.multiScanFile}") {
@@ -85,8 +71,8 @@ class ClientScanService(
         logger.debug { "Initializing WebSocket connection to $gatewayUrl with params $params" }
         client.ws(
             // method = HttpMethod.Post,
-            host = gatewayHost,
-            port = gatewayPort,
+            host = gatewayHostPort.host,
+            port = gatewayHostPort.port,
             path = GatewayRoutes.multiScanFileWebSocket
         ) {
             logger.info { "Established WebSocket connection to $gatewayUrl with params $params" }
@@ -106,7 +92,6 @@ class ClientScanService(
                     params.fileToScan.readBytes()
                 )
             )
-//            outgoing.close()
 
             val md5 = (incoming.receive() as Frame.Text).readText()
             val sha1 = (incoming.receive() as Frame.Text).readText()
@@ -126,9 +111,7 @@ class ClientScanService(
                         val message = frame.readText()
                         logger.debug { "Receiving WebSocket text frame: $message" }
                         val antivirusResponse =
-                            jsonConverter.fromJson<AntivirusReportResponse>(
-                                message
-                            )
+                            message.fromJson<AntivirusReportResponse>()
                         onReceived(antivirusResponse)
                     }
                     else -> logger.debug { "Receiving not supported WebSocket frame" }

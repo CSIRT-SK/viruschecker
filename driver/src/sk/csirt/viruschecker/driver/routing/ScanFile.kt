@@ -2,6 +2,9 @@ package sk.csirt.viruschecker.driver.routing
 
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.readBytes
+import io.ktor.http.cio.websocket.readText
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.locations.KtorExperimentalLocationsAPI
@@ -11,6 +14,9 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.util.KtorExperimentalAPI
 import io.ktor.util.asStream
+import io.ktor.websocket.webSocket
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.io.core.Input
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
@@ -22,6 +28,9 @@ import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.utils.json
+import sk.csirt.viruschecker.utils.toTempFile
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Instant
@@ -29,9 +38,12 @@ import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+@ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
-fun Route.scanFile(antiviruses: Antivirus) {
+fun Route.scanFile(
+    antivirus: Antivirus
+) {
     post<DriverRoutes.ScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
@@ -53,10 +65,45 @@ fun Route.scanFile(antiviruses: Antivirus) {
             call.respond(HttpStatusCode.BadRequest, "File was not received.")
         }
 
-        val response = processFile(fileItem!!, useExternalServices, antiviruses)
-        fileItem!!.dispose()
+        fileItem?.let { fileItem ->
+            val response = processFile(fileItem, useExternalServices, antivirus)
+            fileItem.dispose()
 
-        call.respond(response)
+            call.respond(response)
+        }
+    }
+
+    webSocket(DriverRoutes.scanFileWebSocket) {
+        logger.info { "WebSocket connection established" }
+
+        val useExternalServices = (incoming.receiveOrNull() as? Frame.Text)
+            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
+            ?.takeIf { "useExternalDrivers: true" == it }
+            ?.let { true } ?: false.also { logger.debug { "Received WebSocket message: '$it'" } }
+
+        val originalFilename = (incoming.receiveOrNull() as? Frame.Text)
+            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
+            ?: "".also { logger.debug { "Received WebSocket message: '$it'" } }
+
+        val fileToScan: File = (incoming.receive() as Frame.Binary)
+            .readBytes()
+            .toTempFile()
+
+        val scanChannel = antivirus.run {
+            scanFileChannel(
+                FileScanParameters(
+                    fileToScan = fileToScan,
+                    externalServicesAllowed = useExternalServices,
+                    originalFileName = originalFilename
+                )
+            )
+        }
+
+        for (scanResult in scanChannel) {
+            val message = Frame.Text(scanResult.json())
+            logger.debug { "Sending via WebSocket: $message " }
+            send(message)
+        }
     }
 }
 
@@ -80,7 +127,11 @@ private suspend fun processFile(
 }
 
 @KtorExperimentalAPI
-private fun Input.toCheckParameters(filename: String, path: Path, useExternalServices: Boolean): FileScanParameters {
+private fun Input.toCheckParameters(
+    filename: String,
+    path: Path,
+    useExternalServices: Boolean
+): FileScanParameters {
     val saveFilename = "${UUID.randomUUID()}_$filename"
     val savedFile = path.resolve(saveFilename).toFile()
     sk.csirt.viruschecker.driver.antivirus.logger.debug("Copying received file into ${savedFile.canonicalPath}")

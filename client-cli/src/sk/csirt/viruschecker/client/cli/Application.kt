@@ -5,7 +5,6 @@ import com.xenomachina.argparser.mainBody
 import io.ktor.application.Application
 import kotlinx.coroutines.runBlocking
 import sk.csirt.viruschecker.client.cli.config.CommandLineArguments
-import sk.csirt.viruschecker.client.config.httpClient
 import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.DefaultReporter
@@ -13,10 +12,10 @@ import sk.csirt.viruschecker.client.reporting.Reporter
 import sk.csirt.viruschecker.client.service.ClientScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.config.filterArgsForArgParser
+import sk.csirt.viruschecker.config.httpClient
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
-import sk.csirt.viruschecker.utils.JsonConverter
 import java.time.Instant
 import kotlin.system.exitProcess
 
@@ -34,7 +33,7 @@ fun Application.module() {
     val gatewayUrl = parsedArgs.gateway
     val fileToScan = parsedArgs.fileToScan
 
-    val scanService = ClientScanService(gatewayUrl, client, JsonConverter())
+    val scanService = ClientScanService(gatewayUrl, client)
 //    val scanReport = runBlocking {
 //        scanService.scanFile(
 //            ScanParameters(

@@ -1,4 +1,4 @@
-package sk.csirt.viruschecker.client.config
+package sk.csirt.viruschecker.config
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO

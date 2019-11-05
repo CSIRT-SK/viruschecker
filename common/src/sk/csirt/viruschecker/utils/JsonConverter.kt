@@ -2,7 +2,7 @@ package sk.csirt.viruschecker.utils
 
 import com.google.gson.GsonBuilder
 
-class JsonConverter {
+object JsonConverter {
     val implementation = GsonBuilder().setPrettyPrinting().create()
 
     fun <T> toJson(something: T): String =
@@ -12,3 +12,7 @@ class JsonConverter {
         implementation.fromJson(json, T::class.java)
 
 }
+
+fun <T> T.json(): String = JsonConverter.toJson(this)
+
+inline fun <reified T> String.fromJson(): T = JsonConverter.fromJson(this)

@@ -12,7 +12,8 @@ import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
-import mu.KotlinLogging
+import io.ktor.websocket.WebSockets
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -33,6 +34,7 @@ fun main(args: Array<String>) = mainBody {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
@@ -42,6 +44,8 @@ fun Application.module() {
         level = Level.DEBUG
         filter { call -> call.request.path().startsWith("/") }
     }
+
+    install(WebSockets)
 
 //    install(CORS) {
 //        method(HttpMethod.Options)

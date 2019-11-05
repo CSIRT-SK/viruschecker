@@ -3,6 +3,7 @@ package sk.csirt.viruschecker.gateway.config
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import sk.csirt.viruschecker.config.httpClient
 import sk.csirt.viruschecker.gateway.parsedArgs
 import sk.csirt.viruschecker.gateway.persistence.ScanReportDatabase
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity

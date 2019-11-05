@@ -21,7 +21,8 @@ import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
 import sk.csirt.viruschecker.gateway.routing.utils.toTempFile
 import sk.csirt.viruschecker.routing.GatewayRoutes
-import sk.csirt.viruschecker.utils.JsonConverter
+import sk.csirt.viruschecker.utils.json
+import sk.csirt.viruschecker.utils.toTempFile
 import java.io.File
 import java.time.Instant
 
@@ -30,7 +31,9 @@ private val logger = KotlinLogging.logger { }
 @ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
-fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConverter) {
+fun Route.multiScanFile(
+    scanService: FileScanService
+) {
     post<GatewayRoutes.MultiScanFile> {
         val multipart = call.receiveMultipart()
         logger.info("Receiving file")
@@ -88,37 +91,11 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
             .readBytes()
             .toTempFile()
 
-//        for (frame in incoming) {
-//            when (frame) {
-//                is Frame.Text -> {
-//                    val text = frame.readText()
-//                    if ("useExternalServices" == text) {
-//                        useExternalServices = true
-//                    } else {
-//                        originalFilename = text
-//                    }
-//                }
-//                is Frame.Binary -> {
-//                    fileToScan = frame.readBytes().toTempFile(originalFilename)
-//                }
-//            }
-//        }
         logger.info {
             "Received WebSocket request to scan file $originalFilename using " +
                     "${if (useExternalServices) "also" else "no"} external drivers."
         }
 
-//        if (fileToScan == null) {
-//            outgoing.close()
-//            send(
-//                Frame.Close(
-//                    CloseReason(
-//                        CloseReason.Codes.CANNOT_ACCEPT,
-//                        "Binary file not received"
-//                    )
-//                )
-//            )
-//        }
         val scanChannel = scanService.run {
             scanFileChannel(
                 ScanParameters(
@@ -134,7 +111,7 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
         send(Frame.Text(scanChannel.sha256))
 
         for (antivirusReport in scanChannel) {
-            val message = Frame.Text(jsonConverter.toJson(antivirusReport))
+            val message = Frame.Text(antivirusReport.json())
             logger.debug { "Sending via WebSocket: $message " }
             send(message)
         }

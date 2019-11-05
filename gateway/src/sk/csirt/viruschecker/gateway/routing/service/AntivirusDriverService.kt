@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import mu.KotlinLogging
+import sk.csirt.viruschecker.utils.HostPort
 
 
 abstract class AntivirusDriverService(
@@ -13,6 +14,8 @@ abstract class AntivirusDriverService(
     private val client: HttpClient
 ) {
     private val logger = KotlinLogging.logger { }
+
+    private val driverHostsPorts = drivers.map { HostPort.fromUrlWithPort(it) }
 
     suspend fun <T> multiDriverRequest(
         block: suspend (driverUrl: String, client: HttpClient) -> T
@@ -38,23 +41,31 @@ abstract class AntivirusDriverService(
 
     @ExperimentalCoroutinesApi
     suspend fun <T> CoroutineScope.multiDriverRequestChannel(
-        block: suspend (driverUrl: String, client: HttpClient) -> T
+        block: suspend CoroutineScope.(hostPort: HostPort, client: HttpClient) -> ReceiveChannel<T>
     ): ReceiveChannel<MultiDriverResponse<Result<T>>> = produce<MultiDriverResponse<Result<T>>> {
-        drivers.map { driverUrl ->
+        driverHostsPorts.map { driverUrl ->
             async(IO) {
                 logger.info { "Requesting from $driverUrl" }
-                val result = runCatching { block(driverUrl, client) }
+                runCatching { block(driverUrl, client) }
                     .onFailure {
                         logger.error { "Failed http post to $driverUrl, cause is \n${it.stackTrace}" }
-                    }.onSuccess {
-                        logger.info { "Retrieved report from $driverUrl: $it" }
+                        send(
+                            MultiDriverResponse(
+                                driverUrl.toString(),
+                                Result.failure(it)
+                            )
+                        )
+                    }.onSuccess { driverChannel ->
+                        logger.info { "Retrieved report from $driverUrl" }
+                        for (result in driverChannel) {
+                            send(
+                                MultiDriverResponse(
+                                    driverUrl.toString(),
+                                    Result.success(result)
+                                )
+                            )
+                        }
                     }
-                send(
-                    MultiDriverResponse(
-                        driverUrl,
-                        result
-                    )
-                )
             }
         }.awaitAll()
     }
