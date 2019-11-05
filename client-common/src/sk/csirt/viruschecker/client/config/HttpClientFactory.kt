@@ -25,6 +25,7 @@ fun httpClient(defaultSocketTimeout: Duration) = HttpClient(CIO) {
     engine {
         endpoint {
             connectTimeout = defaultSocketTimeout.toMillis()
+            requestTimeout = defaultSocketTimeout.toMillis()
         }
         https {
             trustManager = object : X509TrustManager {

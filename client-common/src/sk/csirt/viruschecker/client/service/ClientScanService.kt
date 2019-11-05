@@ -71,8 +71,15 @@ class ClientScanService(
             )
         }
 
+    data class HashTriple(
+        val md5: String,
+        val sha1: String,
+        val sha256: String
+    )
+
     suspend fun scanFileWebSocket(
         params: ScanParameters,
+        onHashReceived: (HashTriple) -> Unit,
         onReceived: (AntivirusReportResponse) -> Unit
     ) {
         logger.debug { "Initializing WebSocket connection to $gatewayUrl with params $params" }
@@ -101,9 +108,17 @@ class ClientScanService(
             )
 //            outgoing.close()
 
-//            val md5 = (incoming.receive() as Frame.Text).readText()
-//            val sha1 = (incoming.receive() as Frame.Text).readText()
-//            val sha256 = (incoming.receive() as Frame.Text).readText()
+            val md5 = (incoming.receive() as Frame.Text).readText()
+            val sha1 = (incoming.receive() as Frame.Text).readText()
+            val sha256 = (incoming.receive() as Frame.Text).readText()
+
+            onHashReceived(
+                HashTriple(
+                    md5 = md5,
+                    sha1 = sha1,
+                    sha256 = sha256
+                )
+            )
 
             for (frame in incoming) {
                 when (frame) {

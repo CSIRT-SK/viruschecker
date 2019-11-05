@@ -129,9 +129,9 @@ fun Route.multiScanFile(scanService: FileScanService, jsonConverter: JsonConvert
             )
         }
 
-//        send(Frame.Text(scanChannel.md5))
-//        send(Frame.Text(scanChannel.sha1))
-//        send(Frame.Text(scanChannel.sha256))
+        send(Frame.Text(scanChannel.md5))
+        send(Frame.Text(scanChannel.sha1))
+        send(Frame.Text(scanChannel.sha256))
 
         for (antivirusReport in scanChannel) {
             val message = Frame.Text(jsonConverter.toJson(antivirusReport))

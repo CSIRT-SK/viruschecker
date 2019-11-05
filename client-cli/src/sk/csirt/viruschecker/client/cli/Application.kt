@@ -45,18 +45,26 @@ fun Application.module() {
 //    }
     val scanReport = runBlocking {
         val reports = mutableListOf<AntivirusReportResponse>()
+        var md5 = ""
+        var sha1 = ""
+        var sha256 = ""
         scanService.scanFileWebSocket(
             ScanParameters(
                 fileToScan, fileToScan.name,
                 parsedArgs.useExternalDrivers
-            )
+            ),
+            {
+                md5 = it.md5
+                sha1 = it.sha1
+                sha256 = it.sha256
+            }
         ) {
             reports += it
         }
         FileHashScanResponse(
-            md5 = "ha",
-            sha1 = "haha",
-            sha256 = "hahaha",
+            md5 = md5,
+            sha1 = sha1,
+            sha256 = sha256,
             report = FileScanResponse(
                 date = Instant.now(),
                 filename = fileToScan.name,
