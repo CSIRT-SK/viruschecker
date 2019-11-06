@@ -73,7 +73,7 @@ None
     ``` 
     [
         {
-            "url: "http:192.168.1.112",
+            "url: "http://192.168.1.112",
             "success": "true" 
             "info": {
                 "driverVersion": "0.18.1",
@@ -81,7 +81,7 @@ None
             }
         },
         {
-            "url: "http:192.168.1.115",
+            "url: "http://192.168.1.115",
             "success": "true" 
             "info": {
                 "driverVersion": "0.16.0",
@@ -89,7 +89,7 @@ None
             }
         },
         {
-            "url: "http:192.168.1.118",
+            "url: "http://192.168.1.118",
             "success": "true" 
             "info": {
                 "driverVersion": "0.18.1",
@@ -97,7 +97,7 @@ None
             }
         },
         {
-            "url: "http:192.168.1.121",
+            "url: "http://192.168.1.121",
             "success": "false" 
             "info": {
                 "driverVersion": "ERROR: Could not reach driver.",
@@ -157,7 +157,7 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
      *ScannedStatusResponse schema*
      ```
      enumeration ScanStatusResponse:
-         SCAN_REFUSED
+         SCAN_REFUSED,
          NOT_AVAILABLE,
          OK,
          INFECTED
