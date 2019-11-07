@@ -17,7 +17,7 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
                 } to antivirus.antivirusName
             }.map { (deferredScanResult, antivirusName) ->
                 runCatching { deferredScanResult.await() }
-                    .getOrDummy(params)
+                    .getOrDummy(params, antivirusName)
             }
         }.flatMap { it.scanReport.reports }
         return FileScanResult(
@@ -34,14 +34,16 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
         antiviruses.map { antivirus ->
             async(IO) {
                 val scanResult = runCatching { antivirus.scanFile(params) }
-                    .getOrDummy(params)
-                logger.debug { "Antivirus ${antivirus.antivirusName} sends report $scanResult to websocket channel." }
+                    .getOrDummy(params, antivirusName)
                 send(scanResult)
             }
         }.awaitAll()
     }
 
-    private fun Result<FileScanResult>.getOrDummy(params: FileScanParameters): FileScanResult =
+    private fun Result<FileScanResult>.getOrDummy(
+        params: FileScanParameters,
+        antivirusName: String
+    ): FileScanResult =
         getOrElse { throwable ->
             logger.error(throwable) {
                 "Scan failed. Returning status ${ScanStatusResult.NOT_AVAILABLE} for antivirus $antivirusName."
