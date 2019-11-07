@@ -70,7 +70,9 @@ fun Application.module() {
         fileProperties()
     }
 
-    install(WebSockets)
+    install(WebSockets){
+        timeout = parsedArgs.socketTimeout
+    }
 
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<PersistentScanReportService>()

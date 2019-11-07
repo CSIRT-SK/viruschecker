@@ -35,6 +35,7 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
             async(IO) {
                 val scanResult = runCatching { antivirus.scanFile(params) }
                     .getOrDummy(params)
+                logger.debug { "Antivirus ${antivirus.antivirusName} sends report $scanResult to websocket channel." }
                 send(scanResult)
             }
         }.awaitAll()

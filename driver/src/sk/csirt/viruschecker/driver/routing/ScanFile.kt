@@ -100,8 +100,8 @@ fun Route.scanFile(
         }
 
         for (scanResult in scanChannel) {
-            val message = Frame.Text(scanResult.json())
-            logger.debug { "Sending via WebSocket: $message " }
+            logger.debug { "Sending via WebSocket: $scanResult" }
+            val message = Frame.Text(scanResult.toFileScanResponse().json())
             send(message)
         }
     }

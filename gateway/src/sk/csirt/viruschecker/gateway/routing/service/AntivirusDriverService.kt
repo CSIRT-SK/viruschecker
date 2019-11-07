@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
 import mu.KotlinLogging
 import sk.csirt.viruschecker.utils.HostPort
@@ -41,12 +42,17 @@ abstract class AntivirusDriverService(
 
     @ExperimentalCoroutinesApi
     suspend fun <T> CoroutineScope.multiDriverRequestChannel(
-        block: suspend CoroutineScope.(hostPort: HostPort, client: HttpClient) -> ReceiveChannel<T>
+        block: suspend CoroutineScope.(
+            hostPort: HostPort,
+            client: HttpClient,
+            resultChannel: SendChannel<T>
+        ) -> Unit
     ): ReceiveChannel<MultiDriverResponse<Result<T>>> = produce<MultiDriverResponse<Result<T>>> {
         driverHostsPorts.map { driverUrl ->
             async(IO) {
-                logger.info { "Requesting from $driverUrl" }
-                runCatching { block(driverUrl, client) }
+                logger.info { "Requesting $driverUrl" }
+//                val driverChannel = Channel<T>()
+                runCatching { produce { block(driverUrl, client, this) } }
                     .onFailure {
                         logger.error { "Failed http post to $driverUrl, cause is \n${it.stackTrace}" }
                         send(

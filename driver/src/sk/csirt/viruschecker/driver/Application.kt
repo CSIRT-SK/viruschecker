@@ -45,7 +45,9 @@ fun Application.module() {
         filter { call -> call.request.path().startsWith("/") }
     }
 
-    install(WebSockets)
+    install(WebSockets){
+        timeout = parsedArgs.socketTimeout
+    }
 
 //    install(CORS) {
 //        method(HttpMethod.Options)

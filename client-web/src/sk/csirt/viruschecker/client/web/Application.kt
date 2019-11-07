@@ -20,9 +20,9 @@ import io.ktor.routing.routing
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
+import sk.csirt.viruschecker.client.service.ClientScanService
 import sk.csirt.viruschecker.client.service.GatewayInfoService
 import sk.csirt.viruschecker.client.service.GatewayReportService
-import sk.csirt.viruschecker.client.service.ClientScanService
 import sk.csirt.viruschecker.client.web.config.CommandLineArguments
 import sk.csirt.viruschecker.client.web.config.webClientDependencyInjectionModule
 import sk.csirt.viruschecker.client.web.routing.index
@@ -105,8 +105,8 @@ fun Application.module() {
     val antivirusDriverInfoService by inject<GatewayInfoService>()
 
     routing {
-        index(antivirusDriverInfoService)
         styles()
+        index(antivirusDriverInfoService)
         scanFile(scanService)
         showReport(scanReportService)
         showReportsBy(scanReportService)
