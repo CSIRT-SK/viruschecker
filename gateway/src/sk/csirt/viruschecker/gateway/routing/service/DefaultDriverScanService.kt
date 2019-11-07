@@ -7,7 +7,9 @@ import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.content.PartData
 import kotlinx.coroutines.CoroutineScope
@@ -137,9 +139,15 @@ class DefaultDriverScanService(
                             val scanResponse = message.fromJson<FileScanResponse>()
                             resultChannel.send(scanResponse)
                         }
+                        is Frame.Close ->{
+                            logger.info { "WebSocket connection to $driverHostPort closed" }
+                            close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
+                        }
                         else -> logger.debug { "Receiving not supported WebSocket frame" }
                     }
                 }
+                logger.info { "WebSocket connection to $driverHostPort finished" }
+                close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
             }
 
         }

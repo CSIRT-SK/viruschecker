@@ -7,7 +7,9 @@ import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.http.content.PartData
 import kotlinx.io.streams.asInput
@@ -114,10 +116,15 @@ class ClientScanService(
                             message.fromJson<AntivirusReportResponse>()
                         onReceived(antivirusResponse)
                     }
+                    is Frame.Close -> {
+                        logger.info { "WebSocket connection to $gatewayUrl closed" }
+                        close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
+                    }
                     else -> logger.debug { "Receiving not supported WebSocket frame" }
                 }
             }
-            logger.info { "Finished WebSocket connection to $gatewayUrl with params $params" }
+            logger.info { "WebSocket connection to $gatewayUrl finished" }
+            close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
         }
     }
 

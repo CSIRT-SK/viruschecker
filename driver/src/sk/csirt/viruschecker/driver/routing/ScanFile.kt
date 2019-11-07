@@ -2,9 +2,7 @@ package sk.csirt.viruschecker.driver.routing
 
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readBytes
-import io.ktor.http.cio.websocket.readText
+import io.ktor.http.cio.websocket.*
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.locations.KtorExperimentalLocationsAPI
@@ -104,6 +102,8 @@ fun Route.scanFile(
             val message = Frame.Text(scanResult.toFileScanResponse().json())
             send(message)
         }
+        logger.debug { "Closing WebSocket connection." }
+        close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
     }
 }
 
