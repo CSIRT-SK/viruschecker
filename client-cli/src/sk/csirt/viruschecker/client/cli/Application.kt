@@ -93,5 +93,3 @@ private fun printReports(scanReport: FileHashScanResponse) {
 
     reporters.forEach { it.saveReport(scanReport) }
 }
-
-

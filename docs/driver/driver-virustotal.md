@@ -24,4 +24,3 @@ In this line
 virustotal.apikey=<insert-your-api-key>
 ``` 
 replace the `<insert-your-api-key>` with your api key.
-

@@ -112,4 +112,3 @@ fun Application.module() {
         showReportsBy(scanReportService)
     }
 }
-

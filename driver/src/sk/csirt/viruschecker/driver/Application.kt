@@ -78,4 +78,3 @@ fun Application.module() {
         scanFile(antivirus)
     }
 }
-

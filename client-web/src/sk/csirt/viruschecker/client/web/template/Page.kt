@@ -83,5 +83,3 @@ suspend fun ApplicationCall.respondDefaultHtml(
     )
     respond(content)
 }
-
-

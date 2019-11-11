@@ -59,5 +59,3 @@ suspend fun ApplicationCall.respondMultipleReportsHtml(
         }
     }
 }
-
-
