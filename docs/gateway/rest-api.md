@@ -87,8 +87,8 @@ None
             }
         },
         {
-            "url: "http:192.168.1.118",
-            "success": "true", 
+            "url: "http://192.168.1.118",
+            "success": "true" 
             "info": {
                 "driverVersion": "0.18.1",
                 "antivirus": "VirusTotal"
