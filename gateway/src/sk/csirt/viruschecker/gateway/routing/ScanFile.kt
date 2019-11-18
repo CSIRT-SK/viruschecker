@@ -19,6 +19,9 @@ import sk.csirt.viruschecker.gateway.routing.service.FileScanService
 import sk.csirt.viruschecker.gateway.routing.service.ScanParameters
 import sk.csirt.viruschecker.gateway.routing.utils.toTempFile
 import sk.csirt.viruschecker.routing.GatewayRoutes
+import sk.csirt.viruschecker.routing.payload.HashResponse
+import sk.csirt.viruschecker.routing.payload.ScanFileWebSocketParameters
+import sk.csirt.viruschecker.utils.fromJson
 import sk.csirt.viruschecker.utils.json
 import sk.csirt.viruschecker.utils.toTempFile
 import java.io.File
@@ -76,14 +79,9 @@ fun Route.multiScanFile(
     webSocket(GatewayRoutes.multiScanFileWebSocket) {
         logger.info { "WebSocket connection established" }
 
-        val useExternalServices = (incoming.receiveOrNull() as? Frame.Text)
+        val (useExternalServices, originalFilename) = (incoming.receiveOrNull() as? Frame.Text)
             ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
-            ?.takeIf { "useExternalDrivers: true" == it }
-            ?.let { true } ?: false.also { logger.debug { "Received WebSocket message: '$it'" } }
-
-        val originalFilename = (incoming.receiveOrNull() as? Frame.Text)
-            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
-            ?: "".also { logger.debug { "Received WebSocket message: '$it'" } }
+            ?.fromJson<ScanFileWebSocketParameters>() ?: ScanFileWebSocketParameters(false, "")
 
         val fileToScan: File = (incoming.receive() as Frame.Binary)
             .readBytes()
@@ -104,12 +102,16 @@ fun Route.multiScanFile(
             )
         }
 
-        send(Frame.Text(scanChannel.md5))
-        send(Frame.Text(scanChannel.sha1))
-        send(Frame.Text(scanChannel.sha256))
+        send(
+            HashResponse(
+                md5 = scanChannel.md5,
+                sha1 = scanChannel.sha1,
+                sha256 = scanChannel.sha256
+            ).json()
+        )
 
         for (antivirusReport in scanChannel) {
-            val message = Frame.Text(antivirusReport.json())
+            val message = antivirusReport.json()
             logger.debug { "Sending via WebSocket: $message " }
             send(message)
         }

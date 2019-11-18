@@ -1,5 +1,5 @@
-Deploy driver program on Linux based virtual machines 
-=====================================================
+Deploy driver program on a Linux based virtual machine 
+======================================================
 
 We will use the Linux based VM, more specifically the Ubuntu 18.04 VM.
 Any modern linux distribution is, however, equally suitable.

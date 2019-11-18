@@ -170,6 +170,8 @@ The API endpoints are documented [here](docs/driver/rest-api.md).
 
 For most users, however, this API is not important.
 
+###### Note: If you wish to use the REST API directly, consider using the gateway REST API instead. 
+
 ### 2.4 Extend driver
 
 If you and want to configure the driver our you are a developer wanting to add support for 

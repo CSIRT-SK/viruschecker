@@ -17,8 +17,11 @@ import mu.KotlinLogging
 import sk.csirt.viruschecker.routing.GatewayRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
+import sk.csirt.viruschecker.routing.payload.HashResponse
+import sk.csirt.viruschecker.routing.payload.ScanFileWebSocketParameters
 import sk.csirt.viruschecker.utils.HostPort
 import sk.csirt.viruschecker.utils.fromJson
+import sk.csirt.viruschecker.utils.json
 import java.io.File
 import java.io.FileInputStream
 
@@ -78,15 +81,14 @@ class ClientScanService(
             path = GatewayRoutes.multiScanFileWebSocket
         ) {
             logger.info { "Established WebSocket connection to $gatewayUrl with params $params" }
-            if (params.useExternalDrivers) {
-                logger.debug { "Sending WebSocket text frame 'useExternalDrivers: true'" }
-                send(Frame.Text("useExternalDrivers: true"))
-            } else {
-                logger.debug { "Sending WebSocket text frame 'useExternalDrivers: false'" }
-                send(Frame.Text("useExternalDrivers: false"))
-            }
-            logger.debug { "Sending WebSocket text frame 'params.originalFilename'" }
-            send(Frame.Text(params.originalFilename))
+
+            val scanRequestParams = ScanFileWebSocketParameters(
+                useExternalServices = params.useExternalDrivers,
+                originalFilename = params.originalFilename
+            )
+            logger.debug { "Sending WebSocket text frame '$scanRequestParams'" }
+            send(Frame.Text(scanRequestParams.json()))
+
             logger.debug { "Sending WebSocket binary frame" }
             send(
                 Frame.Binary(
@@ -95,9 +97,7 @@ class ClientScanService(
                 )
             )
 
-            val md5 = (incoming.receive() as Frame.Text).readText()
-            val sha1 = (incoming.receive() as Frame.Text).readText()
-            val sha256 = (incoming.receive() as Frame.Text).readText()
+            val (md5, sha1, sha256) = (incoming.receive() as Frame.Text).readText().fromJson<HashResponse>()
 
             onHashReceived(
                 HashTriple(

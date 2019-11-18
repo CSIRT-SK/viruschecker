@@ -57,15 +57,13 @@ None
     *UrlAntivirusDriverInfoResponse schema*
     ``` 
     structure UrlDriverInfoResponse:
-        url: String,
-        success: Boolean,   // If connection to driver on [url] was successfull.
+        url: String
+        success: Boolean   # `true` if connection to driver on [url] was successfull.
         info: AntivirusDriverInfoResponse   
     ```
-    
-    *DriverInfoResponse schema*
     ``` 
     structure DriverInfoResponse:
-        driverVersion: String,
+        driverVersion: String
         antivirus: String
     ``` 
   
@@ -73,16 +71,16 @@ None
     ``` 
     [
         {
-            "url: "http:192.168.1.112",
-            "success": "true" 
+            "url: "http://192.168.1.112",
+            "success": "true", 
             "info": {
                 "driverVersion": "0.18.1",
                 "antivirus": "Avast, Eset"
             }
         },
         {
-            "url: "http:192.168.1.115",
-            "success": "true" 
+            "url: "http://192.168.1.115",
+            "success": "true", 
             "info": {
                 "driverVersion": "0.16.0",
                 "antivirus": "Comodo"
@@ -90,15 +88,15 @@ None
         },
         {
             "url: "http:192.168.1.118",
-            "success": "true" 
+            "success": "true", 
             "info": {
                 "driverVersion": "0.18.1",
                 "antivirus": "VirusTotal"
             }
         },
         {
-            "url: "http:192.168.1.121",
-            "success": "false" 
+            "url: "http://192.168.1.121",
+            "success": "false", 
             "info": {
                 "driverVersion": "ERROR: Could not reach driver.",
                 "antivirus": "NA"
@@ -139,44 +137,38 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
     Type: *application/json*
     ``` 
     structure FileHashScanResponse
-        sha256: String,
-        md5: String,
-        sha1: String,
+        sha256: String
+        md5: String
+        sha1: String
         report: FileScanResponse
     ``` 
-
-    *FileScanResponse schema*  (identical with driver's API POST /scanFile)
     ```
     structure FileScanResponse:
-        date: DateTimeUTC,
-        filename: String,
-        status: ScanStatusResponse,
+        date: DateTimeUTC
+        filename: String
+        status: ScanStatusResponse
         results:  List<AntivirusReportResponse>
     ``` 
-    
-     *ScannedStatusResponse schema*
-     ```
-     enumeration ScanStatusResponse:
-         SCAN_REFUSED
-         NOT_AVAILABLE,
-         OK,
-         INFECTED
-     ```
-      
-     *AntivirusScanResponse schema*
-     ```
-     structure AntivirusReportResponse:
-         antivirus: String,
-         status: ScanStatusResponse,
-         malwareDescription: String
-     ```
+    ```
+    enumeration ScanStatusResponse:
+        SCAN_REFUSED
+        NOT_AVAILABLE
+        OK
+        INFECTED
+    ```
+    ```
+    structure AntivirusReportResponse:
+        antivirus: String
+        status: ScanStatusResponse
+        malwareDescription: String
+    ```
 
     Example:
     ``` 
     {
         "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
         "md5": "44d88612fea8a8f36de82e1278abb02f",
-        "sha1": "3395856ce81f2b7382dee72602f798b642f14140"
+        "sha1": "3395856ce81f2b7382dee72602f798b642f14140",
         "report": {
             "date": "2019-07-17T07:24:23.530Z",
             "filename": "eicar.exe",
@@ -205,6 +197,55 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
     
     If file upload is unsuccessful.
     
+### WS `/ws/multiScanFile`
+
+Upload file to all deployed drivers in parallel and returns scan reports via WebSocket.
+
+#### Send 
+
+1.  Type: *frame/text*, JSON format
+   
+    Arity: 1
+    ``` 
+    structure ScanFileWebSocketParameters:
+        useExternalServices: Boolean
+        originalFilename: String
+    ``` 
+
+2.  Type: *frame/binary*
+   
+    Arity: 1
+    
+#### Receive 
+
+1.  Type: *frame/text*, JSON format
+
+    Arity: 1
+    
+    ``` 
+    structure HashResponse:
+        md5: String
+        sha1: String
+        sha256: String
+    ``` 
+    
+2.  Type: *frame/text*, JSON format
+   
+    Arity: 1..N
+    
+    ``` 
+    structure AntivirusReportResponse:
+        antivirus: String
+        status: ScanStatusResponse
+        malwareDescription: String
+    ``` 
+    ```
+    enumeration ScanStatusResponse:
+        SCAN_REFUSED
+        NOT_AVAILABLE
+        OK
+        INFECTED
+    ```
 Retrieve scan report
 --------------------
 

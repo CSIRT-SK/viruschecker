@@ -28,8 +28,8 @@ None
     Type: *application/json*
     ``` 
     structure DriverInfoResponse:
-        antivirus: String,
-        driverVersion: String,
+        antivirus: String
+        driverVersion: String
     ``` 
     Example 1:
     ``` 
@@ -42,8 +42,7 @@ None
      ``` 
      {
          "antivirus": "Eset, Avast",
-         "usesExternalServices": "true"
-         "driverVersion": "0.18.1",
+         "driverVersion": "0.18.1"
      }
      ```               
 
@@ -78,26 +77,22 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
     Type: *application/json*
     ``` 
     structure FileScanResponse:
-        date: DateTimeUTC,
-        filename: String,
-        status: ScanStatusResponse,
+        date: DateTimeUTC
+        filename: String
+        status: ScanStatusResponse
         results:  List<AntivirusReportResponse>
     ``` 
-
-    *ScanStatusResponse schema*
     ```
     enumeration ScanStatusResponse:
-        SCAN_REFUSED,
-        NOT_AVAILABLE,
-        OK,
+        SCAN_REFUSED
+        NOT_AVAILABLE
+        OK
         INFECTED
     ```
-  
-    *AntivirusScanResponse schema*
     ```
     structure AntivirusReportResponse:
-        antivirus: String,
-        status: ScanStatusResponse,
+        antivirus: String
+        status: ScanStatusResponse
         malwareDescription: String
     ```
 
@@ -146,3 +141,44 @@ Content-Disposition: form-data; name="file"; filename="eicar.exe"
 * **400 Bad Request**
     
     If file was not received.
+
+### WS `/ws/scanFile`
+
+Upload virus file and returns scan report via WebSocket.
+
+#### Send 
+
+1.  Type: *frame/text*, JSON format
+   
+    Arity: 1
+    ``` 
+    structure ScanFileWebSocketParameters:
+        useExternalServices: Boolean
+        originalFilename: String
+    ``` 
+
+2.  Type: *frame/binary*
+   
+    Arity: 1
+    
+#### Receive 
+
+1.  Type: *frame/text*, JSON format
+   
+    Arity: 1..N
+    
+    ```
+    structure AntivirusReportResponse:
+        antivirus: String
+        status: ScanStatusResponse
+        malwareDescription: String
+    ```
+    ```
+    enumeration ScanStatusResponse:
+        SCAN_REFUSED
+        NOT_AVAILABLE
+        OK
+        INFECTED
+    ```
+       
+   

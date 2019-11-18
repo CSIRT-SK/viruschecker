@@ -2,8 +2,9 @@ package sk.csirt.viruschecker.client.cli
 
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
-import io.ktor.application.Application
+import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import sk.csirt.viruschecker.client.cli.config.CommandLineArguments
 import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
@@ -17,17 +18,14 @@ import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import java.time.Instant
-import kotlin.system.exitProcess
 
 lateinit var parsedArgs: CommandLineArguments
 
+private val logger = KotlinLogging.logger{ }
+
+@KtorExperimentalAPI
 fun main(args: Array<String>) = mainBody {
     parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
-    io.ktor.server.netty.EngineMain.main(args)
-}
-
-@Suppress("unused") // Referenced in application.conf
-fun Application.module() {
     val client = httpClient(parsedArgs.socketTimeout)
 
     val gatewayUrl = parsedArgs.gateway
@@ -42,6 +40,7 @@ fun Application.module() {
 //            )
 //        )
 //    }
+    logger.debug { "Initializing scan" }
     val scanReport = runBlocking {
         val reports = mutableListOf<AntivirusReportResponse>()
         var md5 = ""
@@ -71,11 +70,12 @@ fun Application.module() {
             )
         )
     }
-
+    logger.debug { "Printing reports" }
     printReports(scanReport)
 
+    logger.debug { "Closing http client" }
     client.close()
-    exitProcess(0)
+    logger.debug { "Exiting process" }
 }
 
 private fun printReports(scanReport: FileHashScanResponse) {

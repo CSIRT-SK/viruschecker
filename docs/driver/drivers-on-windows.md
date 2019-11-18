@@ -1,7 +1,7 @@
-Deploy driver program on Windows based virtual machines 
-=======================================================
+Deploy driver program on a Windows based virtual machine 
+========================================================
 
-We will use the Windows based VM, more specifically the Windows 7 VMs.
+We will use the Windows based VM, more specifically the Windows 7 VM.
 Windows 8.1 is, however, more future proof as it has longer support.
 Right now, we do not recommend using Windows 10 because of its forced updates that cannot be 
 completely deactivated.

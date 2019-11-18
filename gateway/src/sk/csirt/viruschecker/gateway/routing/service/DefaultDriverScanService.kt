@@ -25,6 +25,7 @@ import sk.csirt.viruschecker.hash.sha256
 import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.*
 import sk.csirt.viruschecker.utils.fromJson
+import sk.csirt.viruschecker.utils.json
 import java.io.FileInputStream
 import java.time.Instant
 
@@ -100,76 +101,69 @@ class DefaultDriverScanService(
         }
 
     override suspend fun CoroutineScope.scanFileChannel(scanParams: ScanParameters): FileHashScanChannel {
-        val (fileToScan, originalFileName) = scanParams
+        val (fileToScan, originalFilename, useExternalDrivers) = scanParams
         logger.info { "Computing hashes for $fileToScan" }
         val sha256Deferred = async { fileToScan.sha256() }
         val sha1Deferred = async { fileToScan.sha1() }
         val md5Deferred = async { fileToScan.md5() }
 
-        val driverChannel = multiDriverRequestChannel<FileScanResponse> { driverHostPort, client, resultChannel ->
-            client.ws(
-                host = driverHostPort.host,
-                port = driverHostPort.port,
-                path = DriverRoutes.scanFileWebSocket
-            ) {
-                logger.info {
-                    "Established WebSocket connection to $driverHostPort with params $scanParams"
-                }
-                if (scanParams.useExternalDrivers) {
-                    logger.debug { "Sending WebSocket text frame 'useExternalDrivers: true'" }
-                    send(Frame.Text("useExternalDrivers: true"))
-                } else {
-                    logger.debug { "Sending WebSocket text frame 'useExternalDrivers: false'" }
-                    send(Frame.Text("useExternalDrivers: false"))
-                }
-                logger.debug { "Sending WebSocket text frame 'params.originalFilename'" }
-                send(Frame.Text(scanParams.originalFilename))
-                logger.debug { "Sending WebSocket binary frame" }
-                send(
-                    Frame.Binary(
-                        true,
-                        scanParams.fileToScan.readBytes()
-                    )
-                )
-                for(scanResponseFrame in incoming){
-                    when(scanResponseFrame){
-                        is Frame.Text ->{
-                            val message = scanResponseFrame.readText()
-                            logger.debug { "Receiving WebSocket text frame: $message" }
-                            val scanResponse = message.fromJson<FileScanResponse>()
-                            resultChannel.send(scanResponse)
-                        }
-                        is Frame.Close ->{
-                            logger.info { "WebSocket connection to $driverHostPort closed" }
-                            close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
-                        }
-                        else -> logger.debug { "Receiving not supported WebSocket frame" }
+        val driverChannel =
+            multiDriverRequestChannel<AntivirusReportResponse> { driverHostPort, client, resultChannel ->
+                client.ws(
+                    host = driverHostPort.host,
+                    port = driverHostPort.port,
+                    path = DriverRoutes.scanFileWebSocket
+                ) {
+                    logger.info {
+                        "Established WebSocket connection to $driverHostPort with params $scanParams"
                     }
-                }
-                logger.info { "WebSocket connection to $driverHostPort finished" }
-                close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
-            }
+                    val scanRequestParams = ScanFileWebSocketParameters(
+                        useExternalServices = useExternalDrivers,
+                        originalFilename = originalFilename
+                    )
+                    logger.debug { "Sending WebSocket text frame '$scanRequestParams'" }
+                    send(Frame.Text(scanRequestParams.json()))
 
-        }
+                    logger.debug { "Sending WebSocket binary frame" }
+                    send(
+                        Frame.Binary(
+                            true,
+                            scanParams.fileToScan.readBytes()
+                        )
+                    )
+                    for (scanResponseFrame in incoming) {
+                        when (scanResponseFrame) {
+                            is Frame.Text -> {
+                                val message = scanResponseFrame.readText()
+                                logger.debug { "Receiving WebSocket text frame: $message" }
+                                val scanResponse = message.fromJson<AntivirusReportResponse>()
+                                resultChannel.send(scanResponse)
+                            }
+                            is Frame.Close -> {
+                                logger.info { "WebSocket connection to $driverHostPort closed" }
+                                close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
+                            }
+                            else -> logger.debug { "Receiving not supported WebSocket frame" }
+                        }
+                    }
+                    logger.info { "WebSocket connection to $driverHostPort finished" }
+                    close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
+                }
+
+            }
 
         val receiveChannel = produce<AntivirusReportResponse> {
             for ((driverUrl, result) in driverChannel) {
                 result.getOrDefault(
-                    FileScanResponse(
-                        date = Instant.now(),
-                        filename = originalFileName,
-                        results = listOf(
-                            AntivirusReportResponse(
-                                antivirus = "Unknown",
-                                malwareDescription = "Connection to $driverUrl was unsuccessful.",
-                                status = ScanStatusResponse.NOT_AVAILABLE,
-                                virusDatabaseVersion = ""
-                            )
-                        )
+                    AntivirusReportResponse(
+                        antivirus = "Unknown",
+                        malwareDescription = "Connection to $driverUrl was unsuccessful.",
+                        status = ScanStatusResponse.NOT_AVAILABLE,
+                        virusDatabaseVersion = ""
                     )
-                ).results.forEach {
-                    logger.debug { "Sending response via WebSocket: $it" }
-                    send(it)
+                ).let { antivirusReportResponse ->
+                    logger.debug { "Sending response via WebSocket: $antivirusReportResponse" }
+                    send(antivirusReportResponse)
                 }
             }
         }
@@ -180,7 +174,7 @@ class DefaultDriverScanService(
             sha256 = sha256Deferred.await().value,
             reportChannel = FileScanChannel(
                 date = Instant.now(),
-                filename = originalFileName,
+                filename = originalFilename,
                 resultChannel = receiveChannel
             )
         )

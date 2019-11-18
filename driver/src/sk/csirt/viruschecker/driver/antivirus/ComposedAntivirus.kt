@@ -30,12 +30,14 @@ class ComposedAntivirus(private val antiviruses: Iterable<Antivirus>) : Antiviru
 
     @ExperimentalCoroutinesApi
     override suspend fun CoroutineScope.scanFileChannel(params: FileScanParameters)
-            : ReceiveChannel<FileScanResult> = produce {
+            : ReceiveChannel<AntivirusReportResult> = produce {
         antiviruses.map { antivirus ->
             async(IO) {
                 val scanResult = runCatching { antivirus.scanFile(params) }
                     .getOrDummy(params, antivirusName)
-                send(scanResult)
+                scanResult.scanReport.reports.forEach {
+                    send(it)
+                }
             }
         }.awaitAll()
     }

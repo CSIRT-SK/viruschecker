@@ -19,13 +19,16 @@ import kotlinx.io.core.Input
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
 import sk.csirt.viruschecker.driver.antivirus.Antivirus
+import sk.csirt.viruschecker.driver.antivirus.AntivirusReportResult
 import sk.csirt.viruschecker.driver.antivirus.FileScanParameters
 import sk.csirt.viruschecker.driver.antivirus.FileScanResult
 import sk.csirt.viruschecker.driver.config.Constants
 import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
+import sk.csirt.viruschecker.routing.payload.ScanFileWebSocketParameters
 import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.utils.fromJson
 import sk.csirt.viruschecker.utils.json
 import sk.csirt.viruschecker.utils.toTempFile
 import java.io.File
@@ -74,14 +77,9 @@ fun Route.scanFile(
     webSocket(DriverRoutes.scanFileWebSocket) {
         logger.info { "WebSocket connection established" }
 
-        val useExternalServices = (incoming.receiveOrNull() as? Frame.Text)
+        val (useExternalServices, originalFilename) = (incoming.receiveOrNull() as? Frame.Text)
             ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
-            ?.takeIf { "useExternalDrivers: true" == it }
-            ?.let { true } ?: false.also { logger.debug { "Received WebSocket message: '$it'" } }
-
-        val originalFilename = (incoming.receiveOrNull() as? Frame.Text)
-            ?.readText()?.also { logger.debug { "Received WebSocket message: '$it'" } }
-            ?: "".also { logger.debug { "Received WebSocket message: '$it'" } }
+            ?.fromJson<ScanFileWebSocketParameters>() ?: ScanFileWebSocketParameters(false, "")
 
         val fileToScan: File = (incoming.receive() as Frame.Binary)
             .readBytes()
@@ -99,8 +97,7 @@ fun Route.scanFile(
 
         for (scanResult in scanChannel) {
             logger.debug { "Sending via WebSocket: $scanResult" }
-            val message = Frame.Text(scanResult.toFileScanResponse().json())
-            send(message)
+            send(scanResult.toAntivirusReportResponse().json())
         }
         logger.debug { "Closing WebSocket connection." }
         close(CloseReason(CloseReason.Codes.NORMAL, "WebSocket connection finished normally"))
@@ -139,16 +136,15 @@ private fun Input.toCheckParameters(
     return FileScanParameters(savedFile, filename, useExternalServices)
 }
 
+fun AntivirusReportResult.toAntivirusReportResponse() = AntivirusReportResponse(
+    antivirus = antivirusName,
+    status = ScanStatusResponse.valueOf(status.name),
+    malwareDescription = malwareDescription,
+    virusDatabaseVersion = virusDatabaseVersion
+)
+
 fun FileScanResult.toFileScanResponse() = FileScanResponse(
     date = Instant.now(),
     filename = filename,
-    results = scanReport.reports.map {
-        AntivirusReportResponse(
-            antivirus = it.antivirusName,
-            status = ScanStatusResponse.valueOf(it.status.name),
-            malwareDescription = it.malwareDescription,
-            virusDatabaseVersion = it.virusDatabaseVersion
-        )
-    }
+    results = scanReport.reports.map { it.toAntivirusReportResponse() }
 )
-
