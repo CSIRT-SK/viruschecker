@@ -32,14 +32,6 @@ fun main(args: Array<String>) = mainBody {
     val fileToScan = parsedArgs.fileToScan
 
     val scanService = ClientScanService(gatewayUrl, client)
-//    val scanReport = runBlocking {
-//        scanService.scanFile(
-//            ScanParameters(
-//                fileToScan, fileToScan.name,
-//                parsedArgs.useExternalDrivers
-//            )
-//        )
-//    }
     logger.debug { "Initializing scan" }
     val scanReport = runBlocking {
         val reports = mutableListOf<AntivirusReportResponse>()
