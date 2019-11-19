@@ -13,7 +13,7 @@ allprojects {
     group 'sk.csirt.viruschecker'
     version app_version
     apply plugin: 'idea'
-    
+
     idea {
         module {
             downloadSources = true
@@ -37,7 +37,18 @@ subprojects {
         test.kotlin.srcDirs = test.java.srcDirs = ['test']
         main.resources.srcDirs = ['resources']
         test.resources.srcDirs = ['testresources']
+
+//        testIntegration{
+//            kotlin.srcDirs = java.srcDirs = ['testintegration']
+//            resources.srcDirs = ['testintegrationresources']
+//        }
     }
+
+//    configurations {
+//        testIntegrationCompile.extendsFrom testCompile
+//        testIntegrationRuntime.extendsFrom testRuntime
+//    }
+
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -49,6 +60,12 @@ subprojects {
 
         testImplementation "io.mockk:mockk:$mockk_version"
     }
+
+//    task testIntegration(type: Test) {
+//        testClassesDirs = sourceSets.testIntegration.output.classesDirs
+//        classpath = sourceSets.testIntegration.runtimeClasspath
+//    }
+
 
     compileKotlin {
         kotlinOptions {
@@ -65,4 +82,11 @@ subprojects {
             jvmTarget = '1.8'
         }
     }
+
+//    compileTestIntegrationKotlin {
+//        kotlinOptions {
+//            jvmTarget = '1.8'
+//        }
+//    }
+
 }
