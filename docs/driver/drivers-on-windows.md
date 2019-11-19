@@ -1,35 +1,44 @@
-Deploy driver program on Windows based virtual machines 
-=======================================================
+Deploy driver program on a Windows based virtual machine 
+========================================================
 
-We will use the Windows based VM, more specifically the Windows 7 VMs.
+We will use the Windows based VM, more specifically the Windows 7 VM.
 Windows 8.1 is, however, more future proof as it has longer support.
 Right now, we do not recommend using Windows 10 because of its forced updates that cannot be 
 completely deactivated.
 
-1 Create virtual machines
--------------------------
+1 Create virtual machine
+------------------------
 
 These steps describe how to setup Windows 7 VM in VirtualBox, but they are practically identical
 also for newer systems with some parts of the OS having slightly different names. 
 
 ### 1.1 Set up virtual machine
 
+For production purposes it is recommended to create a VM from scratch.
+For development or testing, however, one can instead download a pre-installed VM directly from 
+[Microsoft](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/) with 90 day evaluation 
+license. 
+
 * Install some recent version of VirtualBox.
 
-* Create a new VM.
+* If you want to create a new VM from scratch:
 
-* Type some name, e.g. **VC-Windows**.
+    * Create a new VM.
 
-* Make sure to create a virtual hard drive when asked to (should be the default option). 
+    * Type some name, e.g. **VC-Windows**.
 
-* In the *Memory size* dialog, type at least 4096 MB if you want to use all supported AVs. 
+    * Make sure to create a virtual hard drive when asked to (should be the default option). 
 
-* In the following dialogs, just leave the recommended options.
+    * In the *Memory size* dialog, type at least 4096 MB if you want to use all supported AVs. 
+
+    * In the following dialogs, just leave the recommended options.
+
+###### Note: Windows needs 1 GB of RAM just for itself. For each running antivirus you should allocate additional 512 MB of RAM at least. 
 
 The virtual machine is now created, however, we need to specify a few additional options like 
 networking or location of the installation media.
 
-* Now in the *Oracle VM VirtualBox Manager* right click on the newly created VM and select 
+* Now in the *Oracle VM VirtualBox Manager* right click on the newly created/imported VM and select 
 *Settings*.
 
 * Navigate to the *System* tab.
@@ -44,7 +53,6 @@ networking or location of the installation media.
     option.  
     * Open your Windows iso file and close the *Settings* window by clicking on the *OK* button.
           
-
 * Navigate to the *Network* tab.
     * Make sure the *Enable Network Adapter* is checked.
     * Expand the *Advanced* options and press the *Port Forwarding* button.
@@ -57,6 +65,8 @@ networking or location of the installation media.
         
 ### 1.2 Install Windows on the virtual machine
 
+###### Skip this subsection if using a pre-installed VM.
+ 
 * Start the newly created VM and install the operating system.
 
 * Disable all Windows updates. On Windows 7, this can be done just before the end of the 
@@ -74,12 +84,12 @@ installation process.
 Classic or Basic theme. 
 
 
-#### 1.2.2 Install Java
+### 1.3 Install Java
 
 The driver application requires JRE 1.8 or newer.
 The free and open source Java distributions like AdoptOpenJDK are fully sufficient.
 
-#### 1.2.3 (Optional) Take a snapshot
+### 1.4 (Optional) Take a snapshot
 
 Now the virtual machine should be prepared to install the supported AVs.
 

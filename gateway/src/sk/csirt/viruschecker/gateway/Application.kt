@@ -12,6 +12,9 @@ import io.ktor.locations.Locations
 import io.ktor.request.path
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
+import io.ktor.websocket.WebSockets
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mu.KotlinLogging
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -26,12 +29,14 @@ import sk.csirt.viruschecker.gateway.routing.service.ShareService
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
 
 lateinit var parsedArgs: CommandLineArguments
+val logger = KotlinLogging.logger{ }
 
 fun main(args: Array<String>) = mainBody {
     parsedArgs = ArgParser(filterArgsForArgParser(args)).parseInto(::CommandLineArguments)
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+@ExperimentalCoroutinesApi
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
@@ -65,6 +70,10 @@ fun Application.module() {
         fileProperties()
     }
 
+    install(WebSockets){
+        timeout = parsedArgs.socketTimeout
+    }
+
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<PersistentScanReportService>()
     val checkedUrls by inject<List<UrlDriverInfoResponse>>(checkedDriverUrls)
@@ -76,6 +85,7 @@ fun Application.module() {
         multiScanFile(scanService)
         findByHash(scanReportService)
         shareFile(shareService)
+        findBy(scanReportService)
         findAll(scanReportService)
     }
 

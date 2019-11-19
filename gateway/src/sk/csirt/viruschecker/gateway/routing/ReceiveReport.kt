@@ -28,3 +28,28 @@ fun Route.findByHash(
         }
     }
 }
+
+@KtorExperimentalLocationsAPI
+fun Route.findAll(
+    scanReportService: PersistentScanReportService
+) {
+    get<GatewayRoutes.AllScanReports> {
+        logger.info { "Requested all reports." }
+        val scanReports = scanReportService.findAll()
+        call.respond(scanReports)
+    }
+}
+
+
+@KtorExperimentalLocationsAPI
+fun Route.findBy(
+    scanReportService: PersistentScanReportService
+) {
+    get<GatewayRoutes.ScanReportBy> { params ->
+        val searchWords = params.searchWordsList
+        logger.info { "Requested reports for search words: $searchWords." }
+        val scanReports = scanReportService.findBy(searchWords)
+        call.respond(scanReports)
+    }
+}
+

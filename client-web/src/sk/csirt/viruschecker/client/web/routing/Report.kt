@@ -66,4 +66,3 @@ fun Route.showReport(reportService: GatewayReportService) {
         }
     }
 }
-

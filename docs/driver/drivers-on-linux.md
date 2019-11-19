@@ -1,11 +1,11 @@
-Deploy driver program on Linux based virtual machines 
-=====================================================
+Deploy driver program on a Linux based virtual machine 
+======================================================
 
 We will use the Linux based VM, more specifically the Ubuntu 18.04 VM.
 Any modern linux distribution is, however, equally suitable.
 
-1 Create virtual machines
--------------------------
+1 Create virtual machine
+------------------------
 
 These steps describe how to setup Ubuntu 18.04 VM in VirtualBox.
 
@@ -97,22 +97,26 @@ Driver program currently supports the aforementioned AVs on Windows: Comodo.
 
 ### 2.1 Comodo
 
+###### On Ubuntu 18.04, this AV needs older libssl library than the one shipped with the distribution. This may cause incompatibility with other AVs.
+ 
+
 To install *Comodo Antivirus* open terminal and execute the following commands.
 
-* Install the *libssl* library.
+* Install the *libssl0.9.8* library.
     ```bash
-    sudo apt install libssl
+    wget archive.ubuntu.com/ubuntu/pool/universe/o/openssl098/libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb	
+
+    sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.2_amd64.deb
+
+    sudo apt-get install -f
     ```
-* Download the installation package
-    ```bash
-    wget http://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
-    ```
+
 * Install the antivirus
     ```bash
+    wget http://download.comodo.com/cis/download/installs/linux/cav-linux_x64.deb
+
     sudo gdebi -n cav-linux_x64.deb
-    ``` 
-* Run the post installation script
-    ```bash
+
     sudo /opt/COMODO/post_setup.sh
     ``` 
   
@@ -124,26 +128,9 @@ Open the Comodo window and click on the *Antivirus* tab at the top side of the w
 
 * In the *Scanner Settings* disable the *Real-Time Scanning* option.
 
-
-* In the *Protection* tab permanently disable the *Core shields*, *Ransomware Shield*, 
-*Firewall* and *Real site* features. 
-
-* In the *Privacy* tab, disable the *Sensitive Data Shield*.
-
-* In the *Detection engine* -> *HIPS* tab, make sure the *Enable HIPS* option is disabled. 
-
-* In the *Licensing* window click on the green symbol `x` located to the right of 
-*License key* label.
-
-* In the *Firewall* tab, uncheck the *Enable Firewall* option.  
-
-* In the *Web and email* tab, uncheck the *Enable application protocol content filtering* option.  
-
 #### 2.1.2 Command line utility
 
 Comodo provides the command line utility called *cmdscan* that may be used to scan the 
 selected file for malware.
 It should be located at `/opt/COMODO`.
-The driver is preconfigured to this location and therefore no additional settings should be 
-necessary. 
-
+The driver is preconfigured to this location and therefore no additional settings are required. 

@@ -33,4 +33,9 @@ object WebRoutes {
     @KtorExperimentalLocationsAPI
     @Location(allScanReports)
     class AllScanReports
+
+    const val scanReportsBy = "/scanReportBy"
+    @KtorExperimentalLocationsAPI
+    @Location(scanReportsBy)
+    data class ScanReportsBy(val search: String)
 }

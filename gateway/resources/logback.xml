@@ -24,11 +24,13 @@
         </encoder>
     </appender>
 
-    <root level="debug">N
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
     <logger name="org.apache.http.wire" level="INFO"/>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="sk.csirt.viruschecker" level="DEBUG"/>
+
+    <root level="INFO">N
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
 </configuration>

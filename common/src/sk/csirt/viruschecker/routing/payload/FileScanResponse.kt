@@ -2,6 +2,7 @@ package sk.csirt.viruschecker.routing.payload
 
 import java.time.Instant
 
+
 data class FileHashScanResponse(
     val sha256: String,
     val md5: String,

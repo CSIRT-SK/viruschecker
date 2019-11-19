@@ -12,7 +12,6 @@ dependencies {
     compile "io.ktor:ktor-metrics:$ktor_version"
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-websockets:$ktor_version"
-    compile "io.ktor:ktor-gson:$ktor_version"
     compile "org.koin:koin-ktor:$koin_version"
     compile "com.github.vatbub:VirustotalPublicV2.0:$virus_total_api_v2_version"
 

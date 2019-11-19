@@ -20,10 +20,12 @@ import sk.csirt.viruschecker.client.web.routing.WebRoutes
  * in the content place of the page.
  */
 @KtorExperimentalLocationsAPI
-suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyList(),
-                                               visibility: CacheControl.Visibility = CacheControl.Visibility.Private,
-                                               title: String = "Virus Checker",
-                                               block: DIV.() -> Unit) {
+suspend fun ApplicationCall.respondDefaultHtml(
+    versions: List<Version> = emptyList(),
+    visibility: CacheControl.Visibility = CacheControl.Visibility.Private,
+    title: String = "Virus Checker",
+    block: DIV.() -> Unit
+) {
     val content = HtmlContent(HttpStatusCode.OK) {
         head {
             title { +title }
@@ -40,16 +42,22 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
                         nav("nav") {
                             ul("nav-list") {
                                 li("nav-item") {
-                                    a(classes = "pure-button",
-                                        href = locations.href(WebRoutes.Index())) { +"Home" }
+                                    a(
+                                        classes = "pure-button",
+                                        href = locations.href(WebRoutes.Index())
+                                    ) { +"Home" }
                                 }
                                 li("nav-item") {
-                                        a(classes = "pure-button",
-                                            href = locations.href(WebRoutes.ScanFile())) { +"Scanner" }
+                                    a(
+                                        classes = "pure-button",
+                                        href = locations.href(WebRoutes.ScanFile())
+                                    ) { +"Scanner" }
                                 }
                                 li("nav-item") {
-                                    a(classes = "pure-button",
-                                        href = locations.href(WebRoutes.AllScanReports())) { +"All reports" }
+                                    a(
+                                        classes = "pure-button",
+                                        href = locations.href(WebRoutes.ScanReportsBy(""))
+                                    ) { +"Search reports" }
                                 }
                             }
                         }
@@ -64,10 +72,14 @@ suspend fun ApplicationCall.respondDefaultHtml(versions: List<Version> = emptyLi
     }
     content.versions = versions
     content.caching = CachingOptions(
-        cacheControl = CacheControl.MaxAge(3600 * 24 * 7, mustRevalidate = true, visibility = visibility, proxyMaxAgeSeconds = null, proxyRevalidate = false),
+        cacheControl = CacheControl.MaxAge(
+            3600 * 24 * 7,
+            mustRevalidate = true,
+            visibility = visibility,
+            proxyMaxAgeSeconds = null,
+            proxyRevalidate = false
+        ),
         expires = (null as? GMTDate?)
     )
     respond(content)
 }
-
-

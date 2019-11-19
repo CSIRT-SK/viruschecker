@@ -36,4 +36,27 @@ class PersistentScanReportService(
         }
     }
 
+    override suspend fun findBy(searchWords: Iterable<String>): List<FileHashScanResponse> {
+        val lowerSearchWords = searchWords.map { it.toLowerCase() }
+        return reportRepository
+            .findAll()
+            .asSequence()
+            .filter { scanReport ->
+                lowerSearchWords.any { it == scanReport.md5 }
+
+                        || lowerSearchWords.any { it == scanReport.sha1 }
+
+                        || lowerSearchWords.any { it == scanReport.sha256 }
+
+                        || lowerSearchWords.any { it in scanReport.date.toString() }
+
+                        || scanReport.filename.toLowerCase().let { filename -> lowerSearchWords.any { it in filename } }
+
+                        || scanReport.reports.joinToString(", ").toLowerCase().let { reports -> lowerSearchWords.any { it in reports } }
+            }.map {
+                it.toFileHashScanResponse()
+            }.toList()
+    }
+
+
 }

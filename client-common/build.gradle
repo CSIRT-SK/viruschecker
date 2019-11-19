@@ -4,10 +4,7 @@ dependencies {
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-client-core:$ktor_version"
     compile "io.ktor:ktor-client-core-jvm:$ktor_version"
-    compile "io.ktor:ktor-client-apache:$ktor_version"
-    compile "io.ktor:ktor-client-json-jvm:$ktor_version"
-    compile "io.ktor:ktor-client-gson:$ktor_version"
-    compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
+
         
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 
