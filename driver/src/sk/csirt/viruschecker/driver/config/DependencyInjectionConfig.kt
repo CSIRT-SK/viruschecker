@@ -10,6 +10,10 @@ internal val defaultAntivirusQualifier = named("antivirus")
 
 val driverDependencyInjectionModule = module {
 
+    single<Antivirus>(AntivirusType.DUMMY) {
+        DummyAntivirus()
+    }
+
     single<Antivirus>(AntivirusType.AVAST) {
         Avast(RunProgramCommand(getProperty(Properties.avast)))
     }

@@ -14,6 +14,7 @@ import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.core.module.Module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -27,6 +28,7 @@ import sk.csirt.viruschecker.driver.routing.index
 import sk.csirt.viruschecker.driver.routing.scanFile
 
 lateinit var parsedArgs: CommandLineArguments
+
 private val viruscheckerDriverProperties = DriverPropertiesFactory.loadOrCreateDefault()
 
 fun main(args: Array<String>) = mainBody {
@@ -38,7 +40,7 @@ fun main(args: Array<String>) = mainBody {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
-fun Application.module() {
+fun Application.module(dependencyInjection: Module = driverDependencyInjectionModule) {
 
     install(CallLogging) {
         level = Level.DEBUG
@@ -67,7 +69,7 @@ fun Application.module() {
 
     install(Locations)
     install(Koin) {
-        modules(driverDependencyInjectionModule)
+        modules(dependencyInjection)
         properties(viruscheckerDriverProperties)
     }
 

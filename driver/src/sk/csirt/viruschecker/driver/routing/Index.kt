@@ -16,10 +16,10 @@ private val logger = KotlinLogging.logger { }
 private const val ideRunMessage = "Version not available. Driver application is probably running from IDE."
 
 @KtorExperimentalLocationsAPI
-fun Route.index(virusChecker: Antivirus) {
+fun Route.index(antivirus: Antivirus) {
     get<DriverRoutes.Index> {
         call.respond(DriverInfoResponse(
-            antivirus = virusChecker.antivirusName,
+            antivirus = antivirus.antivirusName,
             driverVersion = Antivirus::class.java.`package`.implementationVersion
                 ?: ideRunMessage
         ))
