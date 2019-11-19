@@ -2,10 +2,15 @@ package sk.csirt.viruschecker.driver.antivirus
 
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.AntivirusType
+import sk.csirt.viruschecker.driver.utils.ProcessRunner
 
 class Eset(
-    scanCommand: RunProgramCommand
-) : CommandLineAntivirus(scanCommand) {
+    scanCommand: RunProgramCommand,
+    processRunner: ProcessRunner
+) : CommandLineAntivirus(
+    scanCommand,
+    processRunner
+) {
 
     private val logger = KotlinLogging.logger { }
 

@@ -4,11 +4,16 @@ import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
+import sk.csirt.viruschecker.driver.utils.ProcessRunner
 import sk.csirt.viruschecker.driver.utils.readRegistryKey
 
 class Microsoft(
-    scanCommand: RunProgramCommand
-) : CommandLineAntivirus(scanCommand) {
+    scanCommand: RunProgramCommand,
+    processRunner: ProcessRunner
+) : CommandLineAntivirus(
+    scanCommand,
+    processRunner
+) {
 
     private val logger = KotlinLogging.logger { }
 

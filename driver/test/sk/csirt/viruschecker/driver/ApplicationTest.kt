@@ -11,7 +11,7 @@ import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import sk.csirt.viruschecker.driver.config.CommandLineArguments
 import sk.csirt.viruschecker.routing.DriverRoutes
-import sk.csirt.viruschecker.sk.csirt.viruschecker.driver.config.testDriverDependencyInjectionModule
+import sk.csirt.viruschecker.driver.config.testDriverDependencyInjectionModule
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

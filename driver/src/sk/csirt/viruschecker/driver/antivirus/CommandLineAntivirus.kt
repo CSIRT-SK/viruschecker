@@ -1,16 +1,16 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import sk.csirt.viruschecker.driver.config.Constants
+import sk.csirt.viruschecker.driver.utils.ProcessRunner
 import java.nio.file.Paths
 import java.util.*
 
 typealias AntivirusOutput = List<String>
 
 abstract class CommandLineAntivirus(
-    private val scanCommand: RunProgramCommand
+    private val scanCommand: RunProgramCommand,
+    private val processRunner: ProcessRunner
 ) : Antivirus, AutoDetectable {
     private val logger = KotlinLogging.logger { }
 
@@ -57,15 +57,7 @@ abstract class CommandLineAntivirus(
 
     private suspend fun runAntivirus(command: List<String>): AntivirusOutput {
         logger.debug("Waiting for $antivirusName. Command to run: $scanCommand")
-        val report = withContext(IO) {
-            ProcessBuilder(command)
-                .start()
-                .inputStream
-                .bufferedReader()
-                .useLines {
-                    it.toList()
-                }
-        }
+        val report = processRunner.runProcess(command)
         logger.debug("Antivirus task completed. Command successfully executed: $scanCommand")
         logger.debug("Output from $antivirusName: $report")
         return report

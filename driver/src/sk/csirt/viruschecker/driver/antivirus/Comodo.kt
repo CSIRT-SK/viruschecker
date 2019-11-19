@@ -1,8 +1,15 @@
 package sk.csirt.viruschecker.driver.antivirus
 
 import sk.csirt.viruschecker.driver.config.AntivirusType
+import sk.csirt.viruschecker.driver.utils.ProcessRunner
 
-class Comodo(scanCommand: RunProgramCommand) : CommandLineAntivirus(scanCommand) {
+class Comodo(
+    scanCommand: RunProgramCommand,
+    processRunner: ProcessRunner
+) : CommandLineAntivirus(
+    scanCommand,
+    processRunner
+) {
 
     override val antivirusName: String = AntivirusType.COMODO.antivirusName
 

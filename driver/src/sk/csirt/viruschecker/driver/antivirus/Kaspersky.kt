@@ -1,10 +1,15 @@
 package sk.csirt.viruschecker.driver.antivirus
 
 import sk.csirt.viruschecker.driver.config.AntivirusType
+import sk.csirt.viruschecker.driver.utils.ProcessRunner
 
 class Kaspersky(
-    scanCommand: RunProgramCommand
-) : CommandLineAntivirus(scanCommand) {
+    scanCommand: RunProgramCommand,
+    processRunner: ProcessRunner
+) : CommandLineAntivirus(
+    scanCommand,
+    processRunner
+) {
 
     override val antivirusName: String = AntivirusType.KASPERSKY.antivirusName
 
