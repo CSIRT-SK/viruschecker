@@ -54,7 +54,6 @@ internal abstract class CommandLineAntivirusTest {
         assertEquals(originalFileName, scanResult.filename)
         assertTrue(scanResult.scanReport.reports.isNotEmpty())
         assertTrue(scanResult.scanReport.reports.all { it.antivirusName.isNotBlank() })
-        assertTrue(scanResult.scanReport.reports.any { it.virusDatabaseVersion.isNotBlank() })
 
         return antivirus.scanFile(scanParameters)
     }
@@ -81,5 +80,11 @@ internal abstract class CommandLineAntivirusTest {
     fun `Infected archive file scan test`() = runBlockingTest{
         val scanResult = performMockedScan(mockArchiveFileScanOutputInfected, true)
         assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
+    }
+
+    @Test
+    fun `Test getting database version`() = runBlockingTest {
+        val scanResult = performMockedScan(mockFileScanOutputHealthy, false)
+        assertTrue(scanResult.scanReport.reports.all { it.virusDatabaseVersion.isNotBlank() })
     }
 }
