@@ -15,33 +15,39 @@ import kotlin.test.assertTrue
 @Ignore
 internal abstract class CommandLineAntivirusTest {
 
-    abstract val mockFileScanOutputHealthy: List<String>
-    abstract val mockFileScanOutputInfected: List<String>
-    abstract val mockArchiveFileScanOutputHealthy: List<String>
-    abstract val mockArchiveFileScanOutputInfected: List<String>
+    abstract val mockFileScanOutputHealthy: String
+    abstract val mockFileScanOutputInfected: String
+    abstract val mockArchiveFileScanOutputHealthy: String
+    abstract val mockArchiveFileScanOutputInfected: String
 
     abstract fun antivirusFactory(
         command: RunProgramCommand,
         processRunner: ProcessRunner
     ): CommandLineAntivirus
 
-    private suspend fun performMockedScan(mockedAntivirusOutput: List<String>): FileScanResult {
-        val processRunner = mockk<ProcessRunner>()
+    private suspend fun performMockedScan(
+        mockedAntivirusOutput: String,
+        isArchive: Boolean
+    ): FileScanResult {
+        val tempFile = createTempFile()
+        val originalFileName = if(isArchive) "test-file-name.zip" else "test-file-name.txt"
 
-        coEvery { processRunner.runProcess(any()) } returns mockedAntivirusOutput
+
+        val processRunner = mockk<ProcessRunner>()
+        val mockedOutputLines = mockedAntivirusOutput
+            .replace(RunProgramCommand.SCAN_FILE, tempFile.name)
+            .split("\n")
+        coEvery { processRunner.runProcess(any()) } returns mockedOutputLines
+
         val antivirus = antivirusFactory(
             command = RunProgramCommand(""),
             processRunner = processRunner
         )
-
-        val tempFile = createTempFile()
-        val originalFileName = "test-file-name.txt"
         val scanParameters = FileScanParameters(
             fileToScan = tempFile,
             originalFileName = originalFileName,
             externalServicesAllowed = true
         )
-
         val scanResult = antivirus.scanFile(scanParameters)
 
         coVerify { processRunner.runProcess(any()) }
@@ -55,28 +61,25 @@ internal abstract class CommandLineAntivirusTest {
 
     @Test
     fun `Healthy file scan test`() = runBlockingTest {
-        val scanResult = performMockedScan(mockArchiveFileScanOutputHealthy)
+        val scanResult = performMockedScan(mockFileScanOutputHealthy, false)
         assertEquals(ScanStatusResult.OK, scanResult.scanReport.status)
     }
 
     @Test
     fun `Infected file scan test`() = runBlockingTest {
-        val scanResult = performMockedScan(mockArchiveFileScanOutputHealthy)
+        val scanResult = performMockedScan(mockFileScanOutputInfected, false)
         assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Healthy archive file scan test`() {
-
+    fun `Healthy archive file scan test`() = runBlockingTest {
+        val scanResult = performMockedScan(mockArchiveFileScanOutputHealthy, true)
+        assertEquals(ScanStatusResult.OK, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Infected archive file scan test`() {
-
-    }
-
-    @Test
-    fun `Cleaning file test`() {
-
+    fun `Infected archive file scan test`() = runBlockingTest{
+        val scanResult = performMockedScan(mockArchiveFileScanOutputInfected, true)
+        assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
     }
 }
