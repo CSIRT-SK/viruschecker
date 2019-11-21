@@ -22,7 +22,7 @@ class Kaspersky(
             .filterNot { it.startsWith(";") }
             .filter { params.fileToScan.name in it }
             .map { line ->
-                line.split("\t").let {
+                line.split("\t").filter{ it.isNotBlank() }.let {
                     Report(
                         status = when (it[2].trim()) {
                             "ok" -> ScanStatusResult.OK
