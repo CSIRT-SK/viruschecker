@@ -33,11 +33,12 @@ internal abstract class CommandLineAntivirusTest {
         val originalFileName = if (isArchive) "test-file-name.zip" else "test-file-name.txt"
 
 
-        val processRunner = mockk<ProcessRunner>()
         val mockedOutputLines = mockedAntivirusOutput(tempFile.name)
             .replace(RunProgramCommand.SCAN_FILE, tempFile.name)
             .split("\n")
-        coEvery { processRunner.runProcess(any()) } returns mockedOutputLines
+        val processRunner = mockk<ProcessRunner>(){
+            coEvery { runProcess(any()) } returns mockedOutputLines
+        }
 
         val antivirus = antivirusFactory(
             command = RunProgramCommand(""),

@@ -6,14 +6,20 @@ import org.koin.dsl.module
 import sk.csirt.viruschecker.driver.antivirus.*
 import sk.csirt.viruschecker.driver.parsedArgs
 import sk.csirt.viruschecker.driver.utils.ProcessRunner
+import sk.csirt.viruschecker.driver.utils.WindowsRegistry
 
 internal val defaultAntivirusQualifier = named("antivirus")
 
 val driverDependencyInjectionModule = module {
 
-    single<ProcessRunner> {
+    single {
         ProcessRunner()
     }
+
+    single {
+        WindowsRegistry()
+    }
+
 
     single<Antivirus>(AntivirusType.DUMMY) {
         DummyAntivirus()
@@ -43,6 +49,7 @@ val driverDependencyInjectionModule = module {
     single<Antivirus>(AntivirusType.MICROSOFT) {
         Microsoft(
             RunProgramCommand(getProperty(Properties.microsoft)),
+            get(),
             get()
         )
     }

@@ -1,15 +1,17 @@
 package sk.csirt.viruschecker.driver.antivirus
 
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import sk.csirt.viruschecker.driver.utils.ProcessRunner
-import sk.csirt.viruschecker.driver.utils.readRegistryKey
+import sk.csirt.viruschecker.driver.utils.WindowsRegistry
 
 class Microsoft(
     scanCommand: RunProgramCommand,
-    processRunner: ProcessRunner
+    processRunner: ProcessRunner,
+    private val registry: WindowsRegistry
 ) : CommandLineAntivirus(
     scanCommand,
     processRunner
@@ -29,10 +31,12 @@ class Microsoft(
             else
                 "HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Signature Updates"
 
-            readRegistryKey(
-                registryKey,
-                "AVSignatureVersion"
-            )
+            async {
+                registry.read(
+                    registryKey,
+                    "AVSignatureVersion"
+                )
+            }
         }
 
         val infectedCountString = rawReport.firstOrNull { line ->
@@ -46,7 +50,7 @@ class Microsoft(
         // return from coroutine
         when {
             infectedCountString == null -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")
-            infectedCount == 0 -> Report(ScanStatusResult.OK, "OK", virusDatabaseVersion)
+            infectedCount == 0 -> Report(ScanStatusResult.OK, "OK", virusDatabaseVersion.await())
             infectedCount >= 1 -> {
                 val description = rawReport
                     .first { it.startsWith("Threat") }
@@ -54,7 +58,7 @@ class Microsoft(
                 Report(
                     ScanStatusResult.INFECTED,
                     description,
-                    virusDatabaseVersion
+                    virusDatabaseVersion.await()
                 )
             }
             else -> Report(ScanStatusResult.NOT_AVAILABLE, "", "")

@@ -26,23 +26,3 @@ fun createDirectoryIfNotExists(directoryName: String){
         Files.createDirectory(directoryPath)
     }
 }
-
-/**
- * Works only on Windows.
- */
-fun readRegistryKey(path: String, key: String): String =
-    ProcessBuilder(
-        "reg",
-        "query",
-        path,
-        "/v",
-        key
-    ).start()
-        .inputStream
-        .bufferedReader()
-        .useLines { it.toList() }
-        .also { logger.debug { "Registry $path\\$key loaded value is: $it" } }
-        .firstOrNull { key in it }
-        ?.split(" ")
-        ?.last()
-        ?: ""

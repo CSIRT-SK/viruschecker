@@ -80,7 +80,7 @@ Info: task 'ods' finished, last error code 0
 ; Corrupted:    0
 ; Errors:       0
 ;  ------------------
-cls""".trimIndent()
+""".trimIndent()
 
     override fun mockArchiveFileScanOutputHealthy(filename: String) =
         """AV bases release date: 2019-11-21 06:11:00 (full)
@@ -104,8 +104,7 @@ cls""".trimIndent()
 
 2019-11-21 11:09:54     $filename   archive ZIP
 2019-11-21 11:09:54     $filename//go/bin/rsrc.exe  ok
-2019-11-21 11:09:54     $filename//go/pkg/windows_amd64/github.com/kardianos
-/osext.a        ok
+2019-11-21 11:09:54     $filename//go/pkg/windows_amd64/github.com/kardianos/osext.a        ok
 2019-11-21 11:09:54    $filename   skipped: by type
 2019-11-21 11:09:54     Scan_Objects${'$'}3929                          completed
 
@@ -146,12 +145,9 @@ Info: task 'ods' finished, last error code 0
 
 2019-11-21 11:08:55     $filename  archive ZIP
 2019-11-21 11:08:56     $filename//go/bin/rsrc.exe ok
-2019-11-21 11:08:56     $filename//go/pkg/windows_amd64/github.com/kardiano
-s/osext.a       archive arch
-2019-11-21 11:08:56     $filename//go/pkg/windows_amd64/github.com/kardiano
-s/osext.a       skipped: by type
-2019-11-21 11:08:56     $filename//eicar.exe       detected        EICAR-Te
-st-File
+2019-11-21 11:08:56     $filename//go/pkg/windows_amd64/github.com/kardianos/osext.a       archive arch
+2019-11-21 11:08:56     $filename//go/pkg/windows_amd64/github.com/kardianos/osext.a       skipped: by type
+2019-11-21 11:08:56     $filename//eicar.exe       detected        EICAR-Test-File
 2019-11-21 11:08:56     $filename//eicar.exe       skipped
 2019-11-21 11:08:56     Scan_Objects${'$'}3927                          completed
 

@@ -76,8 +76,8 @@ Copy the driver executable *jar* file from  **host** located at
 `.../driver/build/libs/driver-[VERSION]-all.jar`
 to the virtual machine. 
 If the Guest Additions are working properly then you may just drag & drop the file from your 
-system's file manager to the virtual machine.
-Place the *jar* file to some reasonable and easy-to-find location, perhaps `~/virus-checker` where 
+host system's file manager to the virtual machine.
+Place the *jar* file to some reasonable and easy-to-find location on the guest, perhaps `~/virus-checker` where 
 `~` denotes your home directory. 
 
 #### 1.2.3 (Optional)  Take a snapshot
@@ -134,3 +134,4 @@ Comodo provides the command line utility called *cmdscan* that may be used to sc
 selected file for malware.
 It should be located at `/opt/COMODO`.
 The driver is preconfigured to this location and therefore no additional settings are required. 
+

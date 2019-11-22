@@ -23,9 +23,9 @@ class Comodo(
             .let {
                 when {
                     it == "Not Virus" ->
-                        Report(ScanStatusResult.OK, it, "")
+                        Report(ScanStatusResult.OK, it, "Not available ATM")
                     it.startsWith("Found Virus") ->
-                        Report(ScanStatusResult.INFECTED, it.split(" is ")[1], "")
+                        Report(ScanStatusResult.INFECTED, it.split(" is ")[1], "Not available ATM")
                     else -> Report(ScanStatusResult.NOT_AVAILABLE, "", "Not available ATM")
                 }
             }
