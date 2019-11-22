@@ -13,7 +13,8 @@ import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
 @Ignore
-internal abstract class CommandLineAntivirusTest {
+internal abstract class CommandLineAntivirusTest
+    : AntivirusTest {
 
     abstract fun mockFileScanOutputHealthy(filename: String): String
     abstract fun mockFileScanOutputInfected(filename: String): String
@@ -36,7 +37,7 @@ internal abstract class CommandLineAntivirusTest {
         val mockedOutputLines = mockedAntivirusOutput(tempFile.name)
             .replace(RunProgramCommand.SCAN_FILE, tempFile.name)
             .split("\n")
-        val processRunner = mockk<ProcessRunner>(){
+        val processRunner = mockk<ProcessRunner>() {
             coEvery { runProcess(any()) } returns mockedOutputLines
         }
 
@@ -60,31 +61,31 @@ internal abstract class CommandLineAntivirusTest {
     }
 
     @Test
-    fun `Healthy file scan test`() = runBlockingTest {
+    override fun `Healthy file scan test`() = runBlockingTest {
         val scanResult = performMockedScan(false) { mockFileScanOutputHealthy(it) }
         assertEquals(ScanStatusResult.OK, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Infected file scan test`() = runBlockingTest {
+    override fun `Infected file scan test`() = runBlockingTest {
         val scanResult = performMockedScan(false) { mockFileScanOutputInfected(it) }
         assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Healthy archive file scan test`() = runBlockingTest {
+    override fun `Healthy archive file scan test`() = runBlockingTest {
         val scanResult = performMockedScan(true) { mockArchiveFileScanOutputHealthy(it) }
         assertEquals(ScanStatusResult.OK, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Infected archive file scan test`() = runBlockingTest {
+    override fun `Infected archive file scan test`() = runBlockingTest {
         val scanResult = performMockedScan(true) { mockArchiveFileScanOutputInfected(it) }
         assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
     }
 
     @Test
-    fun `Test getting database version`() = runBlockingTest {
+    override fun `Get virus database version test`() = runBlockingTest {
         val scanResult = performMockedScan(false) { mockFileScanOutputHealthy(it) }
         assertTrue(scanResult.scanReport.reports.all { it.virusDatabaseVersion.isNotBlank() })
     }

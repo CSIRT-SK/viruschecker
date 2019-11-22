@@ -14,15 +14,11 @@ object Properties {
 }
 
 object DriverPropertiesFactory : PropertiesFactory {
-
-    private val logger = KotlinLogging.logger{ }
-
+    private val logger = KotlinLogging.logger { }
     override val propertiesName = "viruschecker-driver.properties"
-
     // Do not change the value of this variable! Insert your key into [defaultPropertiesUnix] or
     // [defaultPropertiesWindows].
     const val missingApiKeyPlaceHolder = "<insert-your-api-key>"
-
     override val defaultProperties by lazy {
         when {
             SystemUtils.IS_OS_WINDOWS -> {
@@ -34,11 +30,12 @@ object DriverPropertiesFactory : PropertiesFactory {
                 defaultPropertiesUnix
             }
             else -> {
-                logger.warn("Operating system is not officially supported. Generating empty " +
-                        "$propertiesName file.")
+                logger.warn(
+                    "Operating system is not officially supported. Generating empty " +
+                            "$propertiesName file."
+                )
                 ""
             }
         }
     }
-
 }
