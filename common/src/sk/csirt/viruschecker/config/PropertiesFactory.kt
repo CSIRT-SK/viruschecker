@@ -2,7 +2,7 @@ package sk.csirt.viruschecker.config
 
 import mu.KotlinLogging
 import org.apache.commons.io.FileUtils
-import sk.csirt.viruschecker.utils.cleanCommentsAndEmptyLines
+import sk.csirt.viruschecker.utils.filterPropertiesLines
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Paths
@@ -31,7 +31,7 @@ interface PropertiesFactory {
 
     private fun loadProperties(propertiesFile: File): Map<String, Any> =
         FileUtils.readLines(propertiesFile, Charset.defaultCharset())
-            .cleanCommentsAndEmptyLines()
+            .filterPropertiesLines()
             .associate { propertyLine ->
                 propertyLine.split(limit = 2, delimiters = *arrayOf("=", "= ", " = ")).let {
                     it[0] to (it[1].toDoubleOrNull() ?: it[1].toIntOrNull() ?: it[1])

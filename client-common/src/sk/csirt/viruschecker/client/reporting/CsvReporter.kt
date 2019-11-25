@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 class CsvReporter(private val file: File) : Reporter {
-    override fun saveReport(result: FileHashScanResponse) {
+    override fun saveReport(scanResponse: FileHashScanResponse) {
         FileWriter(file).use { fileWriter ->
             CSVPrinter(
                 fileWriter, CSVFormat.DEFAULT.withHeader(
@@ -17,16 +17,16 @@ class CsvReporter(private val file: File) : Reporter {
                     "malwareDescription", "sha256", "sha1", "md5"
                 )
             ).use { csvPrinter ->
-                result.report.results.map {
+                scanResponse.report.results.map {
                    listOf(
-                        result.report.filename,
-                        LocalDateTime.ofInstant(result.report.date, ZoneId.systemDefault()),
+                        scanResponse.report.filename,
+                        LocalDateTime.ofInstant(scanResponse.report.date, ZoneId.systemDefault()),
                         it.antivirus,
                         it.status.name,
                         it.malwareDescription,
-                        result.sha256,
-                        result.sha1,
-                        result.md5
+                        scanResponse.sha256,
+                        scanResponse.sha1,
+                        scanResponse.md5
                     )
                 }.forEach { csvPrinter.printRecord(it) }
             }

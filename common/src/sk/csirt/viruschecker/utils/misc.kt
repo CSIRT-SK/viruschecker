@@ -32,7 +32,7 @@ suspend fun InputStream.copyToSuspend(
     bytesCopied
 }
 
-fun Iterable<String>.cleanCommentsAndEmptyLines() =
+fun Iterable<String>.filterPropertiesLines(): List<String> =
     asSequence()
         .filterNot { it.startsWith("#") }
         .filterNot { it.isBlank() }

@@ -27,7 +27,7 @@ class GatewayReportService(
             logger.info { "Retrieved all reports" }
         }
 
-    suspend fun findReportBy(searchWords: String): List<FileHashScanResponse> {
+    suspend fun findReportsBy(searchWords: String): List<FileHashScanResponse> {
         logger.info{ "Original search words: $searchWords" }
         val searchWordsParsed = searchWords
             .replace(", ", ",")

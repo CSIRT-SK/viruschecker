@@ -3,5 +3,5 @@ package sk.csirt.viruschecker.client.reporting
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 
 interface Reporter{
-    fun saveReport(result: FileHashScanResponse)
+    fun saveReport(scanResponse: FileHashScanResponse)
 }

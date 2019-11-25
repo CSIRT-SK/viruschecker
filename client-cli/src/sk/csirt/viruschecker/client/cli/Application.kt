@@ -8,7 +8,7 @@ import mu.KotlinLogging
 import sk.csirt.viruschecker.client.cli.config.CommandLineArguments
 import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
-import sk.csirt.viruschecker.client.reporting.DefaultReporter
+import sk.csirt.viruschecker.client.reporting.FileReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
 import sk.csirt.viruschecker.client.service.ClientScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
@@ -79,7 +79,7 @@ private fun printReports(scanReport: FileHashScanResponse) {
         if (reportFile.name.endsWith(".csv"))
             listOf<Reporter>(CsvReporter(reportFile))
         else
-            listOf<Reporter>(DefaultReporter(reportFile))
+            listOf<Reporter>(FileReporter(reportFile))
     } else emptyList()
 
 

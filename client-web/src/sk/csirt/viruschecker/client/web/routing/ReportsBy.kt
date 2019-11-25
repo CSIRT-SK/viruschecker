@@ -14,7 +14,7 @@ fun Route.showReportsBy(reportService: GatewayReportService) {
         val scanReports = if(params.search.isBlank())
             emptyList()
         else
-            reportService.findReportBy(params.search)
+            reportService.findReportsBy(params.search)
 
         call.respondMultipleReportsHtml(scanReports){
             h2 { +"Scan reports" }

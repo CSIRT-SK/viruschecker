@@ -27,17 +27,6 @@ sealed class HashAlgorithm(
                     sizeRead = inputStream.read(buffer)
                 }
             }
-//            AsynchronousFileChannel.open(file.toPath()).use { channel ->
-//                val buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE)
-//
-//                var sizeRead = channel.aRead(buffer, 0)
-//                var totalRead = sizeRead
-//                while (sizeRead != -1) {
-//                    digest.update(buffer.moveToByteArray(), 0, sizeRead)
-//                    sizeRead = channel.aRead(buffer, totalRead)
-//                    totalRead += sizeRead
-//                }
-//            }
             digest
         }
 

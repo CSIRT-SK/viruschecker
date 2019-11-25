@@ -15,5 +15,5 @@ data class HostPort(
         }
     }
 
-    override fun toString(): String = "$host:$port"
+    override fun toString(): String = "http://$host:$port"
 }
