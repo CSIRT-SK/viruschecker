@@ -3,9 +3,11 @@ package sk.csirt.viruschecker.driver.antivirus
 import com.kanishka.virustotal.dto.FileScanReport
 import com.kanishka.virustotal.dto.VirusScanInfo
 import com.kanishka.virustotalv2.VirustotalPublicV2Impl
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,24 +20,23 @@ internal class VirusTotalTest : AntivirusTest {
     @Test
     override fun `Healthy file scan test`() {
         val originalFileName = "test-file-name.txt"
-        val scanResult = runBlocking {
-            val mockedVirusTotalApiImplementation = mockk<VirustotalPublicV2Impl>() {
-                every { getScanReport(any()) } returns null
-            }
-            val virusTotal = VirusTotal(
-                apiKey = testApiKey,
-                virusTotalApiImplementation = mockedVirusTotalApiImplementation
-            )
 
-            val tempFile = createTempFile()
-
-            val scanParameters = FileScanParameters(
-                fileToScan = tempFile,
-                originalFileName = originalFileName,
-                externalServicesAllowed = true
-            )
-            virusTotal.scanFile(scanParameters)
+        val mockedVirusTotalApiImplementation = mockk<VirustotalPublicV2Impl>() {
+            every { getScanReport(any()) } returns null
         }
+        val virusTotal = VirusTotal(
+            apiKey = testApiKey,
+            virusTotalApiImplementation = mockedVirusTotalApiImplementation
+        )
+
+        val tempFile = createTempFile()
+
+        val scanParameters = FileScanParameters(
+            fileToScan = tempFile,
+            originalFileName = originalFileName,
+            externalServicesAllowed = true
+        )
+        val scanResult = runBlocking { virusTotal.scanFile(scanParameters) }
         assertEquals(originalFileName, scanResult.filename)
         assertEquals(ScanStatusResult.NOT_AVAILABLE, scanResult.scanReport.status)
     }
@@ -45,11 +46,11 @@ internal class VirusTotalTest : AntivirusTest {
         val scanResult = mockedInfectedFileScan()
         assertEquals(testFileName, scanResult.filename)
         assertTrue(scanResult.scanReport.reports.isNotEmpty())
-        assertEquals(ScanStatusResult.INFECTED,scanResult.scanReport.status)
+        assertEquals(ScanStatusResult.INFECTED, scanResult.scanReport.status)
         assertTrue(scanResult.scanReport.reports.all { it.antivirusName.isNotBlank() })
     }
 
-    private fun mockedInfectedFileScan(): FileScanResult = runBlocking {
+    private fun mockedInfectedFileScan(): FileScanResult {
         val mockedVirusTotalApiImplementation = mockk<VirustotalPublicV2Impl>() {
             every<FileScanReport?> { getScanReport(any()) } returns FileScanReport().apply {
                 md5 = "1d9ab62fa8be2e5934f7a192dd4728a2"
@@ -81,7 +82,7 @@ internal class VirusTotalTest : AntivirusTest {
             originalFileName = testFileName,
             externalServicesAllowed = true
         )
-        virusTotal.scanFile(scanParameters)
+        return runBlocking{ virusTotal.scanFile(scanParameters) }
     }
 
     @Test
@@ -98,6 +99,26 @@ internal class VirusTotalTest : AntivirusTest {
     override fun `Get virus database version test`() {
         val report = mockedInfectedFileScan()
         assertTrue(report.scanReport.reports.first().virusDatabaseVersion.isNotBlank())
+    }
+
+    @Test
+    fun `Handle not allowed external services scenario test`() {
+        val originalFileName = "does-not-matter"
+        val scanParameters = FileScanParameters(
+            fileToScan = File(originalFileName),
+            originalFileName = originalFileName,
+            externalServicesAllowed = false
+        )
+        val mockedVirusTotalApiImplementation = mockk<VirustotalPublicV2Impl>() {
+            every { getScanReport(any()) } returns null
+        }
+        val virusTotal = VirusTotal(
+            apiKey = testApiKey,
+            virusTotalApiImplementation = mockedVirusTotalApiImplementation
+        )
+        val scanResult = runBlocking { virusTotal.scanFile(scanParameters) }
+        assertEquals(originalFileName, scanResult.filename)
+        assertEquals(ScanStatusResult.SCAN_REFUSED, scanResult.scanReport.status)
     }
 
 }

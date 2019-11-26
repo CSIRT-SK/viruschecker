@@ -14,7 +14,6 @@ import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportSer
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DefaultDriverScanService
 import sk.csirt.viruschecker.gateway.routing.service.DriverInfoService
-import sk.csirt.viruschecker.gateway.routing.service.ShareService
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
 import java.io.File
 import java.time.Instant
@@ -26,6 +25,7 @@ val gatewayDependencyInjectionModule = module {
     val sha256Sample = "2f66755d1d48dab1d49441087077cdb4ef4161dca5fb536446c2c20d1ee596fb"
     val sha1Sample = "27cdb0eb9e1fe3fb6a91cec02e2b21c8251e091c"
     val md5Sample = "597c538cf3ea4f2f97cb1b9481af443e"
+
     single(database) {
         ScanReportDatabase(
             file = File(getProperty<String>("database.file")),
@@ -73,5 +73,5 @@ val gatewayDependencyInjectionModule = module {
     }
     single { CachedDriverScanService(get(), get()) }
 
-    single { ShareService() }
+//    single { ShareService() }
 }

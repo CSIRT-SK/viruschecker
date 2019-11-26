@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 @ExperimentalCoroutinesApi
 class IndexTest : RoutingTest() {
     @Test
-    fun testIndex() {
+    fun `Index test`() {
         createTestApplication {
             handleRequest(HttpMethod.Get, DriverRoutes.index).apply {
                 assertEquals(HttpStatusCode.OK, response.status())

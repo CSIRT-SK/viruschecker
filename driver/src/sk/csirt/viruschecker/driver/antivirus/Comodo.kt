@@ -1,8 +1,10 @@
 package sk.csirt.viruschecker.driver.antivirus
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import sk.csirt.viruschecker.driver.config.AntivirusType
 import sk.csirt.viruschecker.driver.utils.ProcessRunner
 
+@ExperimentalCoroutinesApi
 class Comodo(
     scanCommand: RunProgramCommand,
     processRunner: ProcessRunner

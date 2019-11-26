@@ -1,7 +1,7 @@
 package sk.csirt.viruschecker.gateway.routing.service
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.websocket.ws
+import io.ktor.client.features.websocket.webSocket
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
@@ -109,7 +109,7 @@ class DefaultDriverScanService(
 
         val driverChannel =
             multiDriverRequestChannel<AntivirusReportResponse> { driverHostPort, client, resultChannel ->
-                client.ws(
+                client.webSocket(
                     host = driverHostPort.host,
                     port = driverHostPort.port,
                     path = DriverRoutes.scanFileWebSocket

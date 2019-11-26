@@ -33,13 +33,10 @@ interface Antivirus {
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun CoroutineScope.scanFileAndCleanChannel(params: FileScanParameters)
-            : ReceiveChannel<AntivirusReportResult> =
-        scanFileChannel(params).also {
-            launch(IO) {
-                params.fileToScan.delete()
-            }
-        }
+    suspend fun CoroutineScope.scanFileChannelAndClean(params: FileScanParameters)
+            : ReceiveChannel<AntivirusReportResult> = produce {
+        scanFileAndClean(params).scanReport.reports.forEach { send(it) }
+    }
 }
 
 data class FileScanParameters(

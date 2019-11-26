@@ -1,6 +1,6 @@
 package sk.csirt.viruschecker.driver.antivirus
 
-interface AntivirusTest {
+internal interface AntivirusTest {
     fun `Healthy file scan test`()
 
     fun `Infected file scan test`()

@@ -14,7 +14,7 @@ import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import kotlinx.html.*
-import sk.csirt.viruschecker.client.service.ClientScanService
+import sk.csirt.viruschecker.client.service.GatewayScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.client.web.parsedArgs
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
@@ -26,7 +26,7 @@ import java.util.*
 
 
 @KtorExperimentalLocationsAPI
-fun Route.scanFile(scanService: ClientScanService) {
+fun Route.scanFile(scanService: GatewayScanService) {
 
     val useExternalDrivers = "externalDrivers"
 

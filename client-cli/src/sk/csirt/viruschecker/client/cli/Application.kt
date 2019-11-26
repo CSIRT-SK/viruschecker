@@ -10,7 +10,7 @@ import sk.csirt.viruschecker.client.reporting.CommandLineReporter
 import sk.csirt.viruschecker.client.reporting.CsvReporter
 import sk.csirt.viruschecker.client.reporting.FileReporter
 import sk.csirt.viruschecker.client.reporting.Reporter
-import sk.csirt.viruschecker.client.service.ClientScanService
+import sk.csirt.viruschecker.client.service.GatewayScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.config.filterArgsForArgParser
 import sk.csirt.viruschecker.config.httpClient
@@ -31,7 +31,7 @@ fun main(args: Array<String>) = mainBody {
     val gatewayUrl = parsedArgs.gateway
     val fileToScan = parsedArgs.fileToScan
 
-    val scanService = ClientScanService(gatewayUrl, client)
+    val scanService = GatewayScanService(gatewayUrl, client)
     logger.debug { "Initializing scan" }
     val scanReport = runBlocking {
         val reports = mutableListOf<AntivirusReportResponse>()

@@ -25,7 +25,6 @@ import sk.csirt.viruschecker.gateway.config.gatewayDependencyInjectionModule
 import sk.csirt.viruschecker.gateway.persistence.service.PersistentScanReportService
 import sk.csirt.viruschecker.gateway.routing.*
 import sk.csirt.viruschecker.gateway.routing.service.CachedDriverScanService
-import sk.csirt.viruschecker.gateway.routing.service.ShareService
 import sk.csirt.viruschecker.routing.payload.UrlDriverInfoResponse
 
 lateinit var parsedArgs: CommandLineArguments
@@ -77,14 +76,14 @@ fun Application.module() {
     val scanService by inject<CachedDriverScanService>()
     val scanReportService by inject<PersistentScanReportService>()
     val checkedUrls by inject<List<UrlDriverInfoResponse>>(checkedDriverUrls)
-    val shareService by inject<ShareService>()
+//    val shareService by inject<ShareService>()
 
     routing {
         index()
         driversInfo(checkedUrls)
         multiScanFile(scanService)
         findByHash(scanReportService)
-        shareFile(shareService)
+//        shareFile(shareService)
         findBy(scanReportService)
         findAll(scanReportService)
     }

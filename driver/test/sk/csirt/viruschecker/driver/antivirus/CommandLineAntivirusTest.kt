@@ -89,4 +89,5 @@ internal abstract class CommandLineAntivirusTest
         val scanResult = performMockedScan(false) { mockFileScanOutputHealthy(it) }
         assertTrue(scanResult.scanReport.reports.all { it.virusDatabaseVersion.isNotBlank() })
     }
+
 }

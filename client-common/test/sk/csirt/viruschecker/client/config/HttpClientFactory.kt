@@ -16,6 +16,7 @@ internal fun mockHttpClient(handler: MockRequestHandler) = HttpClient(MockEngine
         serializer = GsonSerializer()
     }
     install(WebSockets)
+
     engine {
         addHandler(handler)
     }

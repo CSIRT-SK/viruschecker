@@ -12,7 +12,6 @@ import sk.csirt.viruschecker.routing.payload.DriverInfoResponse
 
 private val logger = KotlinLogging.logger { }
 
-
 private const val ideRunMessage = "Version not available. Driver application is probably running from IDE."
 
 @KtorExperimentalLocationsAPI
@@ -25,5 +24,3 @@ fun Route.index(antivirus: Antivirus) {
         ))
     }
 }
-
-

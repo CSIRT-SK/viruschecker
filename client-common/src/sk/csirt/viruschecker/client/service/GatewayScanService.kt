@@ -1,7 +1,7 @@
 package sk.csirt.viruschecker.client.service
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.websocket.ws
+import io.ktor.client.features.websocket.webSocket
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.ContentDisposition
@@ -31,7 +31,7 @@ data class ScanParameters(
     val useExternalDrivers: Boolean
 )
 
-class ClientScanService(
+class GatewayScanService(
     private val gatewayUrl: String,
     private val client: HttpClient
 ) {
@@ -74,7 +74,7 @@ class ClientScanService(
         onReceived: (AntivirusReportResponse) -> Unit
     ) {
         logger.debug { "Initializing WebSocket connection to $gatewayUrl with params $params" }
-        client.ws(
+        client.webSocket(
             // method = HttpMethod.Post,
             host = gatewayHostPort.host,
             port = gatewayHostPort.port,

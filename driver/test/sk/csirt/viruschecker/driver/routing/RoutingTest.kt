@@ -19,7 +19,6 @@ import sk.csirt.viruschecker.driver.parsedArgs
 fun <R> createTestApplication(test: TestApplicationEngine.() -> R): R =
     withTestApplication({ module(testDriverDependencyInjectionModule) }) { this.test() }
 
-
 @KtorExperimentalLocationsAPI
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi
