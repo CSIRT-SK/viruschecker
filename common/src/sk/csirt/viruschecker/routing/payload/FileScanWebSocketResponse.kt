@@ -3,7 +3,6 @@ package sk.csirt.viruschecker.routing.payload
 import kotlinx.coroutines.channels.ReceiveChannel
 import java.time.Instant
 
-
 data class HashResponse(
     val md5: String,
     val sha1: String,
