@@ -13,10 +13,8 @@ internal class HashHolderTest {
 
     private fun testHash(
         expectedHash: String,
-        hasher: suspend File.() -> HashHolder) {
-        val testFile = createTempFile()
-        testFile.writeText(content)
-        val hash = runBlocking { testFile.hasher() }.value
+        hasher: suspend String.() -> String) {
+        val hash = runBlocking { content.hasher() }
         assertEquals(expectedHash.toLowerCase(), hash.toLowerCase())
     }
 
