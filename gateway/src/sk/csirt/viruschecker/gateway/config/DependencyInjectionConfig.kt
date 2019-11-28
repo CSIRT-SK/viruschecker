@@ -1,5 +1,7 @@
 package sk.csirt.viruschecker.gateway.config
 
+import io.ktor.util.KtorExperimentalAPI
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -21,6 +23,8 @@ import java.time.Instant
 internal val checkedDriverUrls = named("checked.driver.urls")
 private val database = named("scan.report.database")
 
+@ExperimentalCoroutinesApi
+@KtorExperimentalAPI
 val gatewayDependencyInjectionModule = module {
     val sha256Sample = "2f66755d1d48dab1d49441087077cdb4ef4161dca5fb536446c2c20d1ee596fb"
     val sha1Sample = "27cdb0eb9e1fe3fb6a91cec02e2b21c8251e091c"

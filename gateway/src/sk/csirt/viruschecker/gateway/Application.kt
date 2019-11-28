@@ -15,6 +15,7 @@ import io.ktor.util.KtorExperimentalAPI
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mu.KotlinLogging
+import org.koin.core.module.Module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
 import org.slf4j.event.Level
@@ -39,7 +40,7 @@ fun main(args: Array<String>) = mainBody {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
-fun Application.module() {
+fun Application.module(dependencyInjection: Module = gatewayDependencyInjectionModule) {
 
     install(CallLogging) {
         level = Level.DEBUG
@@ -65,7 +66,7 @@ fun Application.module() {
     install(Locations)
 
     install(Koin) {
-        modules(gatewayDependencyInjectionModule)
+        modules(dependencyInjection)
         fileProperties()
     }
 
