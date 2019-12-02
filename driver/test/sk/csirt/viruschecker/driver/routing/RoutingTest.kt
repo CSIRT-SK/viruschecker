@@ -16,13 +16,13 @@ import sk.csirt.viruschecker.driver.parsedArgs
 @KtorExperimentalLocationsAPI
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi
-fun <R> createTestApplication(test: TestApplicationEngine.() -> R): R =
+internal fun <R> createTestApplication(test: TestApplicationEngine.() -> R): R =
     withTestApplication({ module(testDriverDependencyInjectionModule) }) { this.test() }
 
 @KtorExperimentalLocationsAPI
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi
-abstract class RoutingTest {
+internal abstract class RoutingTest {
     init {
         parsedArgs = ArgParser(
             filterArgsForArgParser(

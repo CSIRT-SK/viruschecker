@@ -27,7 +27,7 @@ import kotlin.test.assertTrue
 @KtorExperimentalLocationsAPI
 @KtorExperimentalAPI
 @ExperimentalCoroutinesApi
-class ScanTest : RoutingTest() {
+internal class ScanTest : RoutingTest() {
 
     private val testFilename = "Cizicek-cizicek-vtacik-malicky.txt"
 

@@ -5,8 +5,8 @@ dependencies {
     compile "io.ktor:ktor-client-core:$ktor_version"
     compile "io.ktor:ktor-client-core-jvm:$ktor_version"
 
-        
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
+
 
     testCompile "io.ktor:ktor-client-mock-jvm:$ktor_version"
 }

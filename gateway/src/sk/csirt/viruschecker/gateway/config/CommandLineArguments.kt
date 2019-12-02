@@ -12,7 +12,8 @@ class CommandLineArguments(parser: ArgParser) {
     val driverUrls by parser.positional(
         help = "List of urls containing virus checker drivers."
     ) {
-        FileUtils.readLines(File(this), Charset.defaultCharset())
+        File(this)
+            .readLines()
             .map { it.trim() }
             .filterNot { it.startsWith("#") }
     }

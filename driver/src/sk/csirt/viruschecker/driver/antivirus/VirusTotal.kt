@@ -23,7 +23,7 @@ class VirusTotal(
 
     override suspend fun externalScanFile(params: FileScanParameters): FileScanResult {
         val fileToScan = params.fileToScan
-        val sha256 = fileToScan.sha256().value
+        val sha256 = fileToScan.sha256()
         val scanInformation =
             runCatching { withContext(IO) { virusTotalApiImplementation.getScanReport(sha256) } }
                 .onFailure {

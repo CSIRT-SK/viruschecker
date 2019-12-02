@@ -42,17 +42,23 @@ class PersistentScanReportService(
             .findAll()
             .asSequence()
             .filter { scanReport ->
-                lowerSearchWords.any { it == scanReport.md5 }
+                run {
+                    val filenameLower = scanReport.filename.toLowerCase()
 
-                        || lowerSearchWords.any { it == scanReport.sha1 }
+                    lowerSearchWords.any { it == scanReport.md5 }
 
-                        || lowerSearchWords.any { it == scanReport.sha256 }
+                            || lowerSearchWords.any { it == scanReport.sha1 }
 
-                        || lowerSearchWords.any { it in scanReport.date.toString() }
+                            || lowerSearchWords.any { it == scanReport.sha256 }
 
-                        || scanReport.filename.toLowerCase().let { filename -> lowerSearchWords.any { it in filename } }
+                            || lowerSearchWords.any { it in scanReport.date.toString() }
 
-                        || scanReport.reports.joinToString(", ").toLowerCase().let { reports -> lowerSearchWords.any { it in reports } }
+                            || filenameLower.let { filename -> lowerSearchWords.any { it in filename } }
+
+                            || filenameLower.let { filename -> lowerSearchWords.any { filename in it } }
+
+                            || scanReport.reports.joinToString(", ").toLowerCase().let { reports -> lowerSearchWords.any { it in reports } }
+                }
             }.map {
                 it.toFileHashScanResponse()
             }.toList()

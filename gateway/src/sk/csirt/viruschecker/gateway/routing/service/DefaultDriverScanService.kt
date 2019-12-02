@@ -93,9 +93,9 @@ class DefaultDriverScanService(
                         filename = originalFileName,
                         results = antivirusResponses.sortedBy { it.antivirus }
                     ),
-                    md5 = md5Deferred.await().value,
-                    sha1 = sha1Deferred.await().value,
-                    sha256 = sha256Deferred.await().value
+                    md5 = md5Deferred.await(),
+                    sha1 = sha1Deferred.await(),
+                    sha256 = sha256Deferred.await()
                 )
             }
         }
@@ -169,9 +169,9 @@ class DefaultDriverScanService(
         }
 
         return FileHashScanChannel(
-            md5 = md5Deferred.await().value,
-            sha1 = sha1Deferred.await().value,
-            sha256 = sha256Deferred.await().value,
+            md5 = md5Deferred.await(),
+            sha1 = sha1Deferred.await(),
+            sha256 = sha256Deferred.await(),
             reportChannel = FileScanChannel(
                 date = Instant.now(),
                 filename = originalFilename,
