@@ -4,7 +4,7 @@ import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import java.util.concurrent.ConcurrentMap
 
 class KeyValueScanReportRepository(
-    private val storage: ConcurrentMap<CharSequence, ScanReportEntity>
+    private val storage: ConcurrentMap<String, ScanReportEntity>
 ) : ScanReportRepository {
 
     override suspend fun findAll(): Iterable<ScanReportEntity> {

@@ -6,8 +6,6 @@ import kotlinx.coroutines.yield
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.file.Paths
-import java.util.*
 
 val tempDirectory: String = System.getProperty("java.io.tmpdir")
 
@@ -42,10 +40,8 @@ fun Iterable<String>.filterPropertiesLines(): List<String> =
                 ?.let { line.substring(0, it) } ?: line
         }.toList()
 
-fun ByteArray.toTempFile(optionalFilename: String? = null): File {
-    val filename = optionalFilename?.replace(" ", "-") ?: "file${UUID.randomUUID()}"
-    val tempFileName = "${UUID.randomUUID()}_$filename"
-    val tempFile = Paths.get(System.getProperty("java.io.tmpdir"), tempFileName).toFile()
+fun ByteArray.toTempFile(): File {
+    val tempFile = createTempFile()
     tempFile.writeBytes(this)
     return tempFile
 }
