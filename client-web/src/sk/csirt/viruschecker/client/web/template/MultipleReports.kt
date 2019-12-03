@@ -6,7 +6,7 @@ import io.ktor.http.content.Version
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import kotlinx.html.*
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -47,7 +47,7 @@ suspend fun ApplicationCall.respondMultipleReportsHtml(
                 +"Antivirus reports:"
                 br()
                 scanReport.results.forEach { report ->
-                    val status = if (report.status >= ScanStatusResponse.NOT_AVAILABLE)
+                    val status = if (report.status >= ScanStatus.NOT_AVAILABLE)
                         report.malwareDescription
                     else
                         report.status.toString()

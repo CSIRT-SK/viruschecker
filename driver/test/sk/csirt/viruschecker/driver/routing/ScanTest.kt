@@ -15,7 +15,7 @@ import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import sk.csirt.viruschecker.routing.payload.ScanFileWebSocketParameters
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import sk.csirt.viruschecker.utils.fromJson
 import sk.csirt.viruschecker.utils.json
 import java.io.FileInputStream
@@ -64,7 +64,7 @@ internal class ScanTest : RoutingTest() {
                 assertEquals(HttpStatusCode.OK, response.status())
 
                 val responseParsed = response.content?.fromJson<FileScanResponse>()
-                assertEquals(ScanStatusResponse.OK, responseParsed?.status)
+                assertEquals(ScanStatus.OK, responseParsed?.status)
             }
         }
     }
@@ -127,7 +127,7 @@ internal class ScanTest : RoutingTest() {
                         assertTrue(message is Frame.Text)
 
                         val antivirusReport = message.readText().fromJson<AntivirusReportResponse>()
-                        assertEquals(ScanStatusResponse.OK, antivirusReport.status)
+                        assertEquals(ScanStatus.OK, antivirusReport.status)
 
                         messageCounter++
                     }

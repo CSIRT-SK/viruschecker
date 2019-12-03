@@ -3,6 +3,7 @@ package sk.csirt.viruschecker.gateway.persistence.service
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.gateway.persistence.repository.ScanReportRepository
 import sk.csirt.viruschecker.gateway.persistence.service.converter.toFileHashScanResponse
 import sk.csirt.viruschecker.gateway.persistence.testScanReportEntities
@@ -65,39 +66,18 @@ class PersistentScanReportServiceTest {
     }
 
 
-    private fun executeTestFindBy(searchWords: Iterable<String>) {
+    private fun executeTestFindBy(
+        searchWords: Iterable<String>,
+        shouldReturn: List<ScanReportEntity>) {
         val mockRepository = mockk<ScanReportRepository> {
-            coEvery { findAll() } returns testScanReportEntities
+            coEvery { findBy(any()) } returns shouldReturn
         }
         val service = PersistentScanReportService(mockRepository)
-
         val result = runBlocking {
             service.findBy(searchWords)
         }
-        val lowerSearchWords = searchWords.map { it.toLowerCase() }
-        val correct = testScanReportEntities
-            .asSequence()
-            .filter { scanReport ->
-                run {
-                    val filenameLower = scanReport.filename.toLowerCase()
-
-                    lowerSearchWords.any { it == scanReport.md5 }
-
-                            || lowerSearchWords.any { it == scanReport.sha1 }
-
-                            || lowerSearchWords.any { it == scanReport.sha256 }
-
-                            || lowerSearchWords.any { it in scanReport.date.toString() }
-
-                            || filenameLower.let { filename -> lowerSearchWords.any { it in filename } }
-
-                            || filenameLower.let { filename -> lowerSearchWords.any { filename in it } }
-
-                            || scanReport.reports.joinToString(", ").toLowerCase().let { reports -> lowerSearchWords.any { it in reports } }
-                }
-            }.map { it.toFileHashScanResponse() }
-
-        assertEquals(correct.toSet(), result.toSet())
+        assertEquals(shouldReturn.count(), result.count())
+        assertEquals(shouldReturn.map { it.toFileHashScanResponse() }.toSet(), result.toSet())
     }
 
     @Test
@@ -105,7 +85,7 @@ class PersistentScanReportServiceTest {
         val searchWords = listOf(
             testScanReportEntities.first().filename.substring(5)
         )
-        executeTestFindBy(searchWords)
+        executeTestFindBy(searchWords, listOf(testScanReportEntities.first()))
     }
 
     @Test
@@ -114,12 +94,12 @@ class PersistentScanReportServiceTest {
             testScanReportEntities.first().filename.substring(5),
             testScanReportEntities.last().reports.first().antivirus.substring(1)
         )
-        executeTestFindBy(searchWords)
+        executeTestFindBy(searchWords, testScanReportEntities)
     }
 
     @Test
     fun `Find none by search word test`() {
         val searchWords = listOf(UUID.randomUUID().toString())
-        executeTestFindBy(searchWords)
+        executeTestFindBy(searchWords, emptyList())
     }
 }

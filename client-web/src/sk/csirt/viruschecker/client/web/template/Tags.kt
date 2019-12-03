@@ -1,7 +1,7 @@
 package sk.csirt.viruschecker.client.web.template
 
 import kotlinx.html.*
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 
 /**
  * Paragraph
@@ -20,12 +20,12 @@ fun FlowContent.pOk(classes : String? = null,
     P(attributesMapOf("class", classes, "style", "color:green"), consumer).visit(block)
 
 @HtmlTagMarker
-fun FlowContent.pStatus(status: ScanStatusResponse) {
+fun FlowContent.pStatus(status: ScanStatus) {
     when (status) {
-        ScanStatusResponse.OK -> pOk {
+        ScanStatus.OK -> pOk {
             +"OK"
         }
-        ScanStatusResponse.INFECTED -> pAlert {
+        ScanStatus.INFECTED -> pAlert {
             +"INFECTED"
         }
         else -> p {

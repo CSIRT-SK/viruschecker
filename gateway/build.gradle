@@ -19,7 +19,9 @@ dependencies {
     compile "io.ktor:ktor-client-json-jvm:$ktor_version"
     compile "io.ktor:ktor-client-gson:$ktor_version"
     compile "io.ktor:ktor-client-logging-jvm:$ktor_version"
-    compile "net.openhft:chronicle-map:$chronicle_map_version"
+    compile "com.h2database:h2:$h2_version"
+    compile "org.jetbrains.exposed:exposed:$exposed_orm_version"
+    compile "com.zaxxer:HikariCP:$hikari_version"
     compile "com.github.vatbub:VirustotalPublicV2.0:$virus_total_api_v2_version"
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: apache_commons_version

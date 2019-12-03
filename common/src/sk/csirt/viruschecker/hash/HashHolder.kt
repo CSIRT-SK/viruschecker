@@ -12,7 +12,7 @@ import java.security.MessageDigest
 
 sealed class HashAlgorithm(
     private val algorithm: String,
-    private val hashLength: Int
+    val hashLength: Int
 ) {
 
     suspend fun hash(file: File) =

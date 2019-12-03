@@ -40,7 +40,12 @@ fun main(args: Array<String>) = mainBody {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
-fun Application.module(dependencyInjection: Module = gatewayDependencyInjectionModule) {
+fun Application.module(dependencyInjection: Module = gatewayDependencyInjectionModule(
+    driverUrls =  parsedArgs.driverUrls,
+    defaultSocketTimeout = parsedArgs.socketTimeout,
+    isPersistedDatabase = parsedArgs.useInMemoryDatabase.not(),
+    config = environment.config
+)) {
 
     install(CallLogging) {
         level = Level.DEBUG

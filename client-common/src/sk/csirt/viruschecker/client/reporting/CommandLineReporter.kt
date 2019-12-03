@@ -1,7 +1,7 @@
 package sk.csirt.viruschecker.client.reporting
 
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 
 class CommandLineReporter : Reporter {
 
@@ -22,7 +22,7 @@ SHA-256: ${scanResponse.sha256}
     
 Antivirus reports:
 ${scanResponse.report.results.joinToString("\n") {
-            if(it.status==ScanStatusResponse.INFECTED)
+            if(it.status==ScanStatus.INFECTED)
                 "${it.antivirus}: ${it.status} (${it.malwareDescription}), " +
                         "db_version: ${it.virusDatabaseVersion}"
             else

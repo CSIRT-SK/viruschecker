@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import sk.csirt.viruschecker.gateway.persistence.entity.AntivirusReportEntity
 import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.hash.HashAlgorithm
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import java.time.Instant
 
 internal val fileContent1 = "HalaBalaTancovala"
@@ -21,13 +22,13 @@ internal val testScanReportEntity1 = runBlocking {
                 antivirus = "MeskaVlakUz50Minut",
                 malwareDescription = "SkodaZeTrasou-BA-KE-UzNejazdiaAlternativnyDopravcovia",
                 virusDatabaseVersion = "LeboMeskanieJeSposobenePoruchouVozna",
-                status = "INFECTED"
+                status = ScanStatus.INFECTED
             ),
             AntivirusReportEntity(
-                antivirus = "GejtsoviJeFajne",
-                malwareDescription = "LeboKedNiekdeChceIstTakPoNehoPriletiHelikopteraKtoraHoOdvezieKSukromnemuTryskacu",
-                virusDatabaseVersion = "AleboSaStanemPrezidentomABudemLietatDomovVladnymSpecialomAkoIstyNemenovanyByvalyPrezidentIstejNemenovanejRepubliky",
-                status = "INFECTED"
+                antivirus = "Te-kila",
+                malwareDescription = "NalejBoVypito",
+                virusDatabaseVersion = "VypiBoNalato",
+                status = ScanStatus.INFECTED
             )
         )
     )
@@ -45,13 +46,13 @@ internal val testScanReportEntity2 = runBlocking {
                 antivirus = "UzZaseStojimeZPrevadzkovychDovodov",
                 malwareDescription = "TenVlakViacStojiAkoIde...Prisamvacku",
                 virusDatabaseVersion = "PriemerneKazdych8MinutStojimeZPrevadzkovychDovodov",
-                status = "INFECTED"
+                status = ScanStatus.INFECTED
             ),
             AntivirusReportEntity(
                 antivirus = "MalBySomZacatLogovatZastavenia",
                 malwareDescription = "AleToByMaPriPohladeNaToNeskorDefinitvneTrafilSlak",
                 virusDatabaseVersion = "RadsejBudemKoditNechAsponNejakVyuzijemTenUzasnyCasNaviac",
-                status = "INFECTED"
+                status = ScanStatus.INFECTED
             )
         )
     )

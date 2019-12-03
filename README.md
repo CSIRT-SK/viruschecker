@@ -195,7 +195,7 @@ We provide documentation for two ways to deploy the gateway - on host OS or on L
 
 * Deploy gateway [directly on the host](docs/gateway/gateway-on-host.md)
 
-* Deploy gateway [on the Linux virtual machine](docs/gateway/gateway-on-linux.md)
+* Deploy gateway [on the Linux virtual machine](docs/gateway/gateway-on-linux-vm.md)
 
 ### 3.1 Gateway REST API
 

@@ -8,7 +8,7 @@ import kotlinx.html.*
 import sk.csirt.viruschecker.client.service.GatewayReportService
 import sk.csirt.viruschecker.client.web.template.pStatus
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -50,7 +50,7 @@ fun Route.showReport(reportService: GatewayReportService) {
                             pStatus(report.status)
                         }
                         td {
-                            if(report.status == ScanStatusResponse.INFECTED){
+                            if(report.status == ScanStatus.INFECTED){
                                 +"${report.antivirus}: ${report.malwareDescription}"
                             }else{
                                 +report.antivirus

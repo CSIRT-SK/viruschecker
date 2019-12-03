@@ -7,8 +7,6 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
-val tempDirectory: String = System.getProperty("java.io.tmpdir")
-
 suspend fun InputStream.copyToSuspend(
     out: OutputStream,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,

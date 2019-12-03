@@ -18,11 +18,9 @@ import sk.csirt.viruschecker.client.service.GatewayScanService
 import sk.csirt.viruschecker.client.service.ScanParameters
 import sk.csirt.viruschecker.client.web.parsedArgs
 import sk.csirt.viruschecker.client.web.template.respondDefaultHtml
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import sk.csirt.viruschecker.utils.copyToSuspend
-import sk.csirt.viruschecker.utils.tempDirectory
 import java.io.File
-import java.util.*
 
 
 @KtorExperimentalLocationsAPI
@@ -77,13 +75,15 @@ fun Route.scanFile(scanService: GatewayScanService) {
                     )
                 }
                 is PartData.FileItem -> {
-                    val file = File(
-                        tempDirectory,
-                        "${UUID.randomUUID()}-${part.originalFileName}"
-                    )
-
+                    val file = createTempFile()
                     part.streamProvider()
-                        .use { its -> file.outputStream().buffered().use { its.copyToSuspend(it) } }
+                        .use { inputStream ->
+                            file.outputStream()
+                                .buffered()
+                                .use {
+                                    inputStream.copyToSuspend(it)
+                                }
+                        }
                     scanParameters = scanParameters.copy(
                         fileToScan = file,
                         originalFilename = part.originalFileName ?: file.name
@@ -101,7 +101,7 @@ fun Route.scanFile(scanService: GatewayScanService) {
                     scanResult.copy(
                         report = scanResult.report.copy(
                             results = scanResult.report.results.filterNot {
-                                it.status == ScanStatusResponse.SCAN_REFUSED
+                                it.status == ScanStatus.SCAN_REFUSED
                             }
                         )
                     )

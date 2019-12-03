@@ -3,6 +3,8 @@ Deploy gateway program on host OS
 
 We will assume that the gateway will be deployed on the host OS.
 
+###### Note: Windows or MacOS machines with low free ram 
+
 Let's assume you have two running drivers on VMs with their listening port **8080** forwarded to 
 host's ports **8081** and **8082**.
 

@@ -21,7 +21,13 @@ internal fun <R> createTestApplication(
     httpClientRequestHandler: MockRequestHandler = { respondOk() },
     test: TestApplicationEngine.() -> R
 ): R =
-    withTestApplication({ module(testGatewayDependencyInjectionModule(httpClientRequestHandler)) }) { this.test() }
+    withTestApplication({
+        module(
+            testGatewayDependencyInjectionModule(
+                httpClientRequestHandler = httpClientRequestHandler
+            )
+        )
+    }) { this.test() }
 
 internal val testDriverUrl = "http://localhost:8081"
 

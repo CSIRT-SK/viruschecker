@@ -4,14 +4,13 @@ import sk.csirt.viruschecker.gateway.persistence.entity.ScanReportEntity
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileHashScanResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
 
 internal fun ScanReportEntity.toFileHashScanResponse(): FileHashScanResponse {
     val reports = reports.map {
         AntivirusReportResponse(
             antivirus = it.antivirus,
             malwareDescription = it.malwareDescription,
-            status = ScanStatusResponse.valueOf(it.status),
+            status = it.status,
             virusDatabaseVersion = it.virusDatabaseVersion
         )
     }

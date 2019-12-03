@@ -19,7 +19,7 @@ class PersistentScanReportService(
             reports = response.report.results.map {
                 AntivirusReportEntity(
                     antivirus = it.antivirus,
-                    status = it.status.name,
+                    status = it.status,
                     malwareDescription = it.malwareDescription,
                     virusDatabaseVersion = it.virusDatabaseVersion
                 )
@@ -30,39 +30,14 @@ class PersistentScanReportService(
     override suspend fun findBySha256(hash: String): FileHashScanResponse? =
         reportRepository.findBySha256(hash)?.toFileHashScanResponse()
 
-    override suspend fun findAll(): List<FileHashScanResponse> {
-        return reportRepository.findAll().map {
+    override suspend fun findAll(): List<FileHashScanResponse> =
+        reportRepository.findAll().map {
             it.toFileHashScanResponse()
         }
-    }
 
-    override suspend fun findBy(searchWords: Iterable<String>): List<FileHashScanResponse> {
-        val lowerSearchWords = searchWords.map { it.toLowerCase() }
-        return reportRepository
-            .findAll()
-            .asSequence()
-            .filter { scanReport ->
-                run {
-                    val filenameLower = scanReport.filename.toLowerCase()
-
-                    lowerSearchWords.any { it == scanReport.md5 }
-
-                            || lowerSearchWords.any { it == scanReport.sha1 }
-
-                            || lowerSearchWords.any { it == scanReport.sha256 }
-
-                            || lowerSearchWords.any { it in scanReport.date.toString() }
-
-                            || filenameLower.let { filename -> lowerSearchWords.any { it in filename } }
-
-                            || filenameLower.let { filename -> lowerSearchWords.any { filename in it } }
-
-                            || scanReport.reports.joinToString(", ").toLowerCase().let { reports -> lowerSearchWords.any { it in reports } }
-                }
-            }.map {
-                it.toFileHashScanResponse()
-            }.toList()
-    }
-
+    override suspend fun findBy(searchWords: Iterable<String>): List<FileHashScanResponse> =
+        reportRepository.findBy(searchWords).map {
+            it.toFileHashScanResponse()
+        }
 
 }

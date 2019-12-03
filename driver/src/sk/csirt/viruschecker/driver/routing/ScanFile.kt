@@ -27,7 +27,7 @@ import sk.csirt.viruschecker.routing.DriverRoutes
 import sk.csirt.viruschecker.routing.payload.AntivirusReportResponse
 import sk.csirt.viruschecker.routing.payload.FileScanResponse
 import sk.csirt.viruschecker.routing.payload.ScanFileWebSocketParameters
-import sk.csirt.viruschecker.routing.payload.ScanStatusResponse
+import sk.csirt.viruschecker.routing.payload.ScanStatus
 import sk.csirt.viruschecker.utils.fromJson
 import sk.csirt.viruschecker.utils.json
 import sk.csirt.viruschecker.utils.toTempFile
@@ -138,7 +138,7 @@ private fun Input.toCheckParameters(
 
 fun AntivirusReportResult.toAntivirusReportResponse() = AntivirusReportResponse(
     antivirus = antivirusName,
-    status = ScanStatusResponse.valueOf(status.name),
+    status = ScanStatus.valueOf(status.name),
     malwareDescription = malwareDescription,
     virusDatabaseVersion = virusDatabaseVersion
 )
